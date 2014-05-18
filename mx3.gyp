@@ -6,6 +6,7 @@
             'conditions': [],
             'dependencies': [
                 'deps/leveldb.gyp:leveldb',
+                'deps/json11.gyp:json11',
             ],
             'sources': [
                 # just automatically include all cpp and hpp files in src/ (for now)

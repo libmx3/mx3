@@ -14,15 +14,18 @@ gyp: ./deps/gyp
 ./deps/gyp:
 	git clone --depth 1 https://chromium.googlesource.com/external/gyp.git ./deps/gyp
 
+./deps/json11:
+	git submodule update --init
+
 # instruct gyp to build using the "xcode" build generator, also specify the OS
 # (so we can conditionally compile using that var later)
-mac_proj: deps/gyp
+mac_proj: deps/gyp deps/json11
 	deps/gyp/gyp mx3.gyp -DOS=mac --depth=. -f xcode --generator-output=./build_mac -Icommon.gypi
 
-ios_proj: deps/gyp
+ios_proj: deps/gyp deps/json11
 	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
-android_proj: deps/gyp mx3.gyp
+android_proj: deps/gyp deps/json11 mx3.gyp
 	ANDROID_BUILD_TOP=dirname $(which ndk-build) \
 	deps/gyp/gyp --depth=. -f android \
 	-DOS=android \
