@@ -4,7 +4,9 @@
             'target_name': 'libmx3',
             'type': 'static_library',
             'conditions': [],
-            'dependencies': [],
+            'dependencies': [
+                'deps/leveldb.gyp:leveldb',
+            ],
             'sources': [
                 # just automatically include all cpp and hpp files in src/ (for now)
                 # '<!' is shell expand
