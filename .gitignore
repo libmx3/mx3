@@ -1,0 +1,13 @@
+# build dirs
+build/
+build_ios/
+build_mac/
+
+# gyp + android
+deps/gyp
+GypAndroid.mk
+*.target.mk
+obj/
+
+# executables
+play
