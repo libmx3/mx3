@@ -76,6 +76,8 @@ Api::_open_database(const std::string& db_path) {
     if (!status.ok()) {
         throw std::runtime_error(status.ToString());
     }
-    // we wrap this pointer in a shared_ptr and it will automatically close the db when it is unused.
+    // we wrap this pointer in a unique_ptr and it will automatically close the db when it is unused.
+    // if you try to use a unique_ptr, you'll likely run into problems. Look up "move semantics" to figure out why
+    // if you just want a quick fix, change it to shared_ptr, and your code will start to work.
     return unique_ptr<leveldb::DB>{db};
 }

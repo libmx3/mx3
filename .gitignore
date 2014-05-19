@@ -9,8 +9,7 @@ GypAndroid.mk
 *.target.mk
 obj/
 
-# executables
-play
+# data files
 test_ldb
 test.sqlite
 

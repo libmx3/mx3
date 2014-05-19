@@ -38,17 +38,14 @@ GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
 	mx3.gyp
 
 # a simple place to test stuff out
-play: build_mac/mx3.xcodeproj play.cpp
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play && cp ./build/Debug/play ./play
-
-play_objc: build_mac/mx3.xcodeproj play.cpp
+play: build_mac/mx3.xcodeproj objc/play.m
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc && ./build/Debug/play_objc
 
 mac: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc
 
 ios: build_ios/mx3.xcodeproj
-	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3
+	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc
 
 android: GypAndroid.mk
 	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4

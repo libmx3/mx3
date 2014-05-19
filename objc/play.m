@@ -4,7 +4,7 @@
 int main() {
     MX3Api * api = [[MX3Api alloc] initWithPath:@"../test_ldb"];
     if (![api hasUser]) {
-        [api setUsername:@"steven"];
+        [api setUsername: NSUserName()];
     }
     NSString * username = [api getUsername];
     NSLog(@"Hello, %@", username);

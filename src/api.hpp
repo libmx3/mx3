@@ -6,6 +6,7 @@
 
 namespace mx3 {
 
+// the "api" of how the UI is allowed to talk to the c++ code
 class Api final {
   public:
     Api(const std::string& db_path);
