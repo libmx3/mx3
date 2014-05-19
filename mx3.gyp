@@ -26,6 +26,38 @@
             },
         },
         {
+            'target_name': 'libmx3_objc',
+            'type': 'static_library',
+            'conditions': [],
+            'dependencies': [ 'libmx3' ],
+            'sources': [
+                '<!@(find objc -name "*.mm" -o -name "*.h" -o -name "*.m")',
+            ],
+            'sources!': ['play.m'],
+            'include_dirs': [
+                'include',
+                'objc',
+            ],
+            'all_dependent_settings': {
+                'include_dirs': [
+                    'include',
+                    'objc',
+                ],
+            },
+        },
+        {
+            'target_name': 'play_objc',
+            'type': 'executable',
+            'dependencies': ['libmx3_objc'],
+            # I'm not sure why you have to specify libc++ when you build this :(
+            'libraries': [
+                'libc++.a',
+            ],
+            'sources': [
+                'objc/play.m',
+            ],
+        },
+        {
             'target_name': 'play',
             'type': 'executable',
             'dependencies': ['libmx3'],

@@ -7,6 +7,8 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+using std::cin;
+
 #include <string>
 using std::string;
 
@@ -38,52 +40,15 @@ open_sqlite(const string& path) {
     return db;
 }
 
-// open a database and create if it doesn't exist. Throw an exception in error situations
-// (corrupted database errors and IO errors)
-shared_ptr<leveldb::DB>
-open_leveldb(const string& path) {
-    leveldb::Options options;
-    options.create_if_missing = true;
-
-    leveldb::DB * db = nullptr;
-    auto status = leveldb::DB::Open(options, path.c_str(), &db);
-    if (!status.ok()) {
-        throw std::runtime_error(status.ToString());
-    }
-    // we wrap this pointer in a shared_ptr and it will automatically close the db when it is unused.
-    return shared_ptr<leveldb::DB>{db};
-}
-
 int main() {
-    cout << "Hello, world" << endl;
-
-    // since we are using a shared_ptr to the database, we don't need to close it!
-    // this pattern is called RAII
-    auto l_db = open_leveldb("./test_ldb");
-
-    // open and close a sqlite database
-    auto s_db = open_sqlite("./test.sqlite");
-    sqlite3_close(s_db);
-    s_db = nullptr;
-
-    Json data = Json::object {{
-        {"hello", "world"},
-        {"gyp_is_cool", true},
-        {"float", 1.5},
-        {"bool", false},
-        {"nested", Json::object {
-            {"nested_key", 11}
-        }}
-    }};
-
-    auto serialized = data.dump();
-    cout << serialized << endl;
-
-    string error;
-    auto reparsed = Json::parse(serialized, error);
-    if (!error.empty()) {
-        cout << "error reparsing json, " << error << endl;
+    mx3::Api api("./test_ldb");
+    if (!api.has_user()) {
+        string name;
+        cout << "Please enter your username: ";
+        cin >> name;
+        api.set_username(name);
     }
+    cout << "Hello, " << api.get_username() << endl;
 
     return 0;
 }

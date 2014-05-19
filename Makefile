@@ -2,11 +2,13 @@ all: mac ios android
 
 clean:
 	-rm -rf build/
+	-rm -rf deps/build/
 	-rm -rf build_mac/
 	-rm -rf build_ios/
 	-rm -rf obj/
 	-rm GypAndroid.mk
 	-rm *.target.mk
+	-rm deps/*.target.mk
 	-rm -rf test_ldb
 	-rm test.sqlite
 	-rm play
@@ -36,8 +38,11 @@ GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
 	mx3.gyp
 
 # a simple place to test stuff out
-play: build_ios/mx3.xcodeproj
+play: build_mac/mx3.xcodeproj play.cpp
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play && cp ./build/Debug/play ./play
+
+play_objc: build_mac/mx3.xcodeproj play.cpp
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc && ./build/Debug/play_objc
 
 mac: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3
