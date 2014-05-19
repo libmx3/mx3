@@ -25,10 +25,23 @@ using namespace mx3;
 #include <json11/json11.hpp>
 using json11::Json;
 
+#include <sqlite3/sqlite3.h>
+
+// caller is responsible for closing the db pointer
+sqlite3 *
+open_sqlite(const string& path) {
+    sqlite3 * db = nullptr;
+    auto error = sqlite3_open(path.c_str(), &db);
+    if (error != SQLITE_OK) {
+        throw std::runtime_error("Could not open database at path: " + path);
+    }
+    return db;
+}
+
 // open a database and create if it doesn't exist. Throw an exception in error situations
 // (corrupted database errors and IO errors)
 shared_ptr<leveldb::DB>
-open_db(const string& path) {
+open_leveldb(const string& path) {
     leveldb::Options options;
     options.create_if_missing = true;
 
@@ -46,7 +59,12 @@ int main() {
 
     // since we are using a shared_ptr to the database, we don't need to close it!
     // this pattern is called RAII
-    auto db = open_db("./test_db");
+    auto l_db = open_leveldb("./test_ldb");
+
+    // open and close a sqlite database
+    auto s_db = open_sqlite("./test.sqlite");
+    sqlite3_close(s_db);
+    s_db = nullptr;
 
     Json data = Json::object {{
         {"hello", "world"},

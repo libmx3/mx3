@@ -5,9 +5,11 @@ clean:
 	-rm -rf build_mac/
 	-rm -rf build_ios/
 	-rm -rf obj/
-	-rm play
 	-rm GypAndroid.mk
 	-rm *.target.mk
+	-rm -rf test_ldb
+	-rm test.sqlite
+	-rm play
 
 gyp: ./deps/gyp
 

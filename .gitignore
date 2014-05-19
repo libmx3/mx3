@@ -11,4 +11,8 @@ obj/
 
 # executables
 play
-test_db
+test_ldb
+test.sqlite
+
+# misc
+.DS_Store
