@@ -19,7 +19,7 @@ all the requirements met for building.
 
 ### Objective-C
 
-Run `make play ios` or `mac play mac`
+Run `make play ios` or `make play mac`
 
 ### Building
 
