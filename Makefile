@@ -21,13 +21,13 @@ gyp: ./deps/gyp
 
 # instruct gyp to build using the "xcode" build generator, also specify the OS
 # (so we can conditionally compile using that var later)
-mac_proj: deps/gyp deps/json11
+build_mac/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp
 	deps/gyp/gyp mx3.gyp -DOS=mac --depth=. -f xcode --generator-output=./build_mac -Icommon.gypi
 
-ios_proj: deps/gyp deps/json11
+build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp
 	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
-android_proj: deps/gyp deps/json11 mx3.gyp
+GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
 	ANDROID_BUILD_TOP=dirname $(which ndk-build) \
 	deps/gyp/gyp --depth=. -f android \
 	-DOS=android \
@@ -36,14 +36,17 @@ android_proj: deps/gyp deps/json11 mx3.gyp
 	mx3.gyp
 
 # a simple place to test stuff out
-play: mac_proj
+play: build_ios/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play && cp ./build/Debug/play ./play
 
-mac: mac_proj
+mac: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3
 
-ios: ios_proj
+ios: build_ios/mx3.xcodeproj
 	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3
 
-android: android_proj
+android: GypAndroid.mk
 	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4
+
+test: build_mac/mx3.xcodeproj
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test && ./build/Debug/test

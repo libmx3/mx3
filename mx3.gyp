@@ -33,5 +33,20 @@
                 'play.cpp',
             ],
         },
+        {
+            'target_name': 'test',
+            'type': 'executable',
+            'dependencies': [
+                'libmx3',
+                'deps/gtest.gyp:gtest',
+            ],
+            'include_dirs': [
+                '.',
+                'test',
+            ],
+            'sources': [
+                '<!@(find test -name "*.cpp" -o -name "*.hpp")',
+            ]
+        },
     ],
 }
