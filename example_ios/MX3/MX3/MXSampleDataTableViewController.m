@@ -1,4 +1,5 @@
 #import "MXSampleDataTableViewController.h"
+#import "MX3Api+iOS.h"
 
 NSString *const CellIdentifier = @"MX3Cell";
 
@@ -15,7 +16,7 @@ NSString *const CellIdentifier = @"MX3Cell";
 }
 
 - (void)setupNavigationBar {
-    self.title = [api username];
+    self.title = [[MX3Api sharedAPI] username];
 }
 
 - (void)registerCells {
