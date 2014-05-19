@@ -26,7 +26,7 @@ using std::string;
   return __api->has_user();
 }
 
-- (NSString *) getUsername {
+- (NSString *) username {
   auto username = __api->get_username();
   return ObjcAdapter::convert(username);
 }

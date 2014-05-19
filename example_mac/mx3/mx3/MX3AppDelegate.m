@@ -18,7 +18,7 @@
     NSLog(@"No user found, creating one");
     [api setUsername:NSUserName()];
   }
-  NSString * username = [api getUsername];
+  NSString * username = [api username];
   NSLog(@"Hello, %@", username);
 }
 

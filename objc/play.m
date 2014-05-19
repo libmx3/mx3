@@ -6,7 +6,7 @@ int main() {
     if (![api hasUser]) {
         [api setUsername: NSUserName()];
     }
-    NSString * username = [api getUsername];
+    NSString * username = [api username];
     NSLog(@"Hello, %@", username);
     return 0;
 }
