@@ -2,10 +2,10 @@
 Cross platform has been well studied on desktop, but this is an exploration in doing that on mobile and an open request
 for comments and improvements.
 
-### the name
+### The name
 "mobile times 3", Android, iOS, and Windows Phone. (todo, windows phone support)
 
-### requirements
+### Requirements
 * `python` (required for gyp)
 * xcode & `xcodebuild`
 * android ndk and `ndk-build` on your PATH to build for android
