@@ -1,12 +1,17 @@
 ## libmx3
-A sample project showing how to use some cross platform libs.
+Cross platform has been well studied on desktop, but this is an exploration in doing that on mobile and an open request
+for comments and improvements.
+
+### the name
+"mobile times 3", Android, iOS, and Windows Phone. (todo, windows phone support)
 
 ### requirements
 * `python` (required for gyp)
 * xcode & `xcodebuild`
 * android ndk and `ndk-build` on your PATH to build for android
+* windows phone developer tools (eventually...)
 
-### Quick Start
+### Objc Quick Start
 Run `make play`.  You should see "Hello, #{your login name}" printed to the console, if so, you seem to already have
 all the requirements met for building. This program is compiled from `objc/play.m`
 
