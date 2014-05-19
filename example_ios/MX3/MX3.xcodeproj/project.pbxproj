@@ -17,6 +17,12 @@
 		F0C7718D192A7821006469AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77172192A7821006469AB /* Foundation.framework */; };
 		F0C7718E192A7821006469AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77176192A7821006469AB /* UIKit.framework */; };
 		F0C77198192A7822006469AB /* MX3Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C77197192A7822006469AB /* MX3Tests.m */; };
+		F0C771A7192A78F3006469AB /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771A6192A78F3006469AB /* libc++.dylib */; };
+		F0C771D4192A7E06006469AB /* libmx3_objc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771BE192A79CC006469AB /* libmx3_objc.a */; };
+		F0C771D5192A7E06006469AB /* libmx3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771BC192A79CC006469AB /* libmx3.a */; };
+		F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D6192A7E06006469AB /* libjson11.a */; };
+		F0C771DA192A7E06006469AB /* libleveldb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D7192A7E06006469AB /* libleveldb.a */; };
+		F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D8192A7E06006469AB /* libsqlite3.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,6 +32,48 @@
 			proxyType = 1;
 			remoteGlobalIDString = F0C7716E192A7821006469AB;
 			remoteInfo = MX3;
+		};
+		F0C771BB192A79CC006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 92E822B5EA37A89C8AAD9BB4;
+			remoteInfo = libmx3;
+		};
+		F0C771BD192A79CC006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 39EA06E18557EEFB64C5347F;
+			remoteInfo = libmx3_objc;
+		};
+		F0C771BF192A79CC006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6FCBE719222158C1FBFFBADD;
+			remoteInfo = play_objc;
+		};
+		F0C771C1192A79CC006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB71675945FA32E9B9795C4C;
+			remoteInfo = play;
+		};
+		F0C771C3192A79CC006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8E5AC5F54A231F301800298F;
+			remoteInfo = test;
+		};
+		F0C771D2192A7CBF006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 930F5C277E0446A0EF7CE320;
+			remoteInfo = libmx3_objc;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -44,6 +92,14 @@
 		F0C7718B192A7821006469AB /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		F0C77193192A7821006469AB /* MX3Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MX3Tests-Info.plist"; sourceTree = "<group>"; };
 		F0C77197192A7822006469AB /* MX3Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MX3Tests.m; sourceTree = "<group>"; };
+		F0C771A6192A78F3006469AB /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		F0C771AE192A79CC006469AB /* mx3.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = mx3.xcodeproj; path = ../../../build_ios/mx3.xcodeproj; sourceTree = "<group>"; };
+		F0C771C6192A79F7006469AB /* libjson11.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjson11.a; path = "../../deps/build/Debug-iphoneos/libjson11.a"; sourceTree = "<group>"; };
+		F0C771C7192A79F7006469AB /* libleveldb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libleveldb.a; path = "../../deps/build/Debug-iphoneos/libleveldb.a"; sourceTree = "<group>"; };
+		F0C771CA192A7A02006469AB /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = "../../deps/build/Debug-iphoneos/libsqlite3.a"; sourceTree = "<group>"; };
+		F0C771D6192A7E06006469AB /* libjson11.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjson11.a; path = "../../deps/build/Debug-iphoneos/libjson11.a"; sourceTree = "<group>"; };
+		F0C771D7192A7E06006469AB /* libleveldb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libleveldb.a; path = "../../deps/build/Debug-iphoneos/libleveldb.a"; sourceTree = "<group>"; };
+		F0C771D8192A7E06006469AB /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = "../../deps/build/Debug-iphoneos/libsqlite3.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +107,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */,
+				F0C771DA192A7E06006469AB /* libleveldb.a in Frameworks */,
+				F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */,
+				F0C771D4192A7E06006469AB /* libmx3_objc.a in Frameworks */,
+				F0C771D5192A7E06006469AB /* libmx3.a in Frameworks */,
+				F0C771A7192A78F3006469AB /* libc++.dylib in Frameworks */,
 				F0C77175192A7821006469AB /* CoreGraphics.framework in Frameworks */,
 				F0C77177192A7821006469AB /* UIKit.framework in Frameworks */,
 				F0C77173192A7821006469AB /* Foundation.framework in Frameworks */,
@@ -92,6 +154,13 @@
 		F0C77171192A7821006469AB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F0C771D6192A7E06006469AB /* libjson11.a */,
+				F0C771D7192A7E06006469AB /* libleveldb.a */,
+				F0C771D8192A7E06006469AB /* libsqlite3.a */,
+				F0C771CA192A7A02006469AB /* libsqlite3.a */,
+				F0C771C6192A79F7006469AB /* libjson11.a */,
+				F0C771C7192A79F7006469AB /* libleveldb.a */,
+				F0C771A6192A78F3006469AB /* libc++.dylib */,
 				F0C77172192A7821006469AB /* Foundation.framework */,
 				F0C77174192A7821006469AB /* CoreGraphics.framework */,
 				F0C77176192A7821006469AB /* UIKit.framework */,
@@ -114,6 +183,7 @@
 		F0C77179192A7821006469AB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				F0C771AE192A79CC006469AB /* mx3.xcodeproj */,
 				F0C7717A192A7821006469AB /* MX3-Info.plist */,
 				F0C7717E192A7821006469AB /* main.m */,
 				F0C77180192A7821006469AB /* MX3-Prefix.pch */,
@@ -138,6 +208,18 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		F0C771AF192A79CC006469AB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F0C771BC192A79CC006469AB /* libmx3.a */,
+				F0C771BE192A79CC006469AB /* libmx3_objc.a */,
+				F0C771C0192A79CC006469AB /* play_objc */,
+				F0C771C2192A79CC006469AB /* play */,
+				F0C771C4192A79CC006469AB /* test */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -152,6 +234,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F0C771D3192A7CBF006469AB /* PBXTargetDependency */,
 			);
 			name = MX3;
 			productName = MX3;
@@ -200,6 +283,12 @@
 			mainGroup = F0C77166192A7821006469AB;
 			productRefGroup = F0C77170192A7821006469AB /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = F0C771AF192A79CC006469AB /* Products */;
+					ProjectRef = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				F0C7716E192A7821006469AB /* MX3 */,
@@ -207,6 +296,44 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		F0C771BC192A79CC006469AB /* libmx3.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libmx3.a;
+			remoteRef = F0C771BB192A79CC006469AB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F0C771BE192A79CC006469AB /* libmx3_objc.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libmx3_objc.a;
+			remoteRef = F0C771BD192A79CC006469AB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F0C771C0192A79CC006469AB /* play_objc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = play_objc;
+			remoteRef = F0C771BF192A79CC006469AB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F0C771C2192A79CC006469AB /* play */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = play;
+			remoteRef = F0C771C1192A79CC006469AB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F0C771C4192A79CC006469AB /* test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test;
+			remoteRef = F0C771C3192A79CC006469AB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		F0C7716D192A7821006469AB /* Resources */ = {
@@ -251,6 +378,11 @@
 			isa = PBXTargetDependency;
 			target = F0C7716E192A7821006469AB /* MX3 */;
 			targetProxy = F0C7718F192A7821006469AB /* PBXContainerItemProxy */;
+		};
+		F0C771D3192A7CBF006469AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libmx3_objc;
+			targetProxy = F0C771D2192A7CBF006469AB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -328,12 +460,24 @@
 		F0C7719C192A7822006469AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MX3/MX3-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../objc/,
+				);
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"${SRCROOT}/../../deps/build/Debug/",
+					"/Users/piet.brauer/Documents/Projekte/iOS/mx3/deps/build/Debug-iphoneos",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -341,12 +485,24 @@
 		F0C7719D192A7822006469AB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MX3/MX3-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					../../objc/,
+				);
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"${SRCROOT}/../../deps/build/Debug/",
+					"/Users/piet.brauer/Documents/Projekte/iOS/mx3/deps/build/Debug-iphoneos",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
