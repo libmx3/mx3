@@ -1,0 +1,425 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F0C77173192A7821006469AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77172192A7821006469AB /* Foundation.framework */; };
+		F0C77175192A7821006469AB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77174192A7821006469AB /* CoreGraphics.framework */; };
+		F0C77177192A7821006469AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77176192A7821006469AB /* UIKit.framework */; };
+		F0C7717F192A7821006469AB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C7717E192A7821006469AB /* main.m */; };
+		F0C77183192A7821006469AB /* MXAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C77182192A7821006469AB /* MXAppDelegate.m */; };
+		F0C77185192A7821006469AB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F0C77184192A7821006469AB /* Images.xcassets */; };
+		F0C7718C192A7821006469AB /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C7718B192A7821006469AB /* XCTest.framework */; };
+		F0C7718D192A7821006469AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77172192A7821006469AB /* Foundation.framework */; };
+		F0C7718E192A7821006469AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77176192A7821006469AB /* UIKit.framework */; };
+		F0C77198192A7822006469AB /* MX3Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C77197192A7822006469AB /* MX3Tests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F0C7718F192A7821006469AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C77167192A7821006469AB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F0C7716E192A7821006469AB;
+			remoteInfo = MX3;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F0C7716F192A7821006469AB /* MX3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MX3.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0C77172192A7821006469AB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F0C77174192A7821006469AB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F0C77176192A7821006469AB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		F0C7717A192A7821006469AB /* MX3-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MX3-Info.plist"; sourceTree = "<group>"; };
+		F0C7717E192A7821006469AB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F0C77180192A7821006469AB /* MX3-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MX3-Prefix.pch"; sourceTree = "<group>"; };
+		F0C77181192A7821006469AB /* MXAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MXAppDelegate.h; sourceTree = "<group>"; };
+		F0C77182192A7821006469AB /* MXAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MXAppDelegate.m; sourceTree = "<group>"; };
+		F0C77184192A7821006469AB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		F0C7718A192A7821006469AB /* MX3Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MX3Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0C7718B192A7821006469AB /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		F0C77193192A7821006469AB /* MX3Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MX3Tests-Info.plist"; sourceTree = "<group>"; };
+		F0C77197192A7822006469AB /* MX3Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MX3Tests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F0C7716C192A7821006469AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0C77175192A7821006469AB /* CoreGraphics.framework in Frameworks */,
+				F0C77177192A7821006469AB /* UIKit.framework in Frameworks */,
+				F0C77173192A7821006469AB /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F0C77187192A7821006469AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0C7718C192A7821006469AB /* XCTest.framework in Frameworks */,
+				F0C7718E192A7821006469AB /* UIKit.framework in Frameworks */,
+				F0C7718D192A7821006469AB /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F0C77166192A7821006469AB = {
+			isa = PBXGroup;
+			children = (
+				F0C77178192A7821006469AB /* MX3 */,
+				F0C77191192A7821006469AB /* MX3Tests */,
+				F0C77171192A7821006469AB /* Frameworks */,
+				F0C77170192A7821006469AB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F0C77170192A7821006469AB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F0C7716F192A7821006469AB /* MX3.app */,
+				F0C7718A192A7821006469AB /* MX3Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F0C77171192A7821006469AB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F0C77172192A7821006469AB /* Foundation.framework */,
+				F0C77174192A7821006469AB /* CoreGraphics.framework */,
+				F0C77176192A7821006469AB /* UIKit.framework */,
+				F0C7718B192A7821006469AB /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F0C77178192A7821006469AB /* MX3 */ = {
+			isa = PBXGroup;
+			children = (
+				F0C77181192A7821006469AB /* MXAppDelegate.h */,
+				F0C77182192A7821006469AB /* MXAppDelegate.m */,
+				F0C77184192A7821006469AB /* Images.xcassets */,
+				F0C77179192A7821006469AB /* Supporting Files */,
+			);
+			path = MX3;
+			sourceTree = "<group>";
+		};
+		F0C77179192A7821006469AB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F0C7717A192A7821006469AB /* MX3-Info.plist */,
+				F0C7717E192A7821006469AB /* main.m */,
+				F0C77180192A7821006469AB /* MX3-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F0C77191192A7821006469AB /* MX3Tests */ = {
+			isa = PBXGroup;
+			children = (
+				F0C77197192A7822006469AB /* MX3Tests.m */,
+				F0C77192192A7821006469AB /* Supporting Files */,
+			);
+			path = MX3Tests;
+			sourceTree = "<group>";
+		};
+		F0C77192192A7821006469AB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F0C77193192A7821006469AB /* MX3Tests-Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F0C7716E192A7821006469AB /* MX3 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F0C7719B192A7822006469AB /* Build configuration list for PBXNativeTarget "MX3" */;
+			buildPhases = (
+				F0C7716B192A7821006469AB /* Sources */,
+				F0C7716C192A7821006469AB /* Frameworks */,
+				F0C7716D192A7821006469AB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MX3;
+			productName = MX3;
+			productReference = F0C7716F192A7821006469AB /* MX3.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F0C77189192A7821006469AB /* MX3Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F0C7719E192A7822006469AB /* Build configuration list for PBXNativeTarget "MX3Tests" */;
+			buildPhases = (
+				F0C77186192A7821006469AB /* Sources */,
+				F0C77187192A7821006469AB /* Frameworks */,
+				F0C77188192A7821006469AB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F0C77190192A7821006469AB /* PBXTargetDependency */,
+			);
+			name = MX3Tests;
+			productName = MX3Tests;
+			productReference = F0C7718A192A7821006469AB /* MX3Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F0C77167192A7821006469AB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = MX;
+				LastUpgradeCheck = 0510;
+				TargetAttributes = {
+					F0C77189192A7821006469AB = {
+						TestTargetID = F0C7716E192A7821006469AB;
+					};
+				};
+			};
+			buildConfigurationList = F0C7716A192A7821006469AB /* Build configuration list for PBXProject "MX3" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F0C77166192A7821006469AB;
+			productRefGroup = F0C77170192A7821006469AB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F0C7716E192A7821006469AB /* MX3 */,
+				F0C77189192A7821006469AB /* MX3Tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F0C7716D192A7821006469AB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0C77185192A7821006469AB /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F0C77188192A7821006469AB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F0C7716B192A7821006469AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0C7717F192A7821006469AB /* main.m in Sources */,
+				F0C77183192A7821006469AB /* MXAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F0C77186192A7821006469AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0C77198192A7822006469AB /* MX3Tests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F0C77190192A7821006469AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F0C7716E192A7821006469AB /* MX3 */;
+			targetProxy = F0C7718F192A7821006469AB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F0C77199192A7822006469AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		F0C7719A192A7822006469AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F0C7719C192A7822006469AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MX3/MX3-Prefix.pch";
+				INFOPLIST_FILE = "MX3/MX3-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		F0C7719D192A7822006469AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MX3/MX3-Prefix.pch";
+				INFOPLIST_FILE = "MX3/MX3-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		F0C7719F192A7822006469AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MX3.app/MX3";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MX3/MX3-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "MX3Tests/MX3Tests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		F0C771A0192A7822006469AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/MX3.app/MX3";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MX3/MX3-Prefix.pch";
+				INFOPLIST_FILE = "MX3Tests/MX3Tests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F0C7716A192A7821006469AB /* Build configuration list for PBXProject "MX3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0C77199192A7822006469AB /* Debug */,
+				F0C7719A192A7822006469AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F0C7719B192A7822006469AB /* Build configuration list for PBXNativeTarget "MX3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0C7719C192A7822006469AB /* Debug */,
+				F0C7719D192A7822006469AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		F0C7719E192A7822006469AB /* Build configuration list for PBXNativeTarget "MX3Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0C7719F192A7822006469AB /* Debug */,
+				F0C771A0192A7822006469AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F0C77167192A7821006469AB /* Project object */;
+}
