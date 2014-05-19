@@ -23,6 +23,7 @@
 		F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D6192A7E06006469AB /* libjson11.a */; };
 		F0C771DA192A7E06006469AB /* libleveldb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D7192A7E06006469AB /* libleveldb.a */; };
 		F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D8192A7E06006469AB /* libsqlite3.a */; };
+		F0C771E3192A800F006469AB /* MXSampleDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C771E2192A800F006469AB /* MXSampleDataTableViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +101,8 @@
 		F0C771D6192A7E06006469AB /* libjson11.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjson11.a; path = "../../deps/build/Debug-iphoneos/libjson11.a"; sourceTree = "<group>"; };
 		F0C771D7192A7E06006469AB /* libleveldb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libleveldb.a; path = "../../deps/build/Debug-iphoneos/libleveldb.a"; sourceTree = "<group>"; };
 		F0C771D8192A7E06006469AB /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = "../../deps/build/Debug-iphoneos/libsqlite3.a"; sourceTree = "<group>"; };
+		F0C771E1192A800F006469AB /* MXSampleDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MXSampleDataTableViewController.h; sourceTree = "<group>"; };
+		F0C771E2192A800F006469AB /* MXSampleDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MXSampleDataTableViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +177,8 @@
 			children = (
 				F0C77181192A7821006469AB /* MXAppDelegate.h */,
 				F0C77182192A7821006469AB /* MXAppDelegate.m */,
+				F0C771E1192A800F006469AB /* MXSampleDataTableViewController.h */,
+				F0C771E2192A800F006469AB /* MXSampleDataTableViewController.m */,
 				F0C77184192A7821006469AB /* Images.xcassets */,
 				F0C77179192A7821006469AB /* Supporting Files */,
 			);
@@ -360,6 +365,7 @@
 			files = (
 				F0C7717F192A7821006469AB /* main.m in Sources */,
 				F0C77183192A7821006469AB /* MXAppDelegate.m in Sources */,
+				F0C771E3192A800F006469AB /* MXSampleDataTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
