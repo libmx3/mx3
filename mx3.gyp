@@ -8,6 +8,7 @@
                 'deps/leveldb.gyp:leveldb',
                 'deps/json11.gyp:json11',
                 'deps/sqlite3.gyp:sqlite3',
+                'deps/CppSQLite.gyp:CppSQLite',
             ],
             'sources': [
                 # just automatically include all cpp and hpp files in src/ (for now)
@@ -55,14 +56,6 @@
             ],
             'sources': [
                 'objc/play.m',
-            ],
-        },
-        {
-            'target_name': 'play',
-            'type': 'executable',
-            'dependencies': ['libmx3'],
-            'sources': [
-                'play.cpp',
             ],
         },
         {
