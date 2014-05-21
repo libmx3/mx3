@@ -3,13 +3,14 @@
 #include <memory>
 #include <leveldb/db.h>
 #include <json11/json11.hpp>
+#include <CppSQLite/CppSQLite3.h>
 
 namespace mx3 {
 
 // the "api" of how the UI is allowed to talk to the c++ code
 class Api final {
   public:
-    Api(const std::string& db_path);
+    Api(const std::string& root_dir);
     // whether a user already exists
     bool has_user() const;
     // get the current username, or "" if none exists
@@ -24,7 +25,8 @@ class Api final {
     json11::Json _get_value(const std::string& key) const;
     void _set_value(const std::string& key, const json11::Json& value);
 
-    std::unique_ptr<leveldb::DB> m_db;
+    CppSQLite3DB m_sqlite;
+    std::unique_ptr<leveldb::DB> m_ldb;
 };
 
 }

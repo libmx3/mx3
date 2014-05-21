@@ -10,7 +10,7 @@ using std::string;
   mx3::Api * __api;
 }
 
-- (instancetype) initWithPath:(NSString *)path {
+- (instancetype) initWithRootPath:(NSString *)path {
   if(!(self = [super init])) {
     return nil;
   }

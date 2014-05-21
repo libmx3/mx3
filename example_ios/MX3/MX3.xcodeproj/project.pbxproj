@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B02CAAE9192CFB0C007D3B2F /* libCppSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */; };
 		F0C77173192A7821006469AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77172192A7821006469AB /* Foundation.framework */; };
 		F0C77175192A7821006469AB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77174192A7821006469AB /* CoreGraphics.framework */; };
 		F0C77177192A7821006469AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77176192A7821006469AB /* UIKit.framework */; };
@@ -56,13 +57,6 @@
 			remoteGlobalIDString = 6FCBE719222158C1FBFFBADD;
 			remoteInfo = play_objc;
 		};
-		F0C771C1192A79CC006469AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DB71675945FA32E9B9795C4C;
-			remoteInfo = play;
-		};
 		F0C771C3192A79CC006469AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
@@ -80,6 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCppSQLite.a; path = "../../deps/build/Debug-iphoneos/libCppSQLite.a"; sourceTree = "<group>"; };
 		F0C7716F192A7821006469AB /* MX3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MX3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0C77172192A7821006469AB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F0C77174192A7821006469AB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -113,6 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B02CAAE9192CFB0C007D3B2F /* libCppSQLite.a in Frameworks */,
 				F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */,
 				F0C771DA192A7E06006469AB /* libleveldb.a in Frameworks */,
 				F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */,
@@ -160,6 +156,7 @@
 		F0C77171192A7821006469AB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */,
 				F0C771D6192A7E06006469AB /* libjson11.a */,
 				F0C771D7192A7E06006469AB /* libleveldb.a */,
 				F0C771D8192A7E06006469AB /* libsqlite3.a */,
@@ -224,7 +221,6 @@
 				F0C771BC192A79CC006469AB /* libmx3.a */,
 				F0C771BE192A79CC006469AB /* libmx3_objc.a */,
 				F0C771C0192A79CC006469AB /* play_objc */,
-				F0C771C2192A79CC006469AB /* play */,
 				F0C771C4192A79CC006469AB /* test */,
 			);
 			name = Products;
@@ -327,13 +323,6 @@
 			fileType = "compiled.mach-o.executable";
 			path = play_objc;
 			remoteRef = F0C771BF192A79CC006469AB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		F0C771C2192A79CC006469AB /* play */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = play;
-			remoteRef = F0C771C1192A79CC006469AB /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		F0C771C4192A79CC006469AB /* test */ = {
@@ -487,6 +476,7 @@
 					"$(inherited)",
 					"${SRCROOT}/../../deps/build/Debug/",
 					"/Users/piet.brauer/Documents/Projekte/iOS/mx3/deps/build/Debug-iphoneos",
+					"/Users/steven/projects/mx3/deps/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "armv7 armv7s";
@@ -512,6 +502,7 @@
 					"$(inherited)",
 					"${SRCROOT}/../../deps/build/Debug/",
 					"/Users/piet.brauer/Documents/Projekte/iOS/mx3/deps/build/Debug-iphoneos",
+					"/Users/steven/projects/mx3/deps/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "armv7 armv7s";
@@ -578,6 +569,7 @@
 				F0C7719D192A7822006469AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F0C7719E192A7822006469AB /* Build configuration list for PBXNativeTarget "MX3Tests" */ = {
 			isa = XCConfigurationList;
@@ -586,6 +578,7 @@
 				F0C771A0192A7822006469AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

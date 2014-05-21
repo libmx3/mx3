@@ -8,8 +8,10 @@ static MX3Api *_sharedAPI;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         NSString *documentsFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-        NSString *file = [documentsFolder stringByAppendingPathComponent:@"test_ldb"];
-        _sharedAPI = [[MX3Api alloc] initWithPath:file];
+        // give mx3 a root folder to work in
+        // todo, make sure that the path exists before passing it to mx3 c++
+        NSString *file = [documentsFolder stringByAppendingPathComponent:@"mx3"];
+        _sharedAPI = [[MX3Api alloc] initWithRootPath:file];
 
         if (![_sharedAPI hasUser]) {
             NSLog(@"No user found, creating one");

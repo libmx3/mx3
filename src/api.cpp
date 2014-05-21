@@ -12,7 +12,15 @@ namespace {
     const string USERNAME_KEY = "username";
 }
 
-Api::Api(const string& path) : m_db(_open_database(path)) {}
+Api::Api(const string& root_path) :
+    m_sqlite(),
+    // todo this needs to use a fs/path abstraction (not yet built)
+    m_ldb(_open_database(root_path + "/example_ldb"))
+{
+    // still needs fs abstraction :(
+    string sqlite_path = root_path + "/example.sqlite";
+    m_sqlite.open(sqlite_path.c_str());
+}
 
 bool
 Api::has_user() const {
@@ -32,7 +40,7 @@ Api::set_username(const string& username) {
 json11::Json
 Api::_get_value(const std::string& key) const {
     string value;
-    auto status = m_db->Get({}, key, &value);
+    auto status = m_ldb->Get({}, key, &value);
     _throw_if_error(status);
 
     // an "expected" error is that that key isn't found, represent that as a null
@@ -52,7 +60,7 @@ Api::_get_value(const std::string& key) const {
 void
 Api::_set_value(const std::string& key, const json11::Json& value) {
     auto serialized = value.dump();
-    auto status = m_db->Put({}, key, serialized.c_str());
+    auto status = m_ldb->Put({}, key, serialized.c_str());
     _throw_if_error(status);
 }
 
