@@ -9,12 +9,13 @@ using mx3::ObjcAdapter;
 }
 
 - (instancetype) initWithSnapshot:(std::unique_ptr<mx3::SqlSnapshot>)snapshot {
-  if(!(self = [super init])) {
-    return nil;
-  }
-  // when you assign one unique_ptr to another, you have to move it because there can only ever
-  // be one copy of a unique pointer at a time.  If you need to be able to "copy" pointers, use shared_ptr
-  __snapshot = std::move(snapshot);
+    self = [super init];
+    if (self) {
+        // when you assign one unique_ptr to another, you have to move it because there can only ever
+        // be one copy of a unique pointer at a time.  If you need to be able to "copy" pointers, use shared_ptr
+        __snapshot = std::move(snapshot);
+    }
+
   return self;
 }
 
