@@ -1,5 +1,6 @@
 #import "MXSampleDataTableViewController.h"
 #import "MX3Api+iOS.h"
+#import "MX3VersionEyeAPI.h"
 
 NSString *const CellIdentifier = @"MX3Cell";
 
@@ -16,6 +17,8 @@ NSString *const CellIdentifier = @"MX3Cell";
     self.snapshot = [[MX3Api sharedAPI] launches];
     [self setupNavigationBar];
     [self registerCells];
+
+    [MX3VersionEyeAPI downloadProducts];
 }
 
 - (void)setupNavigationBar {
