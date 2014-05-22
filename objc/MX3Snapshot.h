@@ -12,5 +12,5 @@
 #endif
 - (NSString *) rowAtIndex:(NSUInteger)index;
 - (NSUInteger) count;
-- (void) dealloc;
+
 @end
