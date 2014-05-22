@@ -3,28 +3,40 @@
 #include <memory>
 #include <leveldb/db.h>
 #include <json11/json11.hpp>
+#include <CppSQLite/CppSQLite3.h>
+#include "sql_snapshot.hpp"
 
 namespace mx3 {
 
 // the "api" of how the UI is allowed to talk to the c++ code
 class Api final {
   public:
-    Api(const std::string& db_path);
+    Api(const std::string& root_dir);
     // whether a user already exists
     bool has_user() const;
     // get the current username, or "" if none exists
     std::string get_username() const;
     void set_username(const std::string& name);
 
+    // a _very_ simplistic query api
+    std::unique_ptr<mx3::SqlSnapshot> get_launches();
+
   private:
     static std::unique_ptr<leveldb::DB> _open_database(const std::string& db_path);
     static void _throw_if_error(const leveldb::Status& status);
+
+    // set up the database
+    void _setup_db();
+
+    // log to sqlite that the app has been launched
+    void _log_launch(size_t num);
 
     // persistent getters and setters for NSUserDefatuls style stuff
     json11::Json _get_value(const std::string& key) const;
     void _set_value(const std::string& key, const json11::Json& value);
 
-    std::unique_ptr<leveldb::DB> m_db;
+    CppSQLite3DB m_sqlite;
+    std::unique_ptr<leveldb::DB> m_ldb;
 };
 
 }

@@ -1,5 +1,4 @@
 #import "MXAppDelegate.h"
-#import "MX3Api.h"
 #import "MXSampleDataTableViewController.h"
 
 @implementation MXAppDelegate

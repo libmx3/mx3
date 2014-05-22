@@ -1,24 +1,18 @@
 { 'targets': [
     {
-        'target_name': 'sqlite3',
+        'target_name': 'CppSQLite',
         'type': 'static_library',
         'sources': [
-            "sqlite3/sqlite3.c"
-        ],
-        'defines': [
-            'HAVE_USLEEP=1',
-        ],
-        'cflags': [
-            '-DHAVE_USLEEP=1',
+            "CppSQLite/CppSQLite3.cpp"
         ],
         'all_dependent_settings': {
             'include_dirs': [
                 '.',
-                'sqlite3',
             ]
         },
         'include_dirs': [
-            'sqlite3',
+            'sqlite3/',
+            'CppSQLite',
         ],
     },
 ]}

@@ -2,7 +2,7 @@
 #import "MX3Api.h"
 
 int main() {
-    MX3Api * api = [[MX3Api alloc] initWithPath:@"../test_ldb"];
+    MX3Api * api = [[MX3Api alloc] initWithRootPath:@"../mx3"];
     if (![api hasUser]) {
         [api setUsername: NSUserName()];
     }

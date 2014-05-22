@@ -1,3 +1,6 @@
 [submodule "deps/json11"]
 	path = deps/json11
 	url = git@github.com:dropbox/json11.git
+[submodule "deps/CppSQLite"]
+	path = deps/CppSQLite
+	url = git@github.com:neosmart/CppSQLite.git
