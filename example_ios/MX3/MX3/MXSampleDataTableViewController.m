@@ -3,7 +3,9 @@
 
 NSString *const CellIdentifier = @"MX3Cell";
 
-@interface MXSampleDataTableViewController ()
+@interface MXSampleDataTableViewController () {
+    MX3Snapshot * __snapshot;
+}
 
 @end
 
@@ -11,6 +13,7 @@ NSString *const CellIdentifier = @"MX3Cell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    __snapshot = [[MX3Api sharedAPI] launches];
     [self setupNavigationBar];
     [self registerCells];
 }
@@ -24,14 +27,14 @@ NSString *const CellIdentifier = @"MX3Cell";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 1;
+    return [__snapshot count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier
                                                             forIndexPath:indexPath];
 
-    cell.textLabel.text = @"MX3 rocks";
+    cell.textLabel.text = [__snapshot rowAtIndex: indexPath.row];
     cell.detailTextLabel.text = @"If you manage to get the deps right";
 
     return cell;

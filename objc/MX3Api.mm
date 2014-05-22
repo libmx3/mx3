@@ -4,22 +4,28 @@
 using mx3::ObjcAdapter;
 
 #include <string>
+#include <memory>
+using std::unique_ptr;
 using std::string;
 
 @implementation MX3Api {
-  mx3::Api * __api;
+  std::unique_ptr<mx3::Api> __api;
 }
 
 - (instancetype) initWithRootPath:(NSString *)path {
   if(!(self = [super init])) {
     return nil;
   }
-  __api = new mx3::Api(ObjcAdapter::convert(path));
+  __api = unique_ptr<mx3::Api>(new mx3::Api(ObjcAdapter::convert(path)));
   return self;
 }
 
 - (void) dealloc {
-    delete __api, __api = nullptr;
+    __api = nullptr;
+}
+
+- (MX3Snapshot *) launches {
+    return [[MX3Snapshot alloc] initWithSnapshot: __api->get_launches()];
 }
 
 - (BOOL) hasUser {

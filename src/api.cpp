@@ -7,6 +7,11 @@ using json11::Json;
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <vector>
+using std::vector;
+
+
+#include "sql_snapshot.hpp"
 
 namespace {
     const string USERNAME_KEY = "username";
@@ -20,6 +25,15 @@ Api::Api(const string& root_path) :
     // still needs fs abstraction :(
     string sqlite_path = root_path + "/example.sqlite";
     m_sqlite.open(sqlite_path.c_str());
+    _setup_db();
+
+    auto j_launch_number = _get_value("launch_number");
+    size_t launch = 0;
+    if (j_launch_number.is_number()) {
+        launch = j_launch_number.number_value() + 1;
+    }
+    _set_value("launch_number", static_cast<double>(launch));
+    _log_launch(launch);
 }
 
 bool
@@ -35,6 +49,31 @@ Api::get_username() const {
 void
 Api::set_username(const string& username) {
     _set_value(USERNAME_KEY, username);
+}
+
+unique_ptr<mx3::SqlSnapshot>
+Api::get_launches() {
+    auto stmt = m_sqlite.compileStatement("SELECT content FROM Data");
+    auto query = stmt.execQuery();
+    return std::unique_ptr<mx3::SqlSnapshot>( new mx3::SqlSnapshot(query) );
+}
+
+void
+Api::_log_launch(size_t num) {
+    string log_line = "Launch #" + std::to_string(num);
+    auto stmt = m_sqlite.compileStatement("INSERT INTO `Data` (content) VALUES (?1)");
+    stmt.bind(1, log_line.c_str());
+    stmt.execDML();
+}
+
+void
+Api::_setup_db() {
+    vector<string> setup_commands  {
+        "CREATE TABLE IF NOT EXISTS `Data` (content TEXT)"
+    };
+    for (const auto& cmd : setup_commands) {
+        m_sqlite.execDML(cmd.c_str());
+    }
 }
 
 json11::Json
