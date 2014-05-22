@@ -14,6 +14,7 @@
         'all_dependent_settings': {
             'include_dirs': [
                 '.',
+                'sqlite3',
             ]
         },
         'include_dirs': [

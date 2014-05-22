@@ -11,7 +11,7 @@
             ]
         },
         'include_dirs': [
-            'sqlite3',
+            'sqlite3/',
             'CppSQLite',
         ],
     },

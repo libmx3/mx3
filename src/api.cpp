@@ -1,4 +1,6 @@
 #include "api.hpp"
+#include "stl.hpp"
+
 using std::string;
 using std::unique_ptr;
 using mx3::Api;
