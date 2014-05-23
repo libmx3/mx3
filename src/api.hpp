@@ -1,17 +1,17 @@
 #pragma once
-#include <string>
-#include <memory>
+#include "stl.hpp"
 #include <leveldb/db.h>
 #include <json11/json11.hpp>
 #include <CppSQLite/CppSQLite3.h>
 #include "sql_snapshot.hpp"
+#include "event_loop.hpp"
 
 namespace mx3 {
 
 // the "api" of how the UI is allowed to talk to the c++ code
 class Api final {
   public:
-    Api(const std::string& root_dir);
+    Api(const std::string& root_dir, const shared_ptr<mx3::EventLoop>& main_thread);
     // whether a user already exists
     bool has_user() const;
     // get the current username, or "" if none exists
@@ -37,6 +37,8 @@ class Api final {
 
     CppSQLite3DB m_sqlite;
     std::unique_ptr<leveldb::DB> m_ldb;
+    std::shared_ptr<mx3::EventLoop> m_main_thread;
+    std::shared_ptr<mx3::EventLoop> m_bg_thread;
 };
 
 }

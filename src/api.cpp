@@ -1,35 +1,28 @@
 #include "api.hpp"
 #include "stl.hpp"
-
-using std::string;
-using std::unique_ptr;
 using mx3::Api;
 using json11::Json;
-
-#include <iostream>
-using std::cout;
-using std::endl;
-#include <vector>
-using std::vector;
-
 
 #include "sql_snapshot.hpp"
 
 namespace {
-    const string USERNAME_KEY = "username";
+    const string USERNAME_KEY      = "username";
+    const string LAUNCH_NUMBER_KEY = "launch_number";
 }
 
-Api::Api(const string& root_path) :
+Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread) :
     m_sqlite(),
     // todo this needs to use a fs/path abstraction (not yet built)
-    m_ldb(_open_database(root_path + "/example_ldb"))
+    m_ldb(_open_database(root_path + "/example_ldb")),
+    m_main_thread(main_thread),
+    m_bg_thread( make_shared<mx3::NativeEventLoop>() )
 {
     // still needs fs abstraction :(
     string sqlite_path = root_path + "/example.sqlite";
     m_sqlite.open(sqlite_path.c_str());
     _setup_db();
 
-    auto j_launch_number = _get_value("launch_number");
+    auto j_launch_number = _get_value(LAUNCH_NUMBER_KEY);
     size_t launch = 0;
     if (j_launch_number.is_number()) {
         launch = j_launch_number.number_value() + 1;
