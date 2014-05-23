@@ -1,20 +1,22 @@
+// all of the standard c++11 types included
 #pragma once
+#include "stl_util.hpp"
+
 #include <string>
-#include <sstream>
+using std::string;
 
-// some stuff that belongs in the c++ stllib, but isn't
-namespace std {
-    template<typename T, typename... Args>
-    std::unique_ptr<T> make_unique(Args&&... args) {
-        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-    }
+#include <memory>
+using std::unique_ptr;
+using std::shared_ptr;
+using std::make_shared;
+using std::make_unique;
 
-    // for some reason android doesn't ship with to_string
-    // implement it here
-    template<typename T>
-    std::string to_string( const T& n ) {
-        std::ostringstream stm ;
-        stm << n ;
-        return stm.str() ;
-    }
-}
+#include <vector>
+using std::vector;
+
+#include <functional>
+using std::function;
+
+// less common stuff, don't "use" them
+#include <mutex>
+#include <condition_variable>

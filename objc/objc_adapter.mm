@@ -1,4 +1,4 @@
-#include "objc_adapter.h"
+#include "objc_adapter.hpp"
 using mx3::ObjcAdapter;
 
 NSString *

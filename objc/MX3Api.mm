@@ -1,12 +1,10 @@
 #import "MX3Api.h"
+#include "stl.hpp"
 #import <mx3/mx3.hpp>
-#import "objc_adapter.h"
+#import "objc_adapter.hpp"
+#import "objc_event_loop.hpp"
 using mx3::ObjcAdapter;
-
-#include <string>
-#include <memory>
-using std::unique_ptr;
-using std::string;
+using mx3::objc::ObjcEventLoop;
 
 @implementation MX3Api {
   std::unique_ptr<mx3::Api> __api;
@@ -16,7 +14,10 @@ using std::string;
   if(!(self = [super init])) {
     return nil;
   }
-  __api = unique_ptr<mx3::Api>(new mx3::Api(ObjcAdapter::convert(path)));
+  __api = make_unique<mx3::Api>(
+    ObjcAdapter::convert(path),
+    make_shared<ObjcEventLoop>(dispatch_get_main_queue())
+  );
   return self;
 }
 
