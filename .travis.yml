@@ -1,0 +1,9 @@
+language: objective-c
+before_install:
+  - git submodule init
+  - git submodule update
+script:
+  - make clean
+  - make play ios
+  - make test
+  - make ios
