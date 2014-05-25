@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 #import "MX3VersionEyeAPI.h"
 #import "Defines.h"
 
@@ -9,19 +9,17 @@
     NSURL *URL = [NSURL URLWithString:URLString];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
 
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                if (error) {
-                    NSLog(@"%@", error);
-                    return;
-                }
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:[NSOperationQueue mainQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"%@", error);
+            return;
+        }
 
-                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-                NSLog(@"%@", dictionary);
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        NSLog(@"%@", dictionary);
     }];
-
-    [task resume];
 }
 
 @end
