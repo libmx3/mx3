@@ -1,4 +1,4 @@
-all: ios android
+all: mac ios android
 
 clean:
 	-rm -rf build/
@@ -41,8 +41,8 @@ GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
 play: build_mac/mx3.xcodeproj objc/play.m
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | xcpretty -c && ./build/Debug/play_objc
 
-#mac: build_mac/mx3.xcodeproj
-#	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
+mac: build_mac/mx3.xcodeproj
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
 
 ios: build_ios/mx3.xcodeproj
 	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
