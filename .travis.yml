@@ -3,7 +3,7 @@ before_install:
   - git submodule init
   - git submodule update
 script:
-  - make play ios
   - make clean
+  - make play ios
   - make test
   - make ios
