@@ -1,4 +1,8 @@
-// all of the standard c++11 types included
+// include all of the standard stl files
+//
+// although it may be considered bad practice to "use" namespace items in a header file,
+// these types are so intrinsic to c++ that it would be worse practice to copy these names
+// I feel the readability this provides trumps the reasons to not
 #pragma once
 #include "stl_util.hpp"
 
