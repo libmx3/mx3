@@ -1,0 +1,11 @@
+language: objective-c
+before_install:
+  - git submodule update --init
+install:
+  - make gyp
+script:
+  - make clean
+  - make ios
+  - make mac
+  - make test
+  - make play
