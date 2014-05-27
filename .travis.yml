@@ -1,6 +1,7 @@
 language: objective-c
 before_install:
   - git submodule update --init
+  - gem install xcpretty
 install:
   - make gyp
 script:
