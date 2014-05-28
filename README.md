@@ -11,6 +11,7 @@ for comments and improvements.
 
 **long version:**  
 There are many ways to contribute to mx3:
+
 1. bugfixes
 1. documentation of any kind
 1. new target platforms
