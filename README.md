@@ -6,6 +6,21 @@ for comments and improvements.
 ### The name
 "mobile times 3", Android, iOS, and Windows Phone. (todo, windows phone support)
 
+### Contributing
+**short version:** submit a PR, it'll be merged!  
+
+**long version:**  
+There are many ways to contribute to mx3:
+1. bugfixes
+1. documentation of any kind
+1. new target platforms
+1. new proposals for architecture and techniques
+1. educating us about your use case for cross platform mobile
+
+There are a few things laid out in TODO, if you want to contribute but don't know how.  If you are building a _large_
+feature, please file an issue first to ensure that it aligns with the goals of mx3 - if it does, please submit
+a Pull Request **during development** to solicit feedback and enable incremental code review throughout the process.
+
 ### Requirements
 * `python` (required for gyp)
 * xcode & `xcodebuild`
@@ -13,13 +28,13 @@ for comments and improvements.
 * windows phone developer tools (eventually...)
 
 ### Installation
-
-1. Run `git submodule init` and `git submodule update` to download [json11](https://github.com/dropbox/json11).
-2. Run `make play`. You should see "Hello, #{your login name}" printed to the console, if so, you seem to already have
-all the requirements met for building.
+1. Run `git submodule update --init` to download all dependencies
+1. Optionally `gem install xcpretty` to make the output of `xcodebuild` nice
+1. Run `make play`. You should see "Hello, #{your login name}" printed to the console, if so, you seem to already have
+all the requirements met for building on iOS.
+1. Run `make android` to build a static library for android, if this works
 
 ### Objective-C
-
 Run `make play ios` or `make play mac`
 
 ### Building
