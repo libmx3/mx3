@@ -1,11 +1,12 @@
 language: objective-c
 before_install:
   - git submodule update --init
+  - gem install xcpretty
 install:
   - make gyp
 script:
   - make clean
-  - make ios
-  - make mac
-  - make test
-  - make play
+  - make travis_ios
+  - make travis_mac
+  - make travis_test
+  - make travis_play
