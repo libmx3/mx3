@@ -6,7 +6,7 @@ install:
   - make gyp
 script:
   - make clean
-  - make travis_ios
-  - make travis_mac
-  - make travis_test
-  - make travis_play
+  - make ios
+  - make mac
+  - make test
+  - make play
