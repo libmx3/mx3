@@ -32,33 +32,20 @@ build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp
 GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
 	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3 -Icommon.gypi mx3.gyp
 
+xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -c" || echo "cat")
+
 # a simple place to test stuff out
 play: build_mac/mx3.xcodeproj objc/play.m
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc && ./build/Debug/play_objc
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | ${xb-prettifier} && ./build/Debug/play_objc
 
 mac: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
 ios: build_ios/mx3.xcodeproj
-	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc
+	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
 android: GypAndroid.mk
 	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4
 
 test: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test && ./build/Debug/test
-
-
-# Travis integration
-# build make targets _solely_ for building on travis (make it looks nice with xcpretty)
-travis_mac: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
-
-travis_ios: build_ios/mx3.xcodeproj
-	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
-
-travis_test: build_mac/mx3.xcodeproj
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | xcpretty -c && ./build/Debug/test
-
-travis_play: build_mac/mx3.xcodeproj objc/play.m
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | xcpretty -c && ./build/Debug/play_objc
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | ${xb-prettifier} && ./build/Debug/test
