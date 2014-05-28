@@ -30,12 +30,7 @@ build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp
 	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
 GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
-	ANDROID_BUILD_TOP=dirname $(which ndk-build) \
-	deps/gyp/gyp --depth=. -f android \
-	-DOS=android \
-	--root-target libmx3 \
-	-Icommon.gypi \
-	mx3.gyp
+	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3 -Icommon.gypi mx3.gyp
 
 # a simple place to test stuff out
 play: build_mac/mx3.xcodeproj objc/play.m
@@ -52,3 +47,18 @@ android: GypAndroid.mk
 
 test: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test && ./build/Debug/test
+
+
+# Travis integration
+# build make targets _solely_ for building on travis (make it looks nice with xcpretty)
+travis_mac: build_mac/mx3.xcodeproj
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
+
+travis_ios: build_ios/mx3.xcodeproj
+	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | xcpretty -c
+
+travis_test: build_mac/mx3.xcodeproj
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | xcpretty -c && ./build/Debug/test
+
+travis_play: build_mac/mx3.xcodeproj objc/play.m
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | xcpretty -c && ./build/Debug/play_objc
