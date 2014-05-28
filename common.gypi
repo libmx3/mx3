@@ -35,7 +35,7 @@
         'configurations': {
             'Debug': {
                 'defines': [ 'DEBUG' ],
-                'cflags' : [ '-g' ],
+                'cflags' : [ '-g', '-O0' ],
                 'xcode_settings' : {
                 },
             },
