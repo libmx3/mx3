@@ -1,6 +1,4 @@
 #include "MX3Snapshot.h"
-
-#include <mx3/mx3.hpp>
 #include "objc_adapter.hpp"
 using mx3::ObjcAdapter;
 
