@@ -3,21 +3,22 @@
 
 namespace mx3 {
 struct GithubUser {
-    std::string login;
-    std::string avatarURL;
-    std::string gravatarID;
-    std::string url;
-    std::string htmlURL;
-    std::string followersURL;
-    std::string followingURL;
-    std::string gistsURL;
-    std::string starredURL;
-    std::string subscriptionsURL;
-    std::string organizationsURL;
-    std::string reposURL;
-    std::string eventsURL;
-    std::string receivedEventsURL;
-    std::string type;
+using namespace std;
+    string login;
+    string avatarURL;
+    string gravatarID;
+    string url;
+    string htmlURL;
+    string followersURL;
+    string followingURL;
+    string gistsURL;
+    string starredURL;
+    string subscriptionsURL;
+    string organizationsURL;
+    string reposURL;
+    string eventsURL;
+    string receivedEventsURL;
+    string accountType;
     bool siteAdmin;
 };
 }
