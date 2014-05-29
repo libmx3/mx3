@@ -17,8 +17,8 @@ static NSString *baseURL = @"https://api.github.com";
             return;
         }
 
-        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        success(dictionary);
+        // TODO: parse JSON into GithubUser
+        success(nil);
     }];
 }
 
