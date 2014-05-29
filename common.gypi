@@ -1,4 +1,13 @@
 {
+    'configurations': {
+      'Debug': {
+        'xcode_settings': {
+          'GCC_OPTIMIZATION_LEVEL': '0',
+          'ONLY_ACTIVE_ARCH': 'YES',
+        },
+      },
+    },
+    
     'target_defaults': {
         'default_configuration': 'Debug',
         'cflags_cc': [ '-std=c++11', '-fvisibility=hidden', '-fexceptions' ],
@@ -15,7 +24,6 @@
                 'xcode_settings' : {
                     'SDKROOT': 'iphoneos',
                     'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
-                    'ARCHS': 'armv7 armv7s',
                 },
             }],
             ['OS=="mac"', {
@@ -29,7 +37,6 @@
                 'defines': [ 'DEBUG' ],
                 'cflags' : [ '-g', '-O0' ],
                 'xcode_settings' : {
-                    'ONLY_ACTIVE_ARCH': 'YES',
                 },
             },
             'Release': {

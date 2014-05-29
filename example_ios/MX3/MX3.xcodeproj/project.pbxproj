@@ -474,9 +474,6 @@
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"${SRCROOT}/../../deps/build/Debug/",
-					"/Users/piet.brauer/Documents/Projekte/iOS/mx3/deps/build/Debug-iphoneos",
-					"/Users/steven/projects/mx3/deps/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "armv7 armv7s";
@@ -500,9 +497,6 @@
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"${SRCROOT}/../../deps/build/Debug/",
-					"/Users/piet.brauer/Documents/Projekte/iOS/mx3/deps/build/Debug-iphoneos",
-					"/Users/steven/projects/mx3/deps/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "armv7 armv7s";
