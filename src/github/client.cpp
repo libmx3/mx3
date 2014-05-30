@@ -22,10 +22,28 @@ Client::get_users(function<void(vector<github::User>)> callback) {
             // fail somehow
         }
 
-        // parse response.data
-        // github::User current_user;
-        // current_user.login = "blah"
-        // users.push_back(current_user);
+        if (json_response.is_object()) {
+            github::User user;
+            // if json_response["login"].is_string();
+            user.login     = json_response["login"].string_value();
+            bool b_value   = json_response["bool_key_name"].bool_value();
+            int int_value  = json_response["int_key_name"].int_value();
+            double d_value = json_response["double_key_name"].number_value();
+            users.push_back(user);
+
+            // shut up compiler!
+            (void)b_value;
+            (void)int_value;
+            (void)d_value;
+        }
+
+        if (json_response.is_array()) {
+            for (const auto& item : json_response.array_items()) {
+                // don't make the compiler yell
+                (void)item;
+            }
+        }
+
         callback(users);
     });
 }
