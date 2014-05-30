@@ -1,4 +1,3 @@
-#include <iosfwd>
 #include <string>
 
 namespace mx3 {
