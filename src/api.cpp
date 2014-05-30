@@ -10,7 +10,7 @@ namespace {
     const string LAUNCH_NUMBER_KEY = "launch_number";
 }
 
-Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread) :
+Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3::Http>& http_client) :
     m_sqlite(),
     // todo this needs to use a fs/path abstraction (not yet built)
     m_ldb(_open_database(root_path + "/example_ldb")),

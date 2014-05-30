@@ -1,9 +1,10 @@
-#include <iosfwd>
-#include <string>
+#pragma once
+#include "stl.hpp"
 
-namespace mx3 {
-struct GithubUser {
-using namespace std;
+namespace github {
+
+// lets put all the "entities" of the github api in here
+struct User {
     string login;
     string avatarURL;
     string gravatarID;
@@ -21,4 +22,5 @@ using namespace std;
     string accountType;
     bool siteAdmin;
 };
+
 }

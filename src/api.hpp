@@ -5,13 +5,18 @@
 #include <CppSQLite/CppSQLite3.h>
 #include "sql_snapshot.hpp"
 #include "event_loop.hpp"
+#include "http.hpp"
 
 namespace mx3 {
 
 // the "api" of how the UI is allowed to talk to the c++ code
 class Api final {
   public:
-    Api(const std::string& root_dir, const shared_ptr<mx3::EventLoop>& main_thread);
+    Api(
+        const std::string& root_dir,
+        const shared_ptr<mx3::EventLoop>& main_thread,
+        const shared_ptr<mx3::Http>& http_client
+    );
     // whether a user already exists
     bool has_user() const;
     // get the current username, or "" if none exists
