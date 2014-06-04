@@ -55,7 +55,7 @@ Api::get_launches() {
 
 void
 Api::_log_launch(size_t num) {
-    string log_line = "Launch #" + std::to_string(num);
+    string log_line = "Launch #" + to_string(num);
     auto stmt = m_sqlite.compileStatement("INSERT INTO `Data` (content) VALUES (?1)");
     stmt.bind(1, log_line.c_str());
     stmt.execDML();

@@ -14,7 +14,7 @@ using mx3::objc::ObjcEventLoop;
   if(!(self = [super init])) {
     return nil;
   }
-  __api = make_unique<mx3::Api>(
+  __api = std::make_unique<mx3::Api>(
     ObjcAdapter::convert(path),
     make_shared<ObjcEventLoop>(dispatch_get_main_queue())
   );

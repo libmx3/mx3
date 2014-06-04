@@ -13,13 +13,19 @@ using std::string;
 using std::unique_ptr;
 using std::shared_ptr;
 using std::make_shared;
-using std::make_unique;
+using std_patch::make_unique;
+using std_patch::to_string;
 
 #include <vector>
 using std::vector;
 
 #include <functional>
 using std::function;
+
+#include <optional/optional.hpp>
+using std::experimental::optional;
+using std::experimental::nullopt;
+using std::experimental::nullopt_t;
 
 // less common stuff, don't "use" them
 #include <mutex>
