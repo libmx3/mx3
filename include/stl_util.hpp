@@ -4,7 +4,7 @@
 #include <memory>
 
 // some stuff that belongs in the c++ stllib, but isn't
-namespace std {
+namespace std_patch {
     template<typename T, typename... Args>
     std::unique_ptr<T> make_unique(Args&&... args) {
         return std::unique_ptr<T>(new T(std::forward<Args>(args)...));

@@ -7,15 +7,15 @@
         },
       },
     },
-    
+
     'target_defaults': {
         'default_configuration': 'Debug',
-        'cflags_cc': [ '-std=c++11', '-fvisibility=hidden', '-fexceptions' ],
+        'cflags_cc': [ '-std=c++1y', '-fvisibility=hidden', '-fexceptions' ],
         'cflags': ['-Wall'],
         'xcode_settings': {
             'OTHER_CFLAGS' : ['-Wall', '-fvisibility=hidden'],
             'OTHER_CPLUSPLUSFLAGS' : ['-Wall', '-fvisibility=hidden'],
-            'CLANG_CXX_LANGUAGE_STANDARD': 'c++11',
+            'CLANG_CXX_LANGUAGE_STANDARD': 'c++1y',
             'CLANG_CXX_LIBRARY': 'libc++',
             'CLANG_ENABLE_OBJC_ARC': 'YES',
         },
