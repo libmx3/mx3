@@ -6,6 +6,9 @@
 #include "sql_snapshot.hpp"
 #include "event_loop.hpp"
 #include "http.hpp"
+#include "github/client.hpp"
+#include "github/types.hpp"
+#include "query_result.hpp"
 
 namespace mx3 {
 
@@ -26,6 +29,8 @@ class Api final {
     // a _very_ simplistic query api
     std::unique_ptr<mx3::SqlSnapshot> get_launches();
 
+    mx3::QueryResultPtr<github::User> get_github_users();
+
   private:
     static std::unique_ptr<leveldb::DB> _open_database(const std::string& db_path);
     static void _throw_if_error(const leveldb::Status& status);
@@ -41,6 +46,7 @@ class Api final {
     void _set_value(const std::string& key, const json11::Json& value);
 
     CppSQLite3DB m_sqlite;
+    github::Client m_github_client;
     std::unique_ptr<leveldb::DB> m_ldb;
     std::shared_ptr<mx3::EventLoop> m_main_thread;
     std::shared_ptr<mx3::EventLoop> m_bg_thread;

@@ -6,7 +6,7 @@ NSString *const CellIdentifier = @"MX3Cell";
 
 @interface MXSampleDataTableViewController ()
 
-@property (nonatomic) MX3Snapshot *snapshot;
+@property (nonatomic) MX3QueryResult *result;
 
 @end
 
@@ -14,7 +14,10 @@ NSString *const CellIdentifier = @"MX3Cell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.snapshot = [[MX3Api sharedAPI] launches];
+    self.result = [[MX3Api sharedAPI] githubUsers];
+    [self.result listenToChanges:^{
+      [self.tableView reloadData];
+    }];
     [self setupNavigationBar];
     [self registerCells];
 
@@ -34,14 +37,14 @@ NSString *const CellIdentifier = @"MX3Cell";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.snapshot.count;
+    return self.result.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier
                                                             forIndexPath:indexPath];
 
-    cell.textLabel.text = [self.snapshot rowAtIndex:(NSUInteger)indexPath.row];
+    cell.textLabel.text = [self.result rowAtIndex:(NSUInteger)indexPath.row];
     cell.detailTextLabel.text = @"If you manage to get the deps right";
 
     return cell;

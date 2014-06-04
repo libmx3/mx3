@@ -2,6 +2,9 @@
 #include <json11/json11.hpp>
 using github::Client;
 using json11::Json;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace {
     const string BASE_URL = "https://api.github.com";
@@ -20,30 +23,37 @@ Client::get_users(function<void(vector<github::User>)> callback) {
         if (!error.empty()) {
             // there was an error
             // fail somehow
-        }
-
-        if (json_response.is_object()) {
-            github::User user;
-            // if json_response["login"].is_string();
-            user.login     = json_response["login"].string_value();
-            bool b_value   = json_response["bool_key_name"].bool_value();
-            int int_value  = json_response["int_key_name"].int_value();
-            double d_value = json_response["double_key_name"].number_value();
-            users.push_back(user);
-
-            // shut up compiler!
-            (void)b_value;
-            (void)int_value;
-            (void)d_value;
-        }
-
-        if (json_response.is_array()) {
-            for (const auto& item : json_response.array_items()) {
-                // don't make the compiler yell
-                (void)item;
+        } else {
+            if (json_response.is_array()) {
+                for (const auto& item : json_response.array_items()) {
+                    users.emplace_back( _parse_user(item) );
+                }
             }
         }
 
         callback(users);
     });
+}
+
+github::User
+Client::_parse_user(const json11::Json& data) {
+    github::User user;
+    user.login               = data["login"].string_value();
+    user.id                  = data["id"].number_value();
+    user.avatar_url          = data["avatar_url"].string_value();
+    user.gravatar_id         = data["gravatar_id"].string_value();
+    user.url                 = data["url"].string_value();
+    user.html_url            = data["html_url"].string_value();
+    user.followers_url       = data["followers_url"].string_value();
+    user.following_url       = data["following_url"].string_value();
+    user.gists_url           = data["gists_url"].string_value();
+    user.starred_url         = data["starred_url"].string_value();
+    user.subscriptions_url   = data["subscriptions_url"].string_value();
+    user.organizations_url   = data["organizations_url"].string_value();
+    user.repos_url           = data["repos_url"].string_value();
+    user.events_url          = data["events_url"].string_value();
+    user.received_events_url = data["received_events_url"].string_value();
+    user.type                = data["type"].string_value();
+    user.site_admin          = data["site_admin"].bool_value();
+    return user;
 }

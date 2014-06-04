@@ -4,6 +4,7 @@
 #import "objc_adapter.hpp"
 #import "objc_event_loop.hpp"
 #import "objc_http.hpp"
+#import "MX3QueryResult.h"
 using mx3::ObjcAdapter;
 using mx3::objc::ObjcEventLoop;
 using mx3::objc::ObjcHttp;
@@ -30,6 +31,10 @@ using mx3::objc::ObjcHttp;
 
 - (MX3Snapshot *) launches {
     return [[MX3Snapshot alloc] initWithSnapshot: __api->get_launches()];
+}
+
+- (MX3QueryResult *) githubUsers {
+    return [[MX3QueryResult alloc] initWithResult: __api->get_github_users()];
 }
 
 - (BOOL) hasUser {
