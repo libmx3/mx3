@@ -4,3 +4,6 @@
 [submodule "deps/CppSQLite"]
 	path = deps/CppSQLite
 	url = https://github.com/neosmart/CppSQLite.git
+[submodule "deps/optional"]
+	path = deps/optional
+	url = https://github.com/akrzemi1/Optional.git
