@@ -1,5 +1,7 @@
 #include "api.hpp"
 #include "stl.hpp"
+#include "github/client.hpp"
+#include "github/types.hpp"
 using mx3::Api;
 using json11::Json;
 
@@ -10,8 +12,9 @@ namespace {
     const string LAUNCH_NUMBER_KEY = "launch_number";
 }
 
-Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread) :
+Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3::Http>& http_client) :
     m_sqlite(),
+    m_github_client(http_client),
     // todo this needs to use a fs/path abstraction (not yet built)
     m_ldb(_open_database(root_path + "/example_ldb")),
     m_main_thread(main_thread),
@@ -29,6 +32,7 @@ Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread)
     }
     _set_value("launch_number", static_cast<double>(launch));
     _log_launch(launch);
+
 }
 
 bool
@@ -51,6 +55,19 @@ Api::get_launches() {
     auto stmt = m_sqlite.compileStatement("SELECT content FROM Data");
     auto query = stmt.execQuery();
     return std::unique_ptr<mx3::SqlSnapshot>( new mx3::SqlSnapshot(query) );
+}
+
+mx3::QueryResultPtr<github::User>
+Api::get_github_users() {
+    auto result = make_shared<mx3::QueryResult<github::User>>(m_main_thread);
+    std::weak_ptr<mx3::QueryResult<github::User>> result_ref = result;
+    m_github_client.get_users( [=](vector<github::User> users) {
+        auto sp = result_ref.lock();
+        if (sp) {
+            sp->update_data(users);
+        }
+    });
+    return result;
 }
 
 void

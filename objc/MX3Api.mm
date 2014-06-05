@@ -3,8 +3,11 @@
 #import <mx3/mx3.hpp>
 #import "objc_adapter.hpp"
 #import "objc_event_loop.hpp"
+#import "objc_http.hpp"
+#import "MX3QueryResult.h"
 using mx3::ObjcAdapter;
 using mx3::objc::ObjcEventLoop;
+using mx3::objc::ObjcHttp;
 
 @implementation MX3Api {
   std::unique_ptr<mx3::Api> __api;
@@ -16,7 +19,8 @@ using mx3::objc::ObjcEventLoop;
   }
   __api = std::make_unique<mx3::Api>(
     ObjcAdapter::convert(path),
-    make_shared<ObjcEventLoop>(dispatch_get_main_queue())
+    make_shared<ObjcEventLoop>(dispatch_get_main_queue()),
+    make_shared<ObjcHttp>()
   );
   return self;
 }
@@ -27,6 +31,10 @@ using mx3::objc::ObjcEventLoop;
 
 - (MX3Snapshot *) launches {
     return [[MX3Snapshot alloc] initWithSnapshot: __api->get_launches()];
+}
+
+- (MX3QueryResult *) githubUsers {
+    return [[MX3QueryResult alloc] initWithResult: __api->get_github_users()];
 }
 
 - (BOOL) hasUser {
