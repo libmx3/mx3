@@ -1,6 +1,5 @@
 #import "MXSampleDataTableViewController.h"
 #import "MX3Api+iOS.h"
-#import "MX3GithubAPI.h"
 
 NSString *const CellIdentifier = @"MX3Cell";
 
@@ -20,12 +19,6 @@ NSString *const CellIdentifier = @"MX3Cell";
     }];
     [self setupNavigationBar];
     [self registerCells];
-
-    [MX3GithubAPI getUsersWithSuccess:^(id JSON) {
-        NSLog(@"%@", JSON);
-    } failure:^(NSError *error) {
-        NSLog(@"%@", error);
-    }];
 }
 
 - (void)setupNavigationBar {
