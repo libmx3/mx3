@@ -6,6 +6,7 @@ clean:
 	-rm -rf build_mac/
 	-rm -rf build_ios/
 	-rm -rf obj/
+	-rm -rf libs/
 	-rm GypAndroid.mk
 	-rm *.target.mk
 	-rm deps/*.target.mk
@@ -30,7 +31,7 @@ build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp
 	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
 GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
-	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3 -Icommon.gypi mx3.gyp
+	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target mx3_jni -Icommon.gypi mx3.gyp
 
 xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -c" || echo "cat")
 

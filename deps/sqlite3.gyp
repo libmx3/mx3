@@ -10,7 +10,11 @@
         ],
         'cflags': [
             '-DHAVE_USLEEP=1',
+            '-Wno-unused-const-variable',
         ],
+        'xcode_settings': {
+            'OTHER_CFLAGS' : ['<@(_cflags)'],
+        },
         'all_dependent_settings': {
             'include_dirs': [
                 '.',

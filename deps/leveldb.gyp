@@ -27,6 +27,14 @@
             '-D_REENTRANT',
             '-DLEVELDB_PLATFORM_POSIX',
         ],
+        # disable sign compare warnings, since leveldb has a few of them
+        'cflags_cc': [
+            '-Wno-sign-compare',
+            '-Wno-unused-function',
+        ],
+        'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS': ['<@(_cflags_cc)'],
+        },
         'conditions': [
             ['OS=="mac"', {
                 'defines+': ['OS_MACOSX'],

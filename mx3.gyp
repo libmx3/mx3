@@ -48,6 +48,15 @@
             },
         },
         {
+            'target_name': 'mx3_jni',
+            'type': 'shared_library',
+            'conditions': [],
+            'dependencies': [ 'libmx3' ],
+            'sources': [
+                '<!@(find android -name "*.cpp" -o -name "*.c")',
+            ],
+        },
+        {
             'target_name': 'play_objc',
             'type': 'executable',
             'dependencies': ['libmx3_objc'],
