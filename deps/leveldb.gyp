@@ -30,7 +30,6 @@
         # disable sign compare warnings, since leveldb has a few of them
         'cflags_cc': [
             '-Wno-sign-compare',
-            '-Wno-unused-function',
         ],
         'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': ['<@(_cflags_cc)'],
