@@ -6,17 +6,23 @@ clean:
 	-rm -rf build_mac/
 	-rm -rf build_ios/
 	-rm -rf obj/
+	-rm -rf libs/
 	-rm GypAndroid.mk
 	-rm *.target.mk
 	-rm deps/*.target.mk
 	-rm -rf test_ldb
 	-rm test.sqlite
 	-rm play
+	make cleanup_gyp
 
 gyp: ./deps/gyp
 
 ./deps/gyp:
 	git clone --depth 1 https://chromium.googlesource.com/external/gyp.git ./deps/gyp
+
+cleanup_gyp: ./deps/gyp mx3.gyp common.gypi
+	deps/gyp/tools/pretty_gyp.py mx3.gyp > mx3_temp.gyp && mv mx3_temp.gyp mx3.gyp
+	deps/gyp/tools/pretty_gyp.py common.gypi > common_temp.gypi && mv common_temp.gypi common.gypi
 
 ./deps/json11:
 	git submodule update --init
@@ -30,7 +36,7 @@ build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp
 	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
 GypAndroid.mk: deps/gyp deps/json11 mx3.gyp
-	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3 -Icommon.gypi mx3.gyp
+	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3_jni -Icommon.gypi mx3.gyp
 
 xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -c" || echo "cat")
 

@@ -7,3 +7,6 @@
 [submodule "deps/optional"]
 	path = deps/optional
 	url = https://github.com/akrzemi1/Optional.git
+[submodule "deps/leveldb"]
+	path = deps/leveldb
+	url = https://code.google.com/p/leveldb/
