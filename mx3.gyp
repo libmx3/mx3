@@ -48,7 +48,8 @@
       },
     },
     {
-      'target_name': 'mx3_jni',
+      'target_name': 'libmx3_jni',
+      'android_unmangled_name': 1,
       'type': 'shared_library',
       'conditions': [],
       'dependencies': [ 'libmx3' ],
