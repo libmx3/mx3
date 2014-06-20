@@ -11,10 +11,11 @@ public class Api {
     
     Api() {}
 
-    public native int nativeSayHi();
+    public native String nativeSayHi();
     
-    public void sayHi() {
-        Log.d("MyApp",Integer.toString(nativeSayHi()));
+    public String sayHi() {
+    	Log.d("MyApp",nativeSayHi());
+        return nativeSayHi();
     }
 
 
@@ -24,3 +25,4 @@ public class Api {
         //System.out.println("Hello, World!");
     }
 }
+    

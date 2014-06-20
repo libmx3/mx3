@@ -10,9 +10,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class UsersActivity extends Activity {
-
+	
+	public Api myApi;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -23,8 +25,7 @@ public class UsersActivity extends Activity {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
-		Api api = new Api();
-		api.sayHi();
+		myApi = new Api();
 	}
 
 	@Override
@@ -34,6 +35,7 @@ public class UsersActivity extends Activity {
 		getMenuInflater().inflate(R.menu.users, menu);
 		return true;
 	}
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -63,6 +65,12 @@ public class UsersActivity extends Activity {
 			mUsersView = (ListView) rootView.findViewById(R.id.users_list_view);
 			return rootView;
 		}
+	}
+	
+	public void refreshDateAndTime(View view) {
+		TextView text = ((TextView) findViewById(R.id.dateAndTime));
+		if(text == null) Log.d("MyApp","hereNull");
+		text.setText(myApi.sayHi());
 	}
 
 }
