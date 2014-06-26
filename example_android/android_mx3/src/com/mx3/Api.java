@@ -13,8 +13,8 @@ public class Api {
 
     public native String nativeSayHi();
     
+    //Trivial method that prints a welcome message with the date and time.
     public String sayHi() {
-    	Log.d("MyApp",nativeSayHi());
         return nativeSayHi();
     }
 
@@ -22,7 +22,6 @@ public class Api {
     public static void main(String[] args) {
         Api api = new Api();
         api.sayHi();
-        //System.out.println("Hello, World!");
     }
 }
     

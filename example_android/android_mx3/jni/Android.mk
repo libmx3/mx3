@@ -5,7 +5,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := mx3_jni
-LOCAL_SRC_FILES := mx3_jni.cpp other.cpp
+LOCAL_SRC_FILES := mx3_jni.cpp
 
 #include $(MX3_PATH)/GypAndroid.mk
 

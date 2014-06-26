@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+//Currently mostly unimplemented
+
 public class UsersActivity extends Activity {
 	
 	public Api myApi;
@@ -67,6 +69,8 @@ public class UsersActivity extends Activity {
 		}
 	}
 	
+	
+	//Executes on button click, calls native code to refresh the date and time in the text view.
 	public void refreshDateAndTime(View view) {
 		TextView text = ((TextView) findViewById(R.id.dateAndTime));
 		if(text == null) Log.d("MyApp","hereNull");
