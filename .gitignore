@@ -16,6 +16,10 @@ test.sqlite
 
 # misc
 .DS_Store
+example_ldb/LOG.old
+example_ldb/LOG
+example_ldb/CURRENT
+
 
 # Xcode
 *.pbxuser

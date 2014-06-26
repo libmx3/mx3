@@ -14,6 +14,7 @@ clean:
 	-rm test.sqlite
 	-rm play
 	make cleanup_gyp
+	NDK_PROJECT_PATH=./example_android/android_mx3 ndk-build clean
 
 gyp: ./deps/gyp
 
@@ -50,8 +51,10 @@ mac: build_mac/mx3.xcodeproj
 ios: build_ios/mx3.xcodeproj
 	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
+ndk_path = ./example_android/android_mx3
+
 android: GypAndroid.mk
-	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4
+	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=$(ndk_path) ndk-build NDK_APPLICATION_MK=$(ndk_path)/jni/Application.mk -j4
 
 test: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | ${xb-prettifier} && ./build/Debug/test
