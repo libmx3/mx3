@@ -28,7 +28,7 @@
             }],
             ['OS=="mac"', {
                 'xcode_settings' : {
-                    'SDKROOT': 'macosx10.8',
+                    'SDKROOT': 'macosx',
                 },
             }],
         ],
