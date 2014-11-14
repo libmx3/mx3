@@ -3,9 +3,9 @@
         'target_name': 'leveldb',
         'type': 'static_library',
         'sources': [
-            "<!@(find leveldb/db    -name '*.[c|h]' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cc')",
-            "<!@(find leveldb/util  -name '*.[c|h]' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cc')",
-            "<!@(find leveldb/table -name '*.[c|h]' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cc')",
+            "<!@(python ../glob.py leveldb/db '*.[c|h]' '*.hpp' '*.cpp' '*.cc')",
+            "<!@(python ../glob.py leveldb/util  '*.[c|h]' '*.hpp' '*.cpp' '*.cc')",
+            "<!@(python ../glob.py leveldb/table '*.[c|h]' '*.hpp' '*.cpp' '*.cc')",
             'leveldb/port/port_posix.cc',
         ],
 

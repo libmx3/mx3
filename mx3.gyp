@@ -14,8 +14,7 @@
                 # just automatically include all cpp and hpp files in src/ (for now)
                 # '<!' is shell expand
                 # '@' is to splat the arguments into list items
-                # todo(kabbes) this will not work on windows
-                '<!@(find src -name "*.cpp" -o -name "*.hpp")',
+                "<!@(python glob.py src/ '*.cpp' '*.hpp')",
             ],
             'include_dirs': [
                 'include',
@@ -33,7 +32,7 @@
             'conditions': [],
             'dependencies': [ 'libmx3' ],
             'sources': [
-                '<!@(find objc -name "*.mm" -o -name "*.h" -o -name "*.m")',
+                '<!@(python glob.py objc "*.mm" "*.h" "*.m")',
             ],
             'sources!': ['play.m'],
             'include_dirs': [
@@ -71,7 +70,7 @@
                 'test',
             ],
             'sources': [
-                '<!@(find test -name "*.cpp" -o -name "*.hpp")',
+                '<!@(python glob.py test "*.cpp" "*.hpp")',
             ]
         },
     ],
