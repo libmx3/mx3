@@ -15,4 +15,4 @@ for (dirpath, dirnames, files) in os.walk(root_dir):
         for pattern in patterns:
             match = match or fnmatch.fnmatch(f, pattern)
         if match:
-            print os.path.join(dirpath, f)
+            print dirpath + '/' + f
