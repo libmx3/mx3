@@ -14,7 +14,7 @@
                 # just automatically include all cpp and hpp files in src/ (for now)
                 # '<!' is shell expand
                 # '@' is to splat the arguments into list items
-                "<!@(python glob.py src/ '*.cpp' '*.hpp')",
+                "<!@(python glob.py src/ *.cpp *.hpp)",
             ],
             'include_dirs': [
                 'include',
@@ -32,7 +32,7 @@
             'conditions': [],
             'dependencies': [ 'libmx3' ],
             'sources': [
-                '<!@(python glob.py objc "*.mm" "*.h" "*.m")',
+                '<!@(python glob.py objc *.mm *.h *.m)',
             ],
             'sources!': ['play.m'],
             'include_dirs': [
@@ -70,7 +70,7 @@
                 'test',
             ],
             'sources': [
-                '<!@(python glob.py test "*.cpp" "*.hpp")',
+                '<!@(python glob.py test *.cpp *.hpp)',
             ]
         },
     ],
