@@ -3,7 +3,7 @@
         'target_name': 'json11',
         'type': 'static_library',
         'sources': [
-            "json11/json11.cpp"
+            "json11_patch.cpp"
         ],
         'cflags': [
             '-fno-rtti',
