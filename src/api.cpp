@@ -34,7 +34,6 @@ Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread,
     }
     m_db->set("launch_number", static_cast<double>(launch));
     _log_launch(launch);
-
 }
 
 bool
