@@ -21,8 +21,10 @@ gyp: ./deps/gyp
 ./deps/json11:
 	git submodule update --init
 
-djinni: djinni-output-temp/gen.stamp mx3.cidl
+djinni-output-temp/gen.stamp mx3.cidl:
 	./run_djinni.sh
+
+djinni: djinni-output-temp/gen.stamp mx3.cidl
 
 # instruct gyp to build using the "xcode" build generator, also specify the OS
 # (so we can conditionally compile using that var later)
