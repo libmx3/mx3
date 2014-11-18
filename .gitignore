@@ -13,6 +13,8 @@ obj/
 # data files
 test_ldb
 test.sqlite
+example.sqlite
+kv.sqlite
 
 # misc
 .DS_Store
