@@ -1,6 +1,5 @@
 #pragma once
 #include "stl.hpp"
-#include <leveldb/db.h>
 #include <json11/json11.hpp>
 #include <CppSQLite/CppSQLite3.h>
 #include "sql_snapshot.hpp"
@@ -9,6 +8,7 @@
 #include "github/client.hpp"
 #include "github/types.hpp"
 #include "query_result.hpp"
+#include "db/json_store.hpp"
 
 namespace mx3 {
 
@@ -32,22 +32,15 @@ class Api final {
     mx3::QueryResultPtr<github::User> get_github_users();
 
   private:
-    static std::unique_ptr<leveldb::DB> _open_database(const std::string& db_path);
-    static void _throw_if_error(const leveldb::Status& status);
-
     // set up the database
     void _setup_db();
 
     // log to sqlite that the app has been launched
     void _log_launch(size_t num);
 
-    // persistent getters and setters for NSUserDefatuls style stuff
-    json11::Json _get_value(const std::string& key) const;
-    void _set_value(const std::string& key, const json11::Json& value);
-
     CppSQLite3DB m_sqlite;
     github::Client m_github_client;
-    std::unique_ptr<leveldb::DB> m_ldb;
+    std::unique_ptr<mx3::JsonStore> m_db;
     std::shared_ptr<mx3::EventLoop> m_main_thread;
     std::shared_ptr<mx3::EventLoop> m_bg_thread;
 };
