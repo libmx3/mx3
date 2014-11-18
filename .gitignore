@@ -37,3 +37,8 @@ DerivedData
 
 # AppCode
 .idea/
+
+# djinni
+src/gen/
+objc/gen/
+djinni-output-temp/

@@ -9,11 +9,12 @@
 #include "github/types.hpp"
 #include "query_result.hpp"
 #include "db/json_store.hpp"
+#include "gen/api.hpp"
 
 namespace mx3 {
 
 // the "api" of how the UI is allowed to talk to the c++ code
-class Api final {
+class Api final : public mx3_gen::Api {
   public:
     Api(
         const std::string& root_dir,
@@ -21,10 +22,10 @@ class Api final {
         const shared_ptr<mx3::Http>& http_client
     );
     // whether a user already exists
-    bool has_user() const;
+    virtual bool has_user() override;
     // get the current username, or "" if none exists
-    std::string get_username() const;
-    void set_username(const std::string& name);
+    virtual std::string get_username() override;
+    virtual void set_username(const std::string& name) override;
 
     // a _very_ simplistic query api
     std::unique_ptr<mx3::SqlSnapshot> get_launches();

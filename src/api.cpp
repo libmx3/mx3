@@ -37,12 +37,12 @@ Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread,
 }
 
 bool
-Api::has_user() const {
+Api::has_user() {
     return !m_db->get(USERNAME_KEY).is_null();
 }
 
 string
-Api::get_username() const {
+Api::get_username() {
     return m_db->get(USERNAME_KEY).string_value();
 }
 

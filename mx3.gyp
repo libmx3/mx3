@@ -30,7 +30,10 @@
             'target_name': 'libmx3_objc',
             'type': 'static_library',
             'conditions': [],
-            'dependencies': [ 'libmx3' ],
+            'dependencies': [
+                'deps/djinni/support-lib/support_lib.gyp:djinni_objc',
+                'libmx3',
+            ],
             'sources': [
                 '<!@(find objc -name "*.mm" -o -name "*.h" -o -name "*.m")',
             ],

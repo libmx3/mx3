@@ -1,0 +1,5 @@
+api = interface +c {
+    has_user(): bool;
+    get_username(): string;
+    set_username(username: string);
+}
