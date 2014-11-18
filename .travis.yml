@@ -1,5 +1,6 @@
 language: objective-c
 before_install:
+  - git submodule sync
   - git submodule update --init
   - gem install xcpretty
 install:
