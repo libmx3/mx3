@@ -2,7 +2,7 @@
 #include "stl.hpp"
 #include "github/client.hpp"
 #include "github/types.hpp"
-#include "db/leveldb_store.hpp"
+#include "db/sqlite_store.hpp"
 
 using mx3::Api;
 using json11::Json;
@@ -18,7 +18,7 @@ Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread,
     m_sqlite(),
     m_github_client(http_client),
     // todo this needs to use a fs/path abstraction (not yet built)
-    m_db( std_patch::make_unique<mx3::LeveldbStore>(root_path + "/example_ldb") ),
+    m_db( std_patch::make_unique<mx3::SqliteStore>(root_path + "/example.sqlite") ),
     m_main_thread(main_thread),
     m_bg_thread( make_shared<mx3::NativeEventLoop>() )
 {
