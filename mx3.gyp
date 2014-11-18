@@ -5,7 +5,6 @@
             'type': 'static_library',
             'conditions': [],
             'dependencies': [
-                'deps/leveldb.gyp:leveldb',
                 'deps/json11.gyp:json11',
                 'deps/sqlite3.gyp:sqlite3',
                 'deps/CppSQLite.gyp:CppSQLite',
