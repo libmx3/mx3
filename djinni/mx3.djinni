@@ -1,0 +1,10 @@
+@import "view_model.djinni"
+
+api = interface +c {
+    static create_api(root_path: string): api;
+    observer_user_list(): user_list_vm_handle;
+
+    has_user(): bool;
+    get_username(): string;
+    set_username(username: string);
+}

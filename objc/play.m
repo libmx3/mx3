@@ -1,12 +1,13 @@
 #import <Foundation/Foundation.h>
-#import "MX3Api.h"
+#import "gen/MX3Api.h"
+#import "gen/MX3ApiCppProxy.h"
 
 int main() {
-    MX3Api * api = [[MX3Api alloc] initWithRootPath:@"../mx3"];
+    id <MX3Api> api = [MX3ApiCppProxy createApi:@"../mx3"];
     if (![api hasUser]) {
         [api setUsername: NSUserName()];
     }
-    NSString * username = [api username];
+    NSString * username = [api getUsername];
     NSLog(@"Hello, %@", username);
     return 0;
 }

@@ -3,6 +3,7 @@
 #include "github/client.hpp"
 #include "github/types.hpp"
 #include "db/sqlite_store.hpp"
+#include "ui_interface/user_list_vm.hpp"
 
 using mx3::Api;
 using json11::Json;
@@ -49,6 +50,18 @@ Api::get_username() {
 void
 Api::set_username(const string& username) {
     m_db->set(USERNAME_KEY, username);
+}
+
+shared_ptr<mx3_gen::UserListVmHandle>
+Api::observer_user_list() {
+    std::weak_ptr<mx3::EventLoop> ui_thread_weak = m_main_thread;
+    auto ui_post = [ui_thread_weak] (function<void()> run_fn) {
+        auto ui_thread = ui_thread_weak.lock();
+        if (ui_thread) {
+            ui_thread->post(run_fn);
+        }
+    };
+    return make_shared<mx3::UserListVmHandle>(ui_post);
 }
 
 unique_ptr<mx3::SqlSnapshot>

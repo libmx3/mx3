@@ -39,6 +39,6 @@ DerivedData
 .idea/
 
 # djinni
-src/gen/
+src/interface/
 objc/gen/
 djinni-output-temp/

@@ -9,7 +9,7 @@
 #include "github/types.hpp"
 #include "query_result.hpp"
 #include "db/json_store.hpp"
-#include "gen/api.hpp"
+#include "interface/api.hpp"
 
 namespace mx3 {
 
@@ -26,6 +26,8 @@ class Api final : public mx3_gen::Api {
     // get the current username, or "" if none exists
     virtual std::string get_username() override;
     virtual void set_username(const std::string& name) override;
+
+    virtual shared_ptr<mx3_gen::UserListVmHandle> observer_user_list() override;
 
     // a _very_ simplistic query api
     std::unique_ptr<mx3::SqlSnapshot> get_launches();

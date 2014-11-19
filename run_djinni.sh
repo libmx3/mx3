@@ -17,9 +17,9 @@ base_dir=$(cd `dirname "$loc"` && pwd)
 
 temp_out="$base_dir/djinni-output-temp"
 
-in="$base_dir/mx3.cidl"
+in="$base_dir/djinni/mx3.djinni"
 
-cpp_out="$base_dir/src/gen"
+cpp_out="$base_dir/src/interface"
 objc_out="$base_dir/objc/gen"
 jni_out="$base_dir/generated-src/jni"
 java_out="$base_dir/generated-src/java/com/mx3"
@@ -54,6 +54,8 @@ $base_dir/deps/djinni/src/run-assume-built \
     --cpp-out "$temp_out/cpp" \
     --cpp-namespace mx3_gen \
     --ident-cpp-enum-type foo_bar \
+    --cpp-optional-header "<optional/optional.hpp>" \
+    --cpp-optional-template "std::experimental::optional" \
     \
     --objc-out "$temp_out/objc" \
     --objcpp-namespace djinni_generated \

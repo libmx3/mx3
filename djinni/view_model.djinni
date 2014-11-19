@@ -1,0 +1,20 @@
+user_list_vm_cell = record {
+    user_id: i64;
+    name: string;
+}
+
+user_list_vm = interface +c {
+    # the total number of results in this list
+    count(): i32;
+    # get the data for an individual user
+    get(index: i32): optional<user_list_vm_cell>;
+}
+
+user_list_vm_observer = interface +o {
+    on_update(new_data: user_list_vm);
+}
+
+user_list_vm_handle = interface +c {
+    start(observer: user_list_vm_observer);
+    stop();
+}
