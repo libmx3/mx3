@@ -25,7 +25,7 @@ class NativeEventLoop : public mx3::EventLoop {
     // the actual run loop runs here
     void _run_loop();
 
-    std::atomic_bool m_stop;
+    std::atomic<bool> m_stop;
     std::mutex m_mutex;
     std::condition_variable m_cv;
     std::queue<function<void()>> m_queue;

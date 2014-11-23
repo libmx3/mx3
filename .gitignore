@@ -2,6 +2,7 @@
 build/
 build_ios/
 build_mac/
+build_win/
 
 # gyp + android
 deps/gyp
