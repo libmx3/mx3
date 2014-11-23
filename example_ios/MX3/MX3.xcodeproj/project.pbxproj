@@ -28,6 +28,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B0F70B2E1A222B2200E36720 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 930F5C277E0446A0EF7CE320;
+			remoteInfo = libmx3_objc;
+		};
 		F0C7718F192A7821006469AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F0C77167192A7821006469AB /* Project object */;
@@ -62,13 +69,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 8E5AC5F54A231F301800298F;
 			remoteInfo = test;
-		};
-		F0C771D2192A7CBF006469AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 930F5C277E0446A0EF7CE320;
-			remoteInfo = libmx3_objc;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -237,7 +237,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				F0C771D3192A7CBF006469AB /* PBXTargetDependency */,
+				B0F70B2F1A222B2200E36720 /* PBXTargetDependency */,
 			);
 			name = MX3;
 			productName = MX3;
@@ -371,15 +371,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B0F70B2F1A222B2200E36720 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libmx3_objc;
+			targetProxy = B0F70B2E1A222B2200E36720 /* PBXContainerItemProxy */;
+		};
 		F0C77190192A7821006469AB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F0C7716E192A7821006469AB /* MX3 */;
 			targetProxy = F0C7718F192A7821006469AB /* PBXContainerItemProxy */;
-		};
-		F0C771D3192A7CBF006469AB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libmx3_objc;
-			targetProxy = F0C771D2192A7CBF006469AB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -457,7 +457,7 @@
 		F0C7719C192A7822006469AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -473,7 +473,7 @@
 					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = "armv7 armv7s";
+				VALID_ARCHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -481,7 +481,7 @@
 		F0C7719D192A7822006469AB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -497,7 +497,7 @@
 					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = "armv7 armv7s";
+				VALID_ARCHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
