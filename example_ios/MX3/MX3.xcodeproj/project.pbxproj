@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B02CAAE9192CFB0C007D3B2F /* libCppSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */; };
 		B09B174F1A1CD61100C8D6A7 /* libdjinni_objc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B09B174E1A1CD61100C8D6A7 /* libdjinni_objc.a */; };
 		F0C77173192A7821006469AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77172192A7821006469AB /* Foundation.framework */; };
 		F0C77175192A7821006469AB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77174192A7821006469AB /* CoreGraphics.framework */; };
@@ -107,7 +106,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				B09B174F1A1CD61100C8D6A7 /* libdjinni_objc.a in Frameworks */,
-				B02CAAE9192CFB0C007D3B2F /* libCppSQLite.a in Frameworks */,
 				F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */,
 				F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */,
 				F0C771D4192A7E06006469AB /* libmx3_objc.a in Frameworks */,

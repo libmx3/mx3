@@ -7,7 +7,6 @@
             'dependencies': [
                 'deps/json11.gyp:json11',
                 'deps/sqlite3.gyp:sqlite3',
-                'deps/CppSQLite.gyp:CppSQLite',
             ],
             'sources': [
                 # just automatically include all cpp and hpp files in src/ (for now)

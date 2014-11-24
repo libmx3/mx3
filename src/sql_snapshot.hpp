@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <CppSQLite/CppSQLite3.h>
 #include "sqlite/db.hpp"
 
 namespace mx3 {

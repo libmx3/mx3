@@ -1,7 +1,6 @@
 #pragma once
 #include "stl.hpp"
 #include <json11/json11.hpp>
-#include <CppSQLite/CppSQLite3.h>
 #include "sql_snapshot.hpp"
 #include "event_loop.hpp"
 #include "http.hpp"
