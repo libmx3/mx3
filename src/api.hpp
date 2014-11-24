@@ -41,7 +41,7 @@ class Api final : public mx3_gen::Api {
     // log to sqlite that the app has been launched
     void _log_launch(size_t num);
 
-    CppSQLite3DB m_sqlite;
+    sqlite::Db m_sqlite;
     github::Client m_github_client;
     std::unique_ptr<mx3::JsonStore> m_db;
     std::shared_ptr<mx3::EventLoop> m_main_thread;
