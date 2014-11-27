@@ -18,7 +18,7 @@ gyp: ./deps/gyp
 ./deps/gyp:
 	git clone --depth 1 https://chromium.googlesource.com/external/gyp.git ./deps/gyp
 
-./deps/json11:
+./deps/djinni:
 	git submodule update --init
 
 djinni-output-temp/gen.stamp mx3.cidl:

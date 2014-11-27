@@ -8,7 +8,7 @@ namespace mx3 {
 // a class that represents a ResultSet from a Sql query at a point in time
 class SqlSnapshot final {
   public:
-    SqlSnapshot(sqlite::Query& query);
+    SqlSnapshot(sqlite::Cursor& cursor);
     const std::string& at(size_t index);
     size_t size() const { return m_data.size(); }
   private:

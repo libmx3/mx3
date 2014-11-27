@@ -17,8 +17,10 @@ namespace {
 }
 
 Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3::Http>& http_client) :
+    m_http(http_client),
     m_sqlite(root_path + "/example.sqlite"),
-    m_github_client(http_client),
+    m_read_db( make_shared<mx3::sqlite::Db>(root_path + "/example.sqlite") ),
+    m_github_client( m_http ),
     // todo this needs to use a fs/path abstraction (not yet built)
     m_db( std_patch::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") ),
     m_main_thread(main_thread),
@@ -59,7 +61,7 @@ Api::observer_user_list() {
             ui_thread->post(run_fn);
         }
     };
-    return make_shared<mx3::UserListVmHandle>(ui_post);
+    return make_shared<mx3::UserListVmHandle>(m_read_db, m_http, ui_post);
 }
 
 unique_ptr<mx3::SqlSnapshot>
@@ -93,7 +95,26 @@ Api::_log_launch(size_t num) {
 void
 Api::_setup_db() {
     vector<string> setup_commands  {
-        "CREATE TABLE IF NOT EXISTS `Data` (content TEXT)"
+        "CREATE TABLE IF NOT EXISTS `Data` (content TEXT)",
+        "CREATE TABLE IF NOT EXISTS `github_users` ("
+            "`login` TEXT, "
+            "`id` INTEGER, "
+            "`avatar_url` TEXT, "
+            "`gravatar_id` TEXT, "
+            "`url` TEXT, "
+            "`html_url` TEXT, "
+            "`followers_url` TEXT, "
+            "`following_url` TEXT, "
+            "`gists_url` TEXT, "
+            "`starred_url` TEXT, "
+            "`subscriptions_url` TEXT, "
+            "`organizations_url` TEXT, "
+            "`repos_url` TEXT, "
+            "`events_url` TEXT, "
+            "`received_events_url` TEXT, "
+            "`type` TEXT, "
+            "`site_admin` TEXT"
+        ");"
     };
     for (const auto& cmd : setup_commands) {
         m_sqlite.exec(cmd);

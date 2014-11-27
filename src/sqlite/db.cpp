@@ -3,7 +3,7 @@
 
 using mx3::sqlite::Db;
 using mx3::sqlite::Stmt;
-using mx3::sqlite::Query;
+using mx3::sqlite::Cursor;
 
 namespace {
     // a helper funciton which throws when it encounters an error
@@ -29,22 +29,23 @@ Db::Db(const string& path) : m_db {nullptr} {
         SQLITE_OPEN_NOMUTEX |
         SQLITE_OPEN_PRIVATECACHE;
 
-    auto error_code = sqlite3_open_v2(path.c_str(), &m_db, flags, nullptr);
+    sqlite3 * db;
+    auto error_code = sqlite3_open_v2(path.c_str(), &db, flags, nullptr);
+    m_db = unique_ptr<sqlite3, Db::Closer>{db};
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     }
 }
 
-Db::~Db() {
-    if (m_db) {
-        sqlite3_close_v2(m_db);
-    }
+void
+Db::Closer::operator() (sqlite3 * db) {
+    sqlite3_close_v2(db);
 }
 
 void
 Db::exec(const string& sql) {
     char * error_msg = nullptr;
-    auto result = sqlite3_exec(m_db, sql.c_str(), nullptr, nullptr, &error_msg);
+    auto result = sqlite3_exec(m_db.get(), sql.c_str(), nullptr, nullptr, &error_msg);
     if (result && error_msg) {
         if (error_msg) {
             throw std::runtime_error { string(error_msg) };
@@ -58,7 +59,7 @@ Stmt
 Db::prepare(const string& sql) {
     sqlite3_stmt * stmt = nullptr;
     const char * end_point = nullptr;
-    auto error_code = sqlite3_prepare_v2(m_db, sql.c_str(), static_cast<int>(sql.length()), &stmt, &end_point);
+    auto error_code = sqlite3_prepare_v2(m_db.get(), sql.c_str(), static_cast<int>(sql.length()), &stmt, &end_point);
     Stmt wrapped_stmt {stmt};
 
     if (error_code != SQLITE_OK) {
@@ -110,12 +111,12 @@ Stmt::bind(int pos, const string& value) {
 
 int
 Stmt::exec() {
-    auto query = this->exec_query();
+    auto cursor = this->exec_query();
     auto * db = sqlite3_db_handle(m_stmt.get());
     return sqlite3_changes(db);
 }
 
-Query
+Cursor
 Stmt::exec_query() {
     sqlite3_stmt * stmt = m_stmt.get();
     // todo check result code
@@ -130,13 +131,18 @@ Stmt::exec_query() {
           break;
         }
     }
-    return Query {stmt, result == SQLITE_DONE};
+    return Cursor {stmt, result == SQLITE_DONE};
 }
 
-Query::Query(sqlite3_stmt * stmt, bool is_done) : m_is_done{is_done}, m_stmt {stmt} {}
+Cursor::Cursor(sqlite3_stmt * stmt, bool is_done) : m_is_done{is_done}, m_stmt {stmt} {}
 
 void
-Query::next() {
+Cursor::NoopDelete::operator() (sqlite3_stmt * stmt) {
+    sqlite3_reset(stmt);
+}
+
+void
+Cursor::next() {
     auto result = sqlite3_step(m_stmt.get());
     switch (result) {
         case SQLITE_ROW:
@@ -152,10 +158,19 @@ Query::next() {
 }
 
 string
-Query::get_string(int pos) {
+Cursor::get_string(int pos) {
     auto stmt = m_stmt.get();
     if (sqlite3_column_type(stmt, pos) != SQLITE_TEXT) {
         throw std::runtime_error {"invalid type for column"};
     }
     return string { reinterpret_cast<const char *>( sqlite3_column_text(stmt, pos) ) };
+}
+
+int32_t
+Cursor::get_int(int pos) {
+    auto stmt = m_stmt.get();
+    if (sqlite3_column_type(stmt, pos) != SQLITE_INTEGER) {
+        throw std::runtime_error {"invalid type for column"};
+    }
+    return sqlite3_column_int(stmt, pos);
 }
