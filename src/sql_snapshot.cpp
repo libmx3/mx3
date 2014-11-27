@@ -5,7 +5,7 @@ using std::string;
 
 SqlSnapshot::SqlSnapshot(mx3::sqlite::Cursor& cursor) {
     while (cursor.has_next()) {
-        m_data.emplace_back(cursor.get_string(0));
+        m_data.emplace_back(cursor.string_value(0));
         cursor.next();
     }
 }

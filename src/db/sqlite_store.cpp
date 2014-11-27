@@ -14,7 +14,7 @@ SqliteStore::get(const string& key) {
     auto query = stmt.exec_query();
 
     if (query.has_next()) {
-        string value = query.get_string(0);
+        string value = query.string_value(0);
         string error;
         return Json::parse(value, error);
     } else {

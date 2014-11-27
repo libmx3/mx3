@@ -30,7 +30,7 @@ UserListVm::count() {
     if (m_count) {
         return *m_count;
     }
-    m_count = m_count_stmt.exec_query().get_int(0);
+    m_count = m_count_stmt.exec_query().int_value(0);
     std::cout << "Count: " << *m_count << std::endl;
     return *m_count;
 }
@@ -45,7 +45,7 @@ UserListVm::get(const int32_t & index) {
 
     m_row_cache.resize(index + 1);
     while (m_query.has_next() && m_cursor_pos <= index) {
-        m_row_cache[m_cursor_pos] = UserListVmCell {m_cursor_pos, m_query.get_string(0)};
+        m_row_cache[m_cursor_pos] = UserListVmCell {m_cursor_pos, m_query.string_value(0)};
         m_query.next();
         m_cursor_pos++;
     }

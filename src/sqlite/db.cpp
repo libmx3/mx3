@@ -14,6 +14,14 @@ namespace {
             throw std::runtime_error { sqlite3_errstr(error_code) };
         }
     }
+
+    template<typename F>
+    inline auto s_column_or_throw(F&& fn, sqlite3_stmt * stmt, int expected_type, int pos) -> decltype(fn(stmt, pos)) {
+        if (sqlite3_column_type(stmt, pos) != expected_type) {
+            throw std::runtime_error {"invalid type for column"};
+        }
+        return std::forward<F>(fn)(stmt, pos);
+    }
 }
 
 shared_ptr<Db>
@@ -74,9 +82,32 @@ Stmt::Stmt(sqlite3_stmt * stmt) : m_stmt{stmt} {}
 void
 Stmt::Deleter::operator() (sqlite3_stmt * stmt) {
     if (stmt) {
-        auto error_code = sqlite3_finalize(stmt);
-        // check error code, issue warning
+        /* unused error_code = */ sqlite3_finalize(stmt);
     }
+}
+
+int
+Stmt::param_count() const {
+    return sqlite3_bind_parameter_count(m_stmt.get());
+}
+
+optional<string>
+Stmt::param_name(int pos) const {
+    auto name = sqlite3_bind_parameter_name(m_stmt.get(), pos);
+    if (name) {
+        return string {name};
+    } else {
+        return nullopt;
+    }
+}
+
+int
+Stmt::param_index(const string& name) const {
+    auto index = sqlite3_bind_parameter_index(m_stmt.get(), name.c_str());
+    if (index == 0) {
+        throw std::runtime_error { "Param `" + name + "` not found" };
+    }
+    return index;
 }
 
 void
@@ -119,26 +150,49 @@ Stmt::exec() {
 Cursor
 Stmt::exec_query() {
     sqlite3_stmt * stmt = m_stmt.get();
-    // todo check result code
-    sqlite3_reset(stmt);
-    auto result = sqlite3_step(stmt);
-    switch (result) {
+    this->reset();
+    auto result_code = sqlite3_step(stmt);
+    switch (result_code) {
         case SQLITE_ROW:
         case SQLITE_DONE:
             break;
         default: {
-          throw std::runtime_error { "invalid query" };
+          throw std::runtime_error { sqlite3_errstr(result_code) };
           break;
         }
     }
-    return Cursor {stmt, result == SQLITE_DONE};
+    return Cursor {stmt, result_code == SQLITE_DONE};
+}
+
+void
+Stmt::reset() {
+    auto error_code = sqlite3_reset(m_stmt.get());
+    if (error_code != SQLITE_OK) {
+        throw std::runtime_error { sqlite3_errstr(error_code) };
+    }
+}
+
+void
+Stmt::clear_bindings() {
+    sqlite3_clear_bindings(m_stmt.get());
 }
 
 Cursor::Cursor(sqlite3_stmt * stmt, bool is_done) : m_is_done{is_done}, m_stmt {stmt} {}
 
 void
-Cursor::NoopDelete::operator() (sqlite3_stmt * stmt) {
+Cursor::Reset::operator() (sqlite3_stmt * stmt) {
     sqlite3_reset(stmt);
+}
+
+string
+Cursor::column_name(int pos) const {
+    auto name = sqlite3_column_name(m_stmt.get(), pos);
+    return string {name};
+}
+
+int
+Cursor::column_count() const {
+    return sqlite3_column_count(m_stmt.get());
 }
 
 void
@@ -158,19 +212,30 @@ Cursor::next() {
 }
 
 string
-Cursor::get_string(int pos) {
-    auto stmt = m_stmt.get();
-    if (sqlite3_column_type(stmt, pos) != SQLITE_TEXT) {
-        throw std::runtime_error {"invalid type for column"};
-    }
-    return string { reinterpret_cast<const char *>( sqlite3_column_text(stmt, pos) ) };
+Cursor::string_value(int pos) {
+    auto data = s_column_or_throw(sqlite3_column_text, m_stmt.get(), SQLITE_TEXT, pos);
+    return string { reinterpret_cast<const char *>(data) };
 }
 
 int32_t
-Cursor::get_int(int pos) {
+Cursor::int_value(int pos) {
+    return s_column_or_throw(sqlite3_column_int, m_stmt.get(), SQLITE_INTEGER, pos);
+}
+
+int64_t
+Cursor::int64_value(int pos) {
+    return s_column_or_throw(sqlite3_column_int64, m_stmt.get(), SQLITE_INTEGER, pos);
+}
+
+double
+Cursor::double_value(int pos) {
+    return s_column_or_throw(sqlite3_column_double, m_stmt.get(), SQLITE_FLOAT, pos);
+}
+
+vector<uint8_t>
+Cursor::blob_value(int pos) {
     auto stmt = m_stmt.get();
-    if (sqlite3_column_type(stmt, pos) != SQLITE_INTEGER) {
-        throw std::runtime_error {"invalid type for column"};
-    }
-    return sqlite3_column_int(stmt, pos);
+    const auto len = s_column_or_throw(sqlite3_column_bytes, stmt, SQLITE_BLOB, pos);
+    const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
+    return {data, data + len};
 }
