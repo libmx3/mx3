@@ -20,8 +20,8 @@ class UserListVm final : public mx3_gen::UserListVm {
     int32_t m_cursor_pos;
     vector<optional<mx3_gen::UserListVmCell>> m_row_cache;
     shared_ptr<sqlite::Db> m_db;
-    sqlite::Stmt m_count_stmt;
-    sqlite::Stmt m_list_stmt;
+    shared_ptr<sqlite::Stmt> m_count_stmt;
+    shared_ptr<sqlite::Stmt> m_list_stmt;
     sqlite::Cursor m_query;
 };
 

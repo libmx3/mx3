@@ -41,7 +41,7 @@ class Api final : public mx3_gen::Api {
     void _log_launch(size_t num);
 
     shared_ptr<mx3::Http> m_http;
-    sqlite::Db m_sqlite;
+    shared_ptr<sqlite::Db> m_sqlite;
     shared_ptr<sqlite::Db> m_read_db;
 
     github::Client m_github_client;

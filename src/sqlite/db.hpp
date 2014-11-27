@@ -7,6 +7,9 @@ struct sqlite3_stmt;
 
 namespace mx3 { namespace sqlite {
 
+class Stmt;
+class Db;
+
 class Cursor final {
   public:
     bool has_next() { return !m_is_done; }
@@ -23,16 +26,18 @@ class Cursor final {
 
   private:
     friend class Stmt;
-    struct Reset final {
-        void operator() (sqlite3_stmt * stmt);
-    };
-    Cursor(sqlite3_stmt * stmt, bool is_done);
+    Cursor(shared_ptr<Stmt> stmt, bool is_done);
+
+    // this keeps the statement alive while we are executing the query
+    shared_ptr<Stmt> m_stmt;
     bool m_is_done;
-    unique_ptr<sqlite3_stmt, Reset> m_stmt;
+    unique_ptr<bool> m_dont_let_anyone_copy_me;
 };
 
-class Stmt final {
+class Stmt final : public std::enable_shared_from_this<Stmt> {
   public:
+    sqlite3_stmt * borrow_stmt();
+
     // this is how many parameters this statment expects
     int param_count() const;
     // the name of the indexed parameter.  Some parameters are nameless and therefore
@@ -64,20 +69,22 @@ class Stmt final {
     void clear_bindings();
   private:
     friend class Db;
-    struct Deleter final {
+    struct Finalizer final {
         void operator() (sqlite3_stmt * stmt);
     };
-    Stmt(sqlite3_stmt * stmt);
-    unique_ptr<sqlite3_stmt, Deleter> m_stmt;
+    Stmt(sqlite3_stmt * stmt, shared_ptr<Db> db);
+    shared_ptr<Db> m_db;
+    unique_ptr<sqlite3_stmt, Finalizer> m_stmt;
 };
 
-class Db final {
+class Db final : public std::enable_shared_from_this<Db> {
   public:
     static shared_ptr<Db> open(const string& path);
-    Db(const string& path);
+    sqlite3 * borrow_db();
+    shared_ptr<Stmt> prepare(const string& sql);
     void exec(const string& sql);
-    Stmt prepare(const string& sql);
   private:
+    Db(const string& path);
     struct Closer final {
         void operator() (sqlite3 * db);
     };

@@ -18,8 +18,8 @@ namespace {
 
 Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3::Http>& http_client) :
     m_http(http_client),
-    m_sqlite(root_path + "/example.sqlite"),
-    m_read_db( make_shared<mx3::sqlite::Db>(root_path + "/example.sqlite") ),
+    m_sqlite( mx3::sqlite::Db::open(root_path + "/example.sqlite") ),
+    m_read_db( mx3::sqlite::Db::open(root_path + "/example.sqlite") ),
     m_github_client( m_http ),
     // todo this needs to use a fs/path abstraction (not yet built)
     m_db( std_patch::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") ),
@@ -66,8 +66,8 @@ Api::observer_user_list() {
 
 unique_ptr<mx3::SqlSnapshot>
 Api::get_launches() {
-    auto stmt = m_sqlite.prepare("SELECT content FROM Data");
-    auto query = stmt.exec_query();
+    auto stmt = m_sqlite->prepare("SELECT content FROM Data");
+    auto query = stmt->exec_query();
     return std::unique_ptr<mx3::SqlSnapshot>( new mx3::SqlSnapshot(query) );
 }
 
@@ -87,9 +87,9 @@ Api::get_github_users() {
 void
 Api::_log_launch(size_t num) {
     string log_line = "Launch #" + to_string(num);
-    auto stmt = m_sqlite.prepare("INSERT INTO `Data` (content) VALUES (?1)");
-    stmt.bind(1, log_line);
-    stmt.exec();
+    auto stmt = m_sqlite->prepare("INSERT INTO `Data` (content) VALUES (?1)");
+    stmt->bind(1, log_line);
+    stmt->exec();
 }
 
 void
@@ -117,6 +117,6 @@ Api::_setup_db() {
         ");"
     };
     for (const auto& cmd : setup_commands) {
-        m_sqlite.exec(cmd);
+        m_sqlite->exec(cmd);
     }
 }

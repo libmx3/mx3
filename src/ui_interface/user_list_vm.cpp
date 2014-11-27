@@ -22,7 +22,7 @@ UserListVm::UserListVm(shared_ptr<mx3::sqlite::Db> db)
     , m_db {db}
     , m_count_stmt { m_db->prepare(s_count_stmt) }
     , m_list_stmt  { m_db->prepare(s_list_stmt) }
-    , m_query { m_list_stmt.exec_query() }
+    , m_query { m_list_stmt->exec_query() }
 {}
 
 int32_t
@@ -30,8 +30,11 @@ UserListVm::count() {
     if (m_count) {
         return *m_count;
     }
-    m_count = m_count_stmt.exec_query().int_value(0);
-    std::cout << "Count: " << *m_count << std::endl;
+    auto start = chrono::steady_clock::now();
+    m_count = m_count_stmt->exec_query().int_value(0);
+    auto end = chrono::steady_clock::now();
+    double millis = chrono::duration_cast<chrono::nanoseconds>( end - start ).count() / 1000000.0;
+    std::cout << "Count: " << *m_count << " (" << millis << ") milliseconds" << std::endl;
     return *m_count;
 }
 
@@ -74,7 +77,6 @@ UserListVmHandle::UserListVmHandle(
 
 void
 UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
-
     auto db = m_db;
     auto post_ui = m_post_ui;
 
@@ -83,8 +85,8 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
         db->exec("BEGIN TRANSACTION");
         for (const auto& user : users) {
             // todo(kabbes) insert all fields, check for duplicates
-            stmt.bind(1, user.login);
-            stmt.exec();
+            stmt->bind(1, user.login);
+            stmt->exec();
         }
         db->exec("COMMIT TRANSACTION");
         post_ui([db, observer] () {
