@@ -42,7 +42,7 @@ optional<UserListVmCell>
 UserListVm::get(const int32_t & index) {
     auto start = chrono::steady_clock::now();
 
-    if (index < m_row_cache.size()) {
+    if (index < static_cast<int32_t>(m_row_cache.size())) {
         return m_row_cache[index];
     }
 

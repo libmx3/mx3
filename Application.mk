@@ -4,4 +4,4 @@ APP_PLATFORM          := android-19
 APP_STL               := gnustl_static
 APP_ABI               := all
 APP_BUILD_SCRIPT      := GypAndroid.mk
-APP_MODULES           := libmx3_gyp
+APP_MODULES           := mx3_android

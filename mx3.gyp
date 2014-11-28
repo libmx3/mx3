@@ -48,6 +48,28 @@
             },
         },
         {
+            'target_name': 'libmx3_android',
+            'android_unmangled_name': 1,
+            'type': 'shared_library',
+            'dependencies': [
+                'deps/djinni/support-lib/support_lib.gyp:djinni_jni',
+                'libmx3',
+            ],
+            'sources': [
+                '<!@(python glob.py android/jni_gen *.cpp *.hpp)',
+            ],
+            'include_dirs': [
+                'include',
+                'src/interface',
+            ],
+            'all_dependent_settings': {
+                'include_dirs': [
+                    'include',
+                    'src/interface',
+                ],
+            },
+        },
+        {
             'target_name': 'play_objc',
             'type': 'executable',
             'dependencies': ['libmx3_objc'],
