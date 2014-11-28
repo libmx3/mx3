@@ -42,7 +42,7 @@ void
 UsersRequest::on_network_error() {}
 
 void
-UsersRequest::on_success(const int16_t& http_code, const string& data) {
+UsersRequest::on_success(const int16_t&, const string& data) {
     vector<github::User> users;
 
     string error;

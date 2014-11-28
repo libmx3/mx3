@@ -6,6 +6,7 @@ clean:
 	-rm -rf build_mac/
 	-rm -rf build_ios/
 	-rm -rf obj/
+	-rm -rf libs/
 	-rm GypAndroid.mk
 	-rm *.target.mk
 	-rm deps/*.target.mk
@@ -54,5 +55,12 @@ android: GypAndroid.mk
 
 test: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | ${xb-prettifier} && ./build/Debug/test
+
+cleanup_gyp: ./deps/gyp mx3.gyp common.gypi
+	deps/gyp/tools/pretty_gyp.py deps/gtest.gyp > gtest_temp.gyp && mv gtest_temp.gyp deps/gtest.gyp
+	deps/gyp/tools/pretty_gyp.py deps/json11.gyp > json11_temp.gyp && mv json11_temp.gyp deps/json11.gyp
+	deps/gyp/tools/pretty_gyp.py deps/sqlite3.gyp > sqlite3_temp.gyp && mv sqlite3_temp.gyp deps/sqlite3.gyp
+	deps/gyp/tools/pretty_gyp.py mx3.gyp > mx3_temp.gyp && mv mx3_temp.gyp mx3.gyp
+	deps/gyp/tools/pretty_gyp.py common.gypi > common_temp.gypi && mv common_temp.gypi common.gypi
 
 .PHONY: djinni
