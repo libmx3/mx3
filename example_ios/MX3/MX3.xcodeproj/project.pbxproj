@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B02CAAE9192CFB0C007D3B2F /* libCppSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */; };
+		B09B174F1A1CD61100C8D6A7 /* libdjinni_objc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B09B174E1A1CD61100C8D6A7 /* libdjinni_objc.a */; };
 		F0C77173192A7821006469AB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77172192A7821006469AB /* Foundation.framework */; };
 		F0C77175192A7821006469AB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77174192A7821006469AB /* CoreGraphics.framework */; };
 		F0C77177192A7821006469AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C77176192A7821006469AB /* UIKit.framework */; };
@@ -24,10 +24,16 @@
 		F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D6192A7E06006469AB /* libjson11.a */; };
 		F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0C771D8192A7E06006469AB /* libsqlite3.a */; };
 		F0C771E3192A800F006469AB /* MXSampleDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C771E2192A800F006469AB /* MXSampleDataTableViewController.m */; };
-		F0C771E6192A8193006469AB /* MX3Api+iOS.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C771E5192A8193006469AB /* MX3Api+iOS.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B0F70B2E1A222B2200E36720 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 930F5C277E0446A0EF7CE320;
+			remoteInfo = libmx3_objc;
+		};
 		F0C7718F192A7821006469AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F0C77167192A7821006469AB /* Project object */;
@@ -63,17 +69,11 @@
 			remoteGlobalIDString = 8E5AC5F54A231F301800298F;
 			remoteInfo = test;
 		};
-		F0C771D2192A7CBF006469AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 930F5C277E0446A0EF7CE320;
-			remoteInfo = libmx3_objc;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCppSQLite.a; path = "../../deps/build/Debug-iphoneos/libCppSQLite.a"; sourceTree = "<group>"; };
+		B09B174E1A1CD61100C8D6A7 /* libdjinni_objc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdjinni_objc.a; path = "../../deps/djinni/support-lib/build/Debug-iphoneos/libdjinni_objc.a"; sourceTree = "<group>"; };
 		F0C7716F192A7821006469AB /* MX3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MX3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0C77172192A7821006469AB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F0C77174192A7821006469AB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -98,8 +98,6 @@
 		F0C771D8192A7E06006469AB /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = "../../deps/build/Debug-iphoneos/libsqlite3.a"; sourceTree = "<group>"; };
 		F0C771E1192A800F006469AB /* MXSampleDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MXSampleDataTableViewController.h; sourceTree = "<group>"; };
 		F0C771E2192A800F006469AB /* MXSampleDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MXSampleDataTableViewController.m; sourceTree = "<group>"; };
-		F0C771E4192A8193006469AB /* MX3Api+iOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MX3Api+iOS.h"; sourceTree = "<group>"; };
-		F0C771E5192A8193006469AB /* MX3Api+iOS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MX3Api+iOS.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,7 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B02CAAE9192CFB0C007D3B2F /* libCppSQLite.a in Frameworks */,
+				B09B174F1A1CD61100C8D6A7 /* libdjinni_objc.a in Frameworks */,
 				F0C771D9192A7E06006469AB /* libjson11.a in Frameworks */,
 				F0C771DB192A7E06006469AB /* libsqlite3.a in Frameworks */,
 				F0C771D4192A7E06006469AB /* libmx3_objc.a in Frameworks */,
@@ -154,6 +152,7 @@
 		F0C77171192A7821006469AB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B09B174E1A1CD61100C8D6A7 /* libdjinni_objc.a */,
 				B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */,
 				F0C771D6192A7E06006469AB /* libjson11.a */,
 				F0C771D7192A7E06006469AB /* libleveldb.a */,
@@ -175,8 +174,6 @@
 			children = (
 				F0C77181192A7821006469AB /* MXAppDelegate.h */,
 				F0C77182192A7821006469AB /* MXAppDelegate.m */,
-				F0C771E4192A8193006469AB /* MX3Api+iOS.h */,
-				F0C771E5192A8193006469AB /* MX3Api+iOS.m */,
 				F0C771E1192A800F006469AB /* MXSampleDataTableViewController.h */,
 				F0C771E2192A800F006469AB /* MXSampleDataTableViewController.m */,
 				F0C77184192A7821006469AB /* Images.xcassets */,
@@ -238,7 +235,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				F0C771D3192A7CBF006469AB /* PBXTargetDependency */,
+				B0F70B2F1A222B2200E36720 /* PBXTargetDependency */,
 			);
 			name = MX3;
 			productName = MX3;
@@ -358,7 +355,6 @@
 				F0C7717F192A7821006469AB /* main.m in Sources */,
 				F0C77183192A7821006469AB /* MXAppDelegate.m in Sources */,
 				F0C771E3192A800F006469AB /* MXSampleDataTableViewController.m in Sources */,
-				F0C771E6192A8193006469AB /* MX3Api+iOS.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,15 +369,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B0F70B2F1A222B2200E36720 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libmx3_objc;
+			targetProxy = B0F70B2E1A222B2200E36720 /* PBXContainerItemProxy */;
+		};
 		F0C77190192A7821006469AB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F0C7716E192A7821006469AB /* MX3 */;
 			targetProxy = F0C7718F192A7821006469AB /* PBXContainerItemProxy */;
-		};
-		F0C771D3192A7CBF006469AB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libmx3_objc;
-			targetProxy = F0C771D2192A7CBF006469AB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -459,7 +455,7 @@
 		F0C7719C192A7822006469AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -470,9 +466,12 @@
 					../../objc/,
 				);
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = "armv7 armv7s";
+				VALID_ARCHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -480,7 +479,7 @@
 		F0C7719D192A7822006469AB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -491,9 +490,12 @@
 					../../objc/,
 				);
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = "armv7 armv7s";
+				VALID_ARCHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
