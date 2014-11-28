@@ -6,7 +6,7 @@ namespace github {
 // lets put all the "entities" of the github api in here
 struct User {
     string login;
-    uint64_t id;
+    int64_t id;
     string avatar_url;
     string gravatar_id;
     string url;

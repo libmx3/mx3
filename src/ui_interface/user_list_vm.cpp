@@ -80,13 +80,21 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
     auto db = m_db;
     auto post_ui = m_post_ui;
 
-    github::Client::get_users(m_http, [db, post_ui, observer] (vector<github::User> users) {
-        auto stmt = db->prepare("INSERT INTO `github_users` (`login`) VALUES (?1);");
+    github::Client::get_users(m_http, nullopt, [db, post_ui, observer] (vector<github::User> users) {
+        auto update_stmt = db->prepare("UPDATE `github_users` SET `login` = ?2 WHERE `id` = ?1;");
+        auto insert_stmt = db->prepare("INSERT INTO `github_users` (`id`, `login`) VALUES (?1, ?2);");
         db->exec("BEGIN TRANSACTION");
         for (const auto& user : users) {
-            // todo(kabbes) insert all fields, check for duplicates
-            stmt->bind(1, user.login);
-            stmt->exec();
+            update_stmt->reset();
+            update_stmt->bind(1, user.id);
+            update_stmt->bind(2, user.login);
+            if ( update_stmt->exec() == 0 ) {
+                insert_stmt->reset();
+                insert_stmt->bind(1, user.id);
+                insert_stmt->bind(2, user.login);
+                insert_stmt->exec();
+            }
+
         }
         db->exec("COMMIT TRANSACTION");
         post_ui([db, observer] () {
@@ -99,5 +107,4 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
 void
 UserListVmHandle::stop() {
     // this isn't implemented yet :(
-
 }

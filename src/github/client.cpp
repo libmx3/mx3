@@ -14,8 +14,12 @@ Client::Client(const shared_ptr<mx3::Http>& http_client) : m_http(http_client) {
 
 // todo error handling?
 void
-Client::get_users(shared_ptr<mx3::Http> http, function<void(vector<github::User>)> callback) {
-    http->get(BASE_URL + "/users", [callback] (mx3::HttpResponse response) {
+Client::get_users(shared_ptr<mx3::Http> http, optional<uint64_t> since, function<void(vector<github::User>)> callback) {
+    string url = BASE_URL + "/users";
+    if (since) {
+        url += "?since=" + std::to_string(*since);
+    }
+    http->get(url, [callback] (mx3::HttpResponse response) {
         vector<github::User> users;
 
         string error;
@@ -36,8 +40,8 @@ Client::get_users(shared_ptr<mx3::Http> http, function<void(vector<github::User>
 }
 
 void
-Client::get_users(function<void(vector<github::User>)> callback) {
-    Client::get_users(m_http, callback);
+Client::get_users(optional<uint64_t> since, function<void(vector<github::User>)> callback) {
+    Client::get_users(m_http, since, callback);
 }
 
 github::User

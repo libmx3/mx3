@@ -6,7 +6,7 @@
 #include "stl.hpp"
 #include <atomic>
 #include "../http.hpp"
-#include "../sqlite/db.hpp"
+#include "../sqlite/sqlite.hpp"
 
 namespace mx3 {
 

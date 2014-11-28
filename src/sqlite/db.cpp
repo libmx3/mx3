@@ -3,33 +3,10 @@
 
 using mx3::sqlite::Db;
 using mx3::sqlite::Stmt;
-using mx3::sqlite::Cursor;
-
-namespace {
-    // a helper funciton which throws when it encounters an error
-    template<typename F, typename... Args>
-    inline void s_throw_on_sqlite_error(F&& fn, sqlite3_stmt * stmt, Args... args) {
-        auto error_code = fn(stmt, std::forward<Args>(args)...);
-        if (error_code != SQLITE_OK) {
-            throw std::runtime_error { sqlite3_errstr(error_code) };
-        }
-    }
-
-    template<typename F>
-    inline auto s_column_or_throw(F&& fn, sqlite3_stmt * stmt, int expected_type, int pos) -> decltype(fn(stmt, pos)) {
-        if (sqlite3_column_type(stmt, pos) != expected_type) {
-            throw std::runtime_error {"invalid type for column"};
-        }
-        return std::forward<F>(fn)(stmt, pos);
-    }
-}
+using mx3::sqlite::ChangeType;
 
 shared_ptr<Db>
 Db::open(const string& db_path) {
-    return shared_ptr<Db> { new Db(db_path) };
-}
-
-Db::Db(const string& path) : m_db {nullptr} {
     constexpr const int flags =
         SQLITE_OPEN_READWRITE |
         SQLITE_OPEN_CREATE |
@@ -38,16 +15,92 @@ Db::Db(const string& path) : m_db {nullptr} {
         SQLITE_OPEN_PRIVATECACHE;
 
     sqlite3 * db;
-    auto error_code = sqlite3_open_v2(path.c_str(), &db, flags, nullptr);
-    m_db = unique_ptr<sqlite3, Db::Closer>{db};
+    auto error_code = sqlite3_open_v2(db_path.c_str(), &db, flags, nullptr);
+    auto temp_db = unique_ptr<sqlite3, Db::Closer> {db};
+
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     }
+    return shared_ptr<Db> { new Db{std::move(temp_db)} };
 }
+
+shared_ptr<Db>
+Db::open_memory() {
+    return Db::open(":memory:");
+}
+
+shared_ptr<Db>
+Db::inherit_db(sqlite3 * db) {
+    auto temp_db = unique_ptr<sqlite3, Db::Closer> {db};
+    return shared_ptr<Db> { new Db{std::move(temp_db)} };
+}
+
+Db::Db(unique_ptr<sqlite3, Closer> db) : m_db { std::move(db) } {}
 
 sqlite3 *
 Db::borrow_db() {
     return m_db.get();
+}
+
+void
+Db::update_hook(UpdateHookFn update_fn) {
+    m_update_hook = update_fn;
+    sqlite3_update_hook(m_db.get(), [] (void * self, int change_type, const char * db_name, const char * table_name, sqlite3_int64 row_id) {
+        Db * db = static_cast<Db*>(self);
+        if (db->m_update_hook) {
+            auto update_hook = db->m_update_hook;
+            optional<ChangeType> type = nullopt;
+            switch (change_type) {
+                case SQLITE_INSERT: {
+                    type = ChangeType::INSERT;
+                    break;
+                }
+                case SQLITE_UPDATE: {
+                    type = ChangeType::UPDATE;
+                    break;
+                }
+                case SQLITE_DELETE: {
+                    type = ChangeType::DELETE;
+                    break;
+                }
+            }
+            if (!type) {
+                throw std::runtime_error {"Unexpected update type from sqlite"};
+            }
+            update_hook(*type, string {db_name}, string {table_name}, static_cast<int64_t>(row_id));
+        }
+    }, this);
+}
+
+void
+Db::commit_hook(function<bool()> commit_fn) {
+    m_commit_hook = commit_fn;
+    sqlite3_commit_hook(m_db.get(), [] (void * self) -> int {
+        Db * db = static_cast<Db*>(self);
+        if (db->m_commit_hook) {
+            auto commit_hook = db->m_commit_hook;
+            bool result = commit_hook();
+            return result ? 0 : 1;
+        }
+        return 0;
+    }, this);
+}
+
+void
+Db::rollback_hook(function<void()> rollback_fn) {
+    m_rollback_hook = rollback_fn;
+    sqlite3_rollback_hook(m_db.get(), [] (void * self) {
+        Db * db = static_cast<Db*>(self);
+        if (db->m_rollback_hook) {
+            auto rollback_hook = db->m_rollback_hook;
+            rollback_hook();
+        }
+    } , this);
+}
+
+int64_t
+Db::last_insert_rowid() {
+    return sqlite3_last_insert_rowid(m_db.get());
 }
 
 void
@@ -74,6 +127,7 @@ Db::prepare(const string& sql) {
     const char * end_point = nullptr;
     auto error_code = sqlite3_prepare_v2(m_db.get(), sql.c_str(), static_cast<int>(sql.length()), &stmt, &end_point);
 
+    // we don't use make_shared here since we want to be able hide the ctor
     auto raw_stmt = new Stmt {stmt, this->shared_from_this()};
     shared_ptr<Stmt> wrapped_stmt {raw_stmt};
 
@@ -82,167 +136,4 @@ Db::prepare(const string& sql) {
     } else {
         return wrapped_stmt;
     }
-}
-
-Stmt::Stmt(sqlite3_stmt * stmt, shared_ptr<Db> db) : m_db {db}, m_stmt {stmt} {}
-
-sqlite3_stmt *
-Stmt::borrow_stmt() {
-    return m_stmt.get();
-}
-
-void
-Stmt::Finalizer::operator() (sqlite3_stmt * stmt) {
-    if (stmt) {
-        /* unused error_code = */ sqlite3_finalize(stmt);
-    }
-}
-
-int
-Stmt::param_count() const {
-    return sqlite3_bind_parameter_count(m_stmt.get());
-}
-
-optional<string>
-Stmt::param_name(int pos) const {
-    auto name = sqlite3_bind_parameter_name(m_stmt.get(), pos);
-    if (name) {
-        return string {name};
-    } else {
-        return nullopt;
-    }
-}
-
-int
-Stmt::param_index(const string& name) const {
-    auto index = sqlite3_bind_parameter_index(m_stmt.get(), name.c_str());
-    if (index == 0) {
-        throw std::runtime_error { "Param `" + name + "` not found" };
-    }
-    return index;
-}
-
-void
-Stmt::bind(int pos, const vector<uint8_t>& value) {
-    s_throw_on_sqlite_error(sqlite3_bind_blob, m_stmt.get(), pos, value.data(), static_cast<int>(value.size()), SQLITE_TRANSIENT);
-}
-
-void
-Stmt::bind(int pos, double value) {
-    s_throw_on_sqlite_error(sqlite3_bind_double, m_stmt.get(), pos, value);
-}
-
-void
-Stmt::bind(int pos, int32_t value) {
-    s_throw_on_sqlite_error(sqlite3_bind_int, m_stmt.get(), pos, value);
-}
-
-void
-Stmt::bind(int pos, int64_t value) {
-    s_throw_on_sqlite_error(sqlite3_bind_int64, m_stmt.get(), pos, value);
-}
-
-void
-Stmt::bind(int pos, std::nullptr_t) {
-    s_throw_on_sqlite_error(sqlite3_bind_null, m_stmt.get(), pos);
-}
-
-void
-Stmt::bind(int pos, const string& value) {
-    s_throw_on_sqlite_error(sqlite3_bind_text, m_stmt.get(), pos, value.c_str(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
-}
-
-int
-Stmt::exec() {
-    auto cursor = this->exec_query();
-    auto * db = sqlite3_db_handle(m_stmt.get());
-    return sqlite3_changes(db);
-}
-
-Cursor
-Stmt::exec_query() {
-    sqlite3_stmt * stmt = m_stmt.get();
-    this->reset();
-    auto result_code = sqlite3_step(stmt);
-    switch (result_code) {
-        case SQLITE_ROW:
-        case SQLITE_DONE:
-            break;
-        default: {
-          throw std::runtime_error { sqlite3_errstr(result_code) };
-          break;
-        }
-    }
-    return Cursor {this->shared_from_this(), result_code == SQLITE_DONE};
-}
-
-void
-Stmt::reset() {
-    auto error_code = sqlite3_reset(m_stmt.get());
-    if (error_code != SQLITE_OK) {
-        throw std::runtime_error { sqlite3_errstr(error_code) };
-    }
-}
-
-void
-Stmt::clear_bindings() {
-    sqlite3_clear_bindings(m_stmt.get());
-}
-
-Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_done) : m_stmt {stmt} , m_is_done {is_done} {}
-
-string
-Cursor::column_name(int pos) const {
-    auto name = sqlite3_column_name(m_stmt->borrow_stmt(), pos);
-    return string {name};
-}
-
-int
-Cursor::column_count() const {
-    return sqlite3_column_count(m_stmt->borrow_stmt());
-}
-
-void
-Cursor::next() {
-    auto result = sqlite3_step(m_stmt->borrow_stmt());
-    switch (result) {
-        case SQLITE_ROW:
-            break;
-        case SQLITE_DONE:
-            m_is_done = true;
-            break;
-        default: {
-          throw std::runtime_error { "invalid query" };
-          break;
-        }
-    }
-}
-
-string
-Cursor::string_value(int pos) {
-    auto data = s_column_or_throw(sqlite3_column_text, m_stmt->borrow_stmt(), SQLITE_TEXT, pos);
-    return string { reinterpret_cast<const char *>(data) };
-}
-
-int32_t
-Cursor::int_value(int pos) {
-    return s_column_or_throw(sqlite3_column_int, m_stmt->borrow_stmt(), SQLITE_INTEGER, pos);
-}
-
-int64_t
-Cursor::int64_value(int pos) {
-    return s_column_or_throw(sqlite3_column_int64, m_stmt->borrow_stmt(), SQLITE_INTEGER, pos);
-}
-
-double
-Cursor::double_value(int pos) {
-    return s_column_or_throw(sqlite3_column_double, m_stmt->borrow_stmt(), SQLITE_FLOAT, pos);
-}
-
-vector<uint8_t>
-Cursor::blob_value(int pos) {
-    auto stmt = m_stmt->borrow_stmt();
-    const auto len = s_column_or_throw(sqlite3_column_bytes, stmt, SQLITE_BLOB, pos);
-    const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
-    return {data, data + len};
 }
