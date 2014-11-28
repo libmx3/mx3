@@ -13,7 +13,7 @@ namespace {
     const string LAUNCH_NUMBER_KEY = "launch_number";
 }
 
-Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3::Http>& http_client) :
+Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3_gen::Http>& http_client) :
     m_http(http_client),
     // todo this needs to use a fs/path abstraction (not yet built)
     m_db( std_patch::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") ),

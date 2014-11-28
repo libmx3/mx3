@@ -66,7 +66,7 @@ UserListVm::get(const int32_t & index) {
 
 UserListVmHandle::UserListVmHandle(
     shared_ptr<mx3::sqlite::Db> db,
-    shared_ptr<mx3::Http> http,
+    shared_ptr<mx3_gen::Http> http,
     function<void(function<void()>)> ui_thread_post_fn
 )
     : m_db(db)

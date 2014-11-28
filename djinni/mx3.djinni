@@ -1,7 +1,8 @@
+@import "http.djinni"
 @import "view_model.djinni"
 
 api = interface +c {
-    static create_api(root_path: string): api;
+    static create_api(root_path: string, http_impl: http): api;
     observer_user_list(): user_list_vm_handle;
 
     has_user(): bool;

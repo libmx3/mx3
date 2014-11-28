@@ -1,0 +1,8 @@
+http_callback = interface +c {
+    on_network_error();
+    on_success(http_code: i16, data: string);
+}
+
+http = interface +o +j {
+    get(url: string, callback: http_callback);
+}

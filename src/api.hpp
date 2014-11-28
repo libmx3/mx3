@@ -2,9 +2,9 @@
 #include "stl.hpp"
 #include <json11/json11.hpp>
 #include "event_loop.hpp"
-#include "http.hpp"
 #include "db/json_store.hpp"
 #include "sqlite/sqlite.hpp"
+
 #include "interface/api.hpp"
 
 namespace mx3 {
@@ -13,9 +13,9 @@ namespace mx3 {
 class Api final : public mx3_gen::Api {
   public:
     Api(
-        const std::string& root_dir,
+        const std::string & root_path,
         const shared_ptr<mx3::EventLoop>& main_thread,
-        const shared_ptr<mx3::Http>& http_client
+        const shared_ptr<mx3_gen::Http> & http_impl
     );
 
     // whether a user already exists
@@ -30,7 +30,7 @@ class Api final : public mx3_gen::Api {
     // set up the database
     void _setup_db();
 
-    shared_ptr<mx3::Http> m_http;
+    shared_ptr<mx3_gen::Http> m_http;
     shared_ptr<sqlite::Db> m_sqlite;
     shared_ptr<sqlite::Db> m_read_db;
 

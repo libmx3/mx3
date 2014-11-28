@@ -1,6 +1,9 @@
 #include "client.hpp"
 #include <json11/json11.hpp>
+
 using github::Client;
+using github::UsersRequest;
+
 using json11::Json;
 #include <iostream>
 using std::cout;
@@ -10,42 +13,8 @@ namespace {
     const string BASE_URL = "https://api.github.com";
 }
 
-Client::Client(const shared_ptr<mx3::Http>& http_client) : m_http(http_client) {}
-
-// todo error handling?
-void
-Client::get_users(shared_ptr<mx3::Http> http, optional<uint64_t> since, function<void(vector<github::User>)> callback) {
-    string url = BASE_URL + "/users";
-    if (since) {
-        url += "?since=" + std_patch::to_string(*since);
-    }
-    http->get(url, [callback] (mx3::HttpResponse response) {
-        vector<github::User> users;
-
-        string error;
-        auto json_response = Json::parse(response.data, error);
-        if (!error.empty()) {
-            // there was an error
-            // fail somehow
-        } else {
-            if (json_response.is_array()) {
-                for (const auto& item : json_response.array_items()) {
-                    users.emplace_back( _parse_user(item) );
-                }
-            }
-        }
-
-        callback(users);
-    });
-}
-
-void
-Client::get_users(optional<uint64_t> since, function<void(vector<github::User>)> callback) {
-    Client::get_users(m_http, since, callback);
-}
-
 github::User
-Client::_parse_user(const json11::Json& data) {
+github::parse_user(const json11::Json& data) {
     github::User user;
     user.login               = data["login"].string_value();
     user.id                  = data["id"].number_value();
@@ -65,4 +34,46 @@ Client::_parse_user(const json11::Json& data) {
     user.type                = data["type"].string_value();
     user.site_admin          = data["site_admin"].bool_value();
     return user;
+}
+
+UsersRequest::UsersRequest(function<void(vector<github::User>)> users_cb) : m_success_fn {users_cb} {}
+
+void
+UsersRequest::on_network_error() {}
+
+void
+UsersRequest::on_success(const int16_t& http_code, const string& data) {
+    vector<github::User> users;
+
+    string error;
+    auto json_response = Json::parse(data, error);
+    if (!error.empty()) {
+        // there was an error
+        // fail somehow
+    } else {
+        if (json_response.is_array()) {
+            for (const auto& item : json_response.array_items()) {
+                users.emplace_back( github::parse_user(item) );
+            }
+        }
+    }
+    m_success_fn(users);
+}
+
+
+Client::Client(const shared_ptr<mx3_gen::Http>& http_client) : m_http(http_client) {}
+
+// todo error handling?
+void
+Client::get_users(shared_ptr<mx3_gen::Http> http, optional<uint64_t> since, function<void(vector<github::User>)> callback) {
+    string url = BASE_URL + "/users";
+    if (since) {
+        url += "?since=" + std_patch::to_string(*since);
+    }
+    http->get(url, make_shared<github::UsersRequest>(callback));
+}
+
+void
+Client::get_users(optional<uint64_t> since, function<void(vector<github::User>)> callback) {
+    Client::get_users(m_http, since, callback);
 }

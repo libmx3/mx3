@@ -1,5 +1,6 @@
 #import "MXAppDelegate.h"
 #import "MXSampleDataTableViewController.h"
+#import "MX3HttpObjc.h"
 #import "gen/MX3ApiCppProxy.h"
 
 @implementation MXAppDelegate
@@ -15,7 +16,8 @@
         [fileManager createDirectoryAtPath:file withIntermediateDirectories:NO attributes:nil error:nil];
     }
     
-    id <MX3Api> api = [MX3ApiCppProxy createApi:file];
+    id <MX3Http> httpImpl = [[MX3HttpObjc alloc] init];
+    id <MX3Api> api = [MX3ApiCppProxy createApi:file httpImpl: httpImpl];
     
     if (![api hasUser]) {
         NSLog(@"No user found, creating one");
