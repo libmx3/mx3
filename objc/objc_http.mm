@@ -1,11 +1,18 @@
 #include "objc_http.hpp"
-#include "objc_adapter.hpp"
+#include <Foundation/Foundation.h>
+
 using mx3::objc::ObjcHttp;
 using mx3::HttpResponse;
 
+namespace {
+    NSString * s_to_nsstring(const string& str) {
+        return [[NSString alloc] initWithCString:str.c_str() encoding:NSUTF8StringEncoding];
+    }
+}
+
 void
 ObjcHttp::get(const string& url, function<void(HttpResponse)> done_fn) {
-    NSString *URLString   = ObjcAdapter::convert(url);
+    NSString *URLString   = s_to_nsstring(url);
     NSURL *URL            = [NSURL URLWithString:URLString];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
 
