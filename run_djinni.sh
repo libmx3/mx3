@@ -22,7 +22,7 @@ in="$base_dir/djinni/mx3.djinni"
 cpp_out="$base_dir/src/interface"
 objc_out="$base_dir/objc/gen"
 jni_out="$base_dir/android/jni_gen"
-java_out="$base_dir/android/java_gen"
+java_out="$base_dir/android/java_gen/com/mx3"
 
 java_package="com.mx3"
 

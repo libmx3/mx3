@@ -56,6 +56,7 @@
         'libmx3',
       ],
       'sources': [
+        '<!@(python glob.py android/jni *.cpp *.hpp)',
         '<!@(python glob.py android/jni_gen *.cpp *.hpp)',
       ],
       'include_dirs': [
