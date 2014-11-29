@@ -1,0 +1,7 @@
+async_task = interface +c {
+    execute();
+}
+
+event_loop = interface +o +j {
+    post(task: async_task);
+}

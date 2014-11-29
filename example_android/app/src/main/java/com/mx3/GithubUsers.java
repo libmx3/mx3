@@ -7,7 +7,6 @@ import android.view.MenuItem;
 
 
 public class GithubUsers extends Activity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

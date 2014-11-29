@@ -13,12 +13,25 @@ namespace {
     const string LAUNCH_NUMBER_KEY = "launch_number";
 }
 
-Api::Api(const string& root_path, const shared_ptr<mx3::EventLoop>& main_thread, const shared_ptr<mx3_gen::Http>& http_client) :
-    m_http(http_client),
+shared_ptr<mx3_gen::Api>
+mx3_gen::Api::create_api(
+    const string& root_path,
+    const shared_ptr<mx3_gen::EventLoop>& ui_thread,
+    const std::shared_ptr<Http> & http_impl
+) {
+    return make_shared<mx3::Api>(root_path, ui_thread, http_impl);
+}
+
+Api::Api(
+    const string& root_path,
+    const shared_ptr<mx3_gen::EventLoop>& main_thread,
+    const shared_ptr<mx3_gen::Http>& http_client
+) :
+    m_http {http_client},
     // todo this needs to use a fs/path abstraction (not yet built)
-    m_db( std::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") ),
-    m_ui_thread(main_thread),
-    m_bg_thread( make_shared<mx3::NativeEventLoop>() )
+    m_db { std::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") },
+    m_ui_thread {main_thread},
+    m_bg_thread {make_shared<mx3::EventLoopCpp>()}
 {
     m_sqlite = mx3::sqlite::Db::open(root_path + "/example.sqlite");
     _setup_db();
@@ -49,14 +62,7 @@ Api::set_username(const string& username) {
 
 shared_ptr<mx3_gen::UserListVmHandle>
 Api::observer_user_list() {
-    std::weak_ptr<mx3::EventLoop> ui_thread_weak = m_ui_thread;
-    auto ui_post = [ui_thread_weak] (function<void()> run_fn) {
-        auto ui_thread = ui_thread_weak.lock();
-        if (ui_thread) {
-            ui_thread->post(run_fn);
-        }
-    };
-    return make_shared<mx3::UserListVmHandle>(m_read_db, m_http, ui_post);
+    return make_shared<mx3::UserListVmHandle>(m_read_db, m_http, m_ui_thread);
 }
 
 void

@@ -89,9 +89,9 @@
         'libmx3',
         'deps/gtest.gyp:gtest',
       ],
-      'cflags_cc!': [ '-Werror' ],
+      'cflags_cc!': [ '-Werror', '-Wextra' ],
       'xcode_settings': {
-        'OTHER_CPLUSPLUSFLAGS!' : ['-Werror'],
+        'OTHER_CPLUSPLUSFLAGS!' : ['-Werror', '-Wextra'],
       },
       'include_dirs': [
         '.',

@@ -4,6 +4,7 @@
 #include "../interface/user_list_vm_handle.hpp"
 #include "../interface/user_list_vm_observer.hpp"
 #include "../interface/http.hpp"
+#include "../event_loop.hpp"
 #include "stl.hpp"
 #include <atomic>
 #include "../sqlite/sqlite.hpp"
@@ -27,7 +28,11 @@ class UserListVm final : public mx3_gen::UserListVm {
 
 class UserListVmHandle final : public mx3_gen::UserListVmHandle {
   public:
-    UserListVmHandle(shared_ptr<sqlite::Db> db, shared_ptr<mx3_gen::Http> http, function<void(function<void()>)> ui_thread_post_fn);
+    UserListVmHandle(
+        shared_ptr<sqlite::Db> db,
+        shared_ptr<mx3_gen::Http> http,
+        mx3::EventLoopRef ui_thread
+    );
     virtual void start(const shared_ptr<mx3_gen::UserListVmObserver>& observer) override;
     virtual void stop() override;
   private:
@@ -35,7 +40,7 @@ class UserListVmHandle final : public mx3_gen::UserListVmHandle {
     shared_ptr<mx3_gen::Http> m_http;
     std::atomic_bool m_stop;
     shared_ptr<mx3_gen::UserListVmObserver> m_observer;
-    function<void(function<void()>)> m_post_ui;
+    mx3::EventLoopRef m_ui_thread;
 };
 
 } // namespace mx3

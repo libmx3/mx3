@@ -43,3 +43,7 @@ DerivedData
 src/interface/
 objc/gen/
 djinni-output-temp/
+
+# android
+libs/
+obj/
