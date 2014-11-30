@@ -4,7 +4,7 @@
 #include "event_loop.hpp"
 #include "db/json_store.hpp"
 #include "sqlite/sqlite.hpp"
-
+#include "http.hpp"
 #include "interface/api.hpp"
 
 namespace mx3 {
