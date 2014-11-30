@@ -51,7 +51,7 @@ ios: build_ios/mx3.xcodeproj
 	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
 android: GypAndroid.mk
-	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4
+	cd example_android && ./gradlew app:assembleDebug && cd ..
 
 test: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | ${xb-prettifier} && ./build/Debug/test

@@ -1,10 +1,17 @@
 package com.mx3;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 
 public class GithubUsers extends Activity {
@@ -14,6 +21,8 @@ public class GithubUsers extends Activity {
 
     private Api mApi;
     private UserListVmHandle mUserListHandle;
+    private GithubUserAdapter mAdapter;
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,40 +32,60 @@ public class GithubUsers extends Activity {
         Http httpImpl = new AndroidHttp();
         EventLoop mainThread = new AndroidEventLoop();
         mApi = Api.createApi(this.getFilesDir().getAbsolutePath(), mainThread, httpImpl);
+
         mUserListHandle = mApi.observerUserList();
         mUserListHandle.start(new UserListVmObserver() {
             @Override
             public void onUpdate(UserListVm newData) {
-                Log.d("USERS", "count: " + newData.count());
-                if (newData.count() > 0) {
-                    Log.d("USERS", newData.get(0).getName());
-                }
+            mAdapter = new GithubUserAdapter(GithubUsers.this, newData);
+            Log.d("USERS", "count: " + mAdapter.getCount());
+            mListView.setAdapter(mAdapter);
+            mListView.deferNotifyDataSetChanged();
             }
         });
 
         setContentView(R.layout.activity_github_users);
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_github_users, menu);
-        return true;
+        mListView = (ListView)findViewById(R.id.github_user_list);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    protected void onStop() {
+        mUserListHandle.stop();
+        super.onStop();
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    private class GithubUserAdapter extends BaseAdapter {
+        private Context mContext;
+        private LayoutInflater mInflater;
+        private UserListVm mListVm;
+
+        public GithubUserAdapter(Context context, UserListVm viewModel) {
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mListVm = viewModel;
+        }
+        @Override
+        public int getCount() {
+            return mListVm.count();
         }
 
-        return super.onOptionsItemSelected(item);
+        @Override
+        public long getItemId(int pos) {
+            return pos;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return mListVm.get(i);
+        }
+
+        @Override
+        public View getView(int i, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.github_user_cell, parent, false);
+            }
+            TextView textView = (TextView) convertView.findViewById(R.id.name_label);
+            textView.setText(mListVm.get(i).getName());
+            return convertView;
+        }
     }
 }

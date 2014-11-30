@@ -6,12 +6,6 @@
 1. Generic query interface (register for query, get updates when it changes, CoreData like)
 1. once all the above are finished, and the api has stabilized, example apps for many platforms
 
-### Android
-1. JNI bindings && Java wrappers for api.hpp
-1. example Android app
-1. run Android build and perhaps the example app in Travis
-1. HTTP interface implementation
-
 ### iOS
 1. update table view with _not yet built_ query interface ^^
 1. build example app in travis
