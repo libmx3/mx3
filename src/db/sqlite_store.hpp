@@ -11,8 +11,10 @@ class SqliteStore final : public mx3::JsonStore {
     virtual json11::Json get(const string& key) override;
     virtual void set(const string& key, const json11::Json& value) override;
   private:
-    static void _setup_db(shared_ptr<sqlite::Db> db);
     shared_ptr<sqlite::Db> m_db;
+    shared_ptr<sqlite::Stmt> m_select;
+    shared_ptr<sqlite::Stmt> m_update;
+    shared_ptr<sqlite::Stmt> m_insert;
 };
 
 }
