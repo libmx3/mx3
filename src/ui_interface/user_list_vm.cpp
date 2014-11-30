@@ -12,8 +12,8 @@ namespace chrono {
 }
 
 namespace {
-    const string s_count_stmt { "SELECT COUNT(1) FROM `github_users`;" };
-    const string s_list_stmt  { "SELECT `login` FROM `github_users`;" };
+    const string s_count_stmt { "SELECT COUNT(1) FROM `github_users` ORDER BY id;" };
+    const string s_list_stmt  { "SELECT `login` FROM `github_users` ORDER BY id;" };
 }
 
 UserListVm::UserListVm(shared_ptr<mx3::sqlite::Db> db)
@@ -66,7 +66,7 @@ UserListVm::get(const int32_t & index) {
 
 UserListVmHandle::UserListVmHandle(
     shared_ptr<mx3::sqlite::Db> db,
-    shared_ptr<mx3_gen::Http> http,
+    const mx3::Http& http,
     mx3::EventLoopRef ui_thread
 )
     : m_db(db)
@@ -80,7 +80,7 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
     auto db = m_db;
     auto ui_thread = m_ui_thread;
 
-    github::Client::get_users(m_http, nullopt, [db, ui_thread, observer] (vector<github::User> users) mutable {
+    github::get_users(m_http, nullopt, [db, ui_thread, observer] (vector<github::User> users) mutable {
         auto update_stmt = db->prepare("UPDATE `github_users` SET `login` = ?2 WHERE `id` = ?1;");
         auto insert_stmt = db->prepare("INSERT INTO `github_users` (`id`, `login`) VALUES (?1, ?2);");
         db->exec("BEGIN TRANSACTION");
@@ -94,7 +94,6 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
                 insert_stmt->bind(2, user.login);
                 insert_stmt->exec();
             }
-
         }
         db->exec("COMMIT TRANSACTION");
         ui_thread.post([db, observer] () {

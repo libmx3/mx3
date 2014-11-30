@@ -55,6 +55,7 @@
         'deps/djinni/support-lib/support_lib.gyp:djinni_jni',
         'libmx3',
       ],
+      'ldflags' : [ '-llog' ],
       'sources': [
         '<!@(python glob.py android/jni *.cpp *.hpp)',
         '<!@(python glob.py android/jni_gen *.cpp *.hpp)',

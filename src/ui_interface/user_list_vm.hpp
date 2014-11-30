@@ -3,7 +3,7 @@
 #include "../interface/user_list_vm_cell.hpp"
 #include "../interface/user_list_vm_handle.hpp"
 #include "../interface/user_list_vm_observer.hpp"
-#include "../interface/http.hpp"
+#include "../http.hpp"
 #include "../event_loop.hpp"
 #include "stl.hpp"
 #include <atomic>
@@ -30,14 +30,14 @@ class UserListVmHandle final : public mx3_gen::UserListVmHandle {
   public:
     UserListVmHandle(
         shared_ptr<sqlite::Db> db,
-        shared_ptr<mx3_gen::Http> http,
+        const mx3::Http& http,
         mx3::EventLoopRef ui_thread
     );
     virtual void start(const shared_ptr<mx3_gen::UserListVmObserver>& observer) override;
     virtual void stop() override;
   private:
     shared_ptr<sqlite::Db> m_db;
-    shared_ptr<mx3_gen::Http> m_http;
+    mx3::Http m_http;
     std::atomic_bool m_stop;
     shared_ptr<mx3_gen::UserListVmObserver> m_observer;
     mx3::EventLoopRef m_ui_thread;

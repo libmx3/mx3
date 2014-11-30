@@ -1,5 +1,8 @@
 #pragma once
 #include "stl.hpp"
+#include "interface/http.hpp"
+#include "interface/http_callback.hpp"
+#include "event_loop.hpp"
 
 namespace mx3 {
 
@@ -9,10 +12,23 @@ struct HttpResponse {
     string data;
 };
 
-class Http {
+class Http final {
   public:
-    virtual ~Http() {}
-    virtual void get(const string& url, function<void(HttpResponse)>) = 0;
+    Http(shared_ptr<mx3_gen::Http> http_impl, EventLoopRef on_thread);
+    void get(const string& url, function<void(HttpResponse)>);
+  private:
+    class Request final : public mx3_gen::HttpCallback {
+      public:
+        Request(function<void(HttpResponse)> cb, const EventLoopRef& on_thread);
+        virtual void on_network_error();
+        virtual void on_success(const int16_t& http_code, const string& data);
+        void _cb_with(HttpResponse resp);
+      private:
+        mx3::EventLoopRef m_cb_thread;
+        function<void(HttpResponse)> m_cb;
+    };
+    mx3::EventLoopRef m_cb_thread;
+    shared_ptr<mx3_gen::Http> m_http;
 };
 
 }

@@ -9,21 +9,20 @@
 
 namespace mx3 {
 
-// a helper class to turn the `AsyncTask` api into a std::function based one
-class FnTask final : public mx3_gen::AsyncTask {
-  public:
-    FnTask(function<void()> run_me);
-    virtual void execute() override;
-  private:
-    function<void()> m_fn;
-};
-
 // an interface wrapper on top of the platform event loops
 class EventLoopRef final {
   public:
     EventLoopRef(shared_ptr<mx3_gen::EventLoop> loop);
     void post(function<void()> run_fn);
   private:
+    // a helper class to turn the `AsyncTask` api into a std::function based one
+    class Task final : public mx3_gen::AsyncTask {
+      public:
+        Task(function<void()> run_me);
+        virtual void execute() override;
+      private:
+        function<void()> m_fn;
+    };
     shared_ptr<mx3_gen::EventLoop> m_loop;
 };
 

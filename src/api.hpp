@@ -30,13 +30,13 @@ class Api final : public mx3_gen::Api {
     // set up the database
     void _setup_db();
 
-    shared_ptr<mx3_gen::Http> m_http;
     shared_ptr<sqlite::Db> m_sqlite;
     shared_ptr<sqlite::Db> m_read_db;
 
     unique_ptr<mx3::JsonStore> m_db;
     mx3::EventLoopRef m_ui_thread;
     mx3::EventLoopRef m_bg_thread;
+    mx3::Http m_bg_http;
 };
 
 }

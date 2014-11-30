@@ -1,13 +1,12 @@
 #include "event_loop.hpp"
 
 using mx3::EventLoopCpp;
-using mx3::FnTask;
 using mx3::EventLoopRef;
 
-FnTask::FnTask(function<void()> run_me) : m_fn {std::move(run_me)} {}
+EventLoopRef::Task::Task(function<void()> run_me) : m_fn {std::move(run_me)} {}
 
 void
-FnTask::execute() {
+EventLoopRef::Task::execute() {
     m_fn();
 }
 
@@ -15,7 +14,7 @@ EventLoopRef::EventLoopRef(shared_ptr<mx3_gen::EventLoop> loop) : m_loop {std::m
 
 void
 EventLoopRef::post(function<void()> run_fn) {
-    m_loop->post( make_shared<FnTask>(std::move(run_fn)) );
+    m_loop->post( make_shared<EventLoopRef::Task>(std::move(run_fn)) );
 }
 
 EventLoopCpp::EventLoopCpp() : m_stop(false), m_thread(&EventLoopCpp::_run_loop, this) {}

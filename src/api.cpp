@@ -27,11 +27,11 @@ Api::Api(
     const shared_ptr<mx3_gen::EventLoop>& main_thread,
     const shared_ptr<mx3_gen::Http>& http_client
 ) :
-    m_http {http_client},
     // todo this needs to use a fs/path abstraction (not yet built)
     m_db { std::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") },
     m_ui_thread {main_thread},
-    m_bg_thread {make_shared<mx3::EventLoopCpp>()}
+    m_bg_thread {make_shared<mx3::EventLoopCpp>()},
+    m_bg_http {http_client, m_bg_thread}
 {
     m_sqlite = mx3::sqlite::Db::open(root_path + "/example.sqlite");
     _setup_db();
@@ -62,7 +62,7 @@ Api::set_username(const string& username) {
 
 shared_ptr<mx3_gen::UserListVmHandle>
 Api::observer_user_list() {
-    return make_shared<mx3::UserListVmHandle>(m_read_db, m_http, m_ui_thread);
+    return make_shared<mx3::UserListVmHandle>(m_read_db, m_bg_http, m_ui_thread);
 }
 
 void
