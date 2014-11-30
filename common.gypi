@@ -22,7 +22,7 @@
     'conditions': [
       ['OS=="ios"',
         {
-          'xcode_settings+' : {
+          'xcode_settings' : {
             'SDKROOT': 'iphoneos',
             'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
           },

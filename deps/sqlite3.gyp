@@ -14,6 +14,7 @@
       ],
       'xcode_settings': {
         'OTHER_CFLAGS' : ['<@(_cflags)'],
+        'OTHER_CFLAGS!' : ['-Wextra', '-Werror'],
       },
       'all_dependent_settings': {
         'include_dirs': [
