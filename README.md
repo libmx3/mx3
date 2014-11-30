@@ -1,5 +1,5 @@
 ## libmx3
-[![Build Status](https://travis-ci.org/skabbes/mx3.svg?branch=develop)](https://travis-ci.org/skabbes/mx3)  
+[![Build Status](https://travis-ci.org/libmx3/mx3.svg?branch=develop)](https://travis-ci.org/libmx3/mx3)
 Cross platform has been well studied on desktop, but this is an exploration in doing that on mobile and an open request
 for comments and improvements.
 
