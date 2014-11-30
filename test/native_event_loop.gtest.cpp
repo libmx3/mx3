@@ -7,12 +7,12 @@
 #include <mx3/mx3.hpp>
 using namespace mx3;
 
-TEST(NativeEventLoop, ctor_dtor) {
-    NativeEventLoop loop;
+TEST(EventLoopCpp, ctor_dtor) {
+    EventLoopCpp loop;
 }
 
-TEST(NativeEventLoop, dtor_when_blocked) {
-    auto loop = make_unique<NativeEventLoop>();
+TEST(EventLoopCpp, dtor_when_blocked) {
+    auto loop = new mx3::EventLoopRef { make_shared<EventLoopCpp>() };
     semaphore ready_sem;
     std::atomic_bool finished {false};
     loop->post( [&] () {
@@ -21,13 +21,12 @@ TEST(NativeEventLoop, dtor_when_blocked) {
         finished = true;
     });
     ready_sem.wait();
-    // call dtor by assigning to null
-    loop = nullptr;
+    delete loop;
     EXPECT_EQ(finished, true);
 }
 
-TEST(NativeEventLoop, runs_functions) {
-    NativeEventLoop loop;
+TEST(EventLoopCpp, runs_functions) {
+    auto loop = mx3::EventLoopRef { make_shared<EventLoopCpp>() };
     std::atomic_int count{41};
     semaphore ready_sem;
     loop.post( [&] () {
@@ -38,8 +37,8 @@ TEST(NativeEventLoop, runs_functions) {
     EXPECT_EQ(count, 42);
 }
 
-TEST(NativeEventLoop, runs_multi_functions) {
-    NativeEventLoop loop;
+TEST(EventLoopCpp, runs_multi_functions) {
+    auto loop = mx3::EventLoopRef { make_shared<EventLoopCpp>() };
     std::atomic_bool a_ran{false};
     std::atomic_bool b_ran{false};
 
@@ -61,10 +60,10 @@ TEST(NativeEventLoop, runs_multi_functions) {
     EXPECT_EQ(b_ran, true);
 }
 
-TEST(NativeEventLoop, runs_nested_functions) {
+TEST(EventLoopCpp, runs_nested_functions) {
     // a slightly tricky example, because an implementation
     // might accidentally hold the lock while calling the fn
-    NativeEventLoop loop;
+    auto loop = mx3::EventLoopRef { make_shared<EventLoopCpp>() };
     std::atomic_int count{41};
     semaphore ready_sem;
     loop.post( [&] () {

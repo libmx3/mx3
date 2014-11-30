@@ -10,7 +10,7 @@ user_list_vm = interface +c {
     get(index: i32): optional<user_list_vm_cell>;
 }
 
-user_list_vm_observer = interface +o {
+user_list_vm_observer = interface +o +j {
     on_update(new_data: user_list_vm);
 }
 

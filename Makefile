@@ -6,6 +6,7 @@ clean:
 	-rm -rf build_mac/
 	-rm -rf build_ios/
 	-rm -rf obj/
+	-rm -rf libs/
 	-rm GypAndroid.mk
 	-rm *.target.mk
 	-rm deps/*.target.mk
@@ -35,7 +36,7 @@ build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp djinni
 	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
 GypAndroid.mk: deps/gyp deps/json11 mx3.gyp djinni
-	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3 -Icommon.gypi mx3.gyp
+	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3_android -Icommon.gypi mx3.gyp
 
 xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -c" || echo "cat")
 
@@ -50,9 +51,16 @@ ios: build_ios/mx3.xcodeproj
 	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
 android: GypAndroid.mk
-	GYP_CONFIGURATION=Release NDK_PROJECT_PATH=. ndk-build NDK_APPLICATION_MK=Application.mk -j4
+	cd example_android && ./gradlew app:assembleDebug && cd ..
 
 test: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target test | ${xb-prettifier} && ./build/Debug/test
+
+cleanup_gyp: ./deps/gyp mx3.gyp common.gypi
+	deps/gyp/tools/pretty_gyp.py deps/gtest.gyp > gtest_temp.gyp && mv gtest_temp.gyp deps/gtest.gyp
+	deps/gyp/tools/pretty_gyp.py deps/json11.gyp > json11_temp.gyp && mv json11_temp.gyp deps/json11.gyp
+	deps/gyp/tools/pretty_gyp.py deps/sqlite3.gyp > sqlite3_temp.gyp && mv sqlite3_temp.gyp deps/sqlite3.gyp
+	deps/gyp/tools/pretty_gyp.py mx3.gyp > mx3_temp.gyp && mv mx3_temp.gyp mx3.gyp
+	deps/gyp/tools/pretty_gyp.py common.gypi > common_temp.gypi && mv common_temp.gypi common.gypi
 
 .PHONY: djinni

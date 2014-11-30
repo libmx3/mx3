@@ -21,8 +21,8 @@ in="$base_dir/djinni/mx3.djinni"
 
 cpp_out="$base_dir/src/interface"
 objc_out="$base_dir/objc/gen"
-jni_out="$base_dir/generated-src/jni"
-java_out="$base_dir/generated-src/java/com/mx3"
+jni_out="$base_dir/android/jni_gen"
+java_out="$base_dir/android/java_gen/com/mx3"
 
 java_package="com.mx3"
 
@@ -61,10 +61,15 @@ $base_dir/deps/djinni/src/run-assume-built \
     --objcpp-namespace djinni_generated \
     --objc-type-prefix MX3 \
     \
+    --java-out "$temp_out/java" \
+    --java-package $java_package \
+    --ident-java-field mFooBar \
+    --jni-out "$temp_out/jni" \
+    --ident-jni-class NativeFooBar \
+    --ident-jni-file native_foo_bar \
+    \
     --idl "$in"
 
-# --java-out "$temp_out/java" --java-package $java_package --ident-java-field mFooBar \
-# --jni-out "$temp_out/jni" --ident-jni-class NativeFooBar --ident-jni-file NativeFooBar \
 
 # Copy changes from "$temp_output" to final dir.
 
@@ -78,8 +83,8 @@ mirror() {
 
 echo "Copying generated code to final directories..."
 mirror "cpp" "$temp_out/cpp" "$cpp_out"
-# mirror "java" "$temp_out/java" "$java_out"
-# mirror "jni" "$temp_out/jni" "$jni_out"
+mirror "java" "$temp_out/java" "$java_out"
+mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
 
 date > "$gen_stamp"

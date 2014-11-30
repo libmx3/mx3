@@ -13,7 +13,7 @@ using std::string;
 using std::unique_ptr;
 using std::shared_ptr;
 using std::make_shared;
-using std_patch::make_unique;
+using std::make_unique;
 using std_patch::to_string;
 
 #include <vector>

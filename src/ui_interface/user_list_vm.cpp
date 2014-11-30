@@ -42,7 +42,7 @@ optional<UserListVmCell>
 UserListVm::get(const int32_t & index) {
     auto start = chrono::steady_clock::now();
 
-    if (index < m_row_cache.size()) {
+    if (index < static_cast<int32_t>(m_row_cache.size())) {
         return m_row_cache[index];
     }
 
@@ -66,21 +66,21 @@ UserListVm::get(const int32_t & index) {
 
 UserListVmHandle::UserListVmHandle(
     shared_ptr<mx3::sqlite::Db> db,
-    shared_ptr<mx3::Http> http,
-    function<void(function<void()>)> ui_thread_post_fn
+    shared_ptr<mx3_gen::Http> http,
+    mx3::EventLoopRef ui_thread
 )
     : m_db(db)
     , m_http(http)
     , m_stop(false)
     , m_observer(nullptr)
-    , m_post_ui(ui_thread_post_fn) {}
+    , m_ui_thread(std::move(ui_thread)) {}
 
 void
 UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
     auto db = m_db;
-    auto post_ui = m_post_ui;
+    auto ui_thread = m_ui_thread;
 
-    github::Client::get_users(m_http, nullopt, [db, post_ui, observer] (vector<github::User> users) {
+    github::Client::get_users(m_http, nullopt, [db, ui_thread, observer] (vector<github::User> users) mutable {
         auto update_stmt = db->prepare("UPDATE `github_users` SET `login` = ?2 WHERE `id` = ?1;");
         auto insert_stmt = db->prepare("INSERT INTO `github_users` (`id`, `login`) VALUES (?1, ?2);");
         db->exec("BEGIN TRANSACTION");
@@ -97,7 +97,7 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
 
         }
         db->exec("COMMIT TRANSACTION");
-        post_ui([db, observer] () {
+        ui_thread.post([db, observer] () {
             // todo(kabbes) make sure to check if this has been stopped
             observer->on_update( make_shared<UserListVm>(db) );
         });
