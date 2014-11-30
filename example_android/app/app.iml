@@ -25,6 +25,9 @@
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
     <exclude-output />
+    <content url="file://$MODULE_DIR$/../../android/java">
+      <sourceFolder url="file://$MODULE_DIR$/../../android/java" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$/../../android/java_gen">
       <sourceFolder url="file://$MODULE_DIR$/../../android/java_gen" isTestSource="false" />
     </content>
@@ -51,7 +54,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />

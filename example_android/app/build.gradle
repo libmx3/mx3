@@ -10,6 +10,9 @@ android {
         targetSdkVersion 15
         versionCode 1
         versionName "1.0"
+        ndk {
+            moduleName "mx3_android"
+        }
     }
     buildTypes {
         release {
@@ -19,8 +22,9 @@ android {
     }
     sourceSets {
         main {
-            java.srcDirs = ['src/main/java', '../../android/java_gen']
+            java.srcDirs = ['src/main/java', '../../android/java_gen', '../../android/java']
             jniLibs.srcDirs = ['libs']
+            jni.srcDirs = []
         }
     }
 }
@@ -43,7 +47,7 @@ task ndkBuild(type: Exec) {
     }
     environment("NDK_PROJECT_PATH", MainDirectory)
     environment("GYP_CONFIGURATION", "Release")
-    commandLine ndkBuildExecutable
+    commandLine(ndkBuildExecutable, "-j8")
 }
 
 tasks.withType(JavaCompile) {
