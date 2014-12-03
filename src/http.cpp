@@ -25,7 +25,7 @@ Http::Request::on_network_error() {
 }
 
 void
-Http::Request::on_success(const int16_t& http_code, const string& data) {
+Http::Request::on_success(int16_t http_code, const string& data) {
     HttpResponse resp;
     resp.error = false;
     resp.http_code = http_code;

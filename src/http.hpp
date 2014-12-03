@@ -21,7 +21,7 @@ class Http final {
       public:
         Request(function<void(HttpResponse)> cb, const EventLoopRef& on_thread);
         virtual void on_network_error();
-        virtual void on_success(const int16_t& http_code, const string& data);
+        virtual void on_success(int16_t http_code, const string& data);
         void _cb_with(HttpResponse resp);
       private:
         mx3::EventLoopRef m_cb_thread;

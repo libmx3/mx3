@@ -15,7 +15,7 @@ class UserListVm final : public mx3_gen::UserListVm {
   public:
     UserListVm(shared_ptr<sqlite::Db> db_conn);
     virtual int32_t count() override;
-    virtual optional<mx3_gen::UserListVmCell> get(const int32_t & index) override;
+    virtual optional<mx3_gen::UserListVmCell> get(int32_t index) override;
   private:
     optional<int32_t> m_count;
     int32_t m_cursor_pos;

@@ -39,7 +39,7 @@ UserListVm::count() {
 }
 
 optional<UserListVmCell>
-UserListVm::get(const int32_t & index) {
+UserListVm::get(int32_t index) {
     auto start = chrono::steady_clock::now();
 
     if (index < static_cast<int32_t>(m_row_cache.size())) {
