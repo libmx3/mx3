@@ -2,16 +2,13 @@
 #include "stl.hpp"
 #include "cursor.hpp"
 
-// forward delcare these structs to keep from having to include paths propigate
-struct sqlite3_stmt;
-
 namespace mx3 { namespace sqlite {
 
 class Db;
 
 class Stmt final : public std::enable_shared_from_this<Stmt> {
   public:
-    sqlite3_stmt * borrow_stmt();
+    sqlite3_stmt * borrow_stmt() const;
 
     // this is how many parameters this statment expects
     int param_count() const;

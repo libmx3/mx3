@@ -19,7 +19,7 @@ namespace {
 Stmt::Stmt(sqlite3_stmt * stmt, shared_ptr<Db> db) : m_db {db}, m_stmt {stmt} {}
 
 sqlite3_stmt *
-Stmt::borrow_stmt() {
+Stmt::borrow_stmt() const {
     return m_stmt.get();
 }
 

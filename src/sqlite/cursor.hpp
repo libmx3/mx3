@@ -2,6 +2,8 @@
 #include "stl.hpp"
 
 // forward delcare these structs to keep from having to include paths propigate
+struct sqlite3_stmt;
+
 namespace mx3 { namespace sqlite {
 
 class Stmt;
@@ -13,7 +15,9 @@ class Cursor final {
     Cursor(Cursor&&) = default;
     Cursor& operator=(const Cursor&) = delete;
 
-    bool is_valid() { return m_is_valid; }
+    sqlite3_stmt * borrow_stmt() const;
+
+    bool is_valid() const { return m_is_valid; }
     void next();
 
     string column_name(int pos) const;

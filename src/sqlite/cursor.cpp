@@ -16,6 +16,11 @@ namespace {
 
 Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_valid) : m_stmt {stmt} , m_is_valid {is_valid} {}
 
+sqlite3_stmt *
+Cursor::borrow_stmt() const {
+    return m_stmt->borrow_stmt();
+}
+
 string
 Cursor::column_name(int pos) const {
     auto name = sqlite3_column_name(m_stmt->borrow_stmt(), pos);
@@ -71,3 +76,4 @@ Cursor::blob_value(int pos) {
     const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
     return {data, data + len};
 }
+
