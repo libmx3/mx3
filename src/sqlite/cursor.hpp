@@ -8,7 +8,12 @@ class Stmt;
 
 class Cursor final {
   public:
-    bool has_next() { return !m_is_done; }
+    // this is a move-only type
+    Cursor(const Cursor&) = delete;
+    Cursor(Cursor&&) = default;
+    Cursor& operator=(const Cursor&) = delete;
+
+    bool is_valid() { return m_is_valid; }
     void next();
 
     string column_name(int pos) const;
@@ -22,11 +27,11 @@ class Cursor final {
 
   private:
     friend class Stmt;
-    Cursor(shared_ptr<Stmt> stmt, bool is_done);
+    Cursor(shared_ptr<Stmt> stmt, bool is_valid);
 
     // this keeps the statement alive while we are executing the query
     shared_ptr<Stmt> m_stmt;
-    bool m_is_done;
+    bool m_is_valid;
     unique_ptr<bool> m_dont_let_anyone_copy_me;
 };
 

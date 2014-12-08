@@ -47,7 +47,7 @@ UserListVm::get(int32_t index) {
     }
 
     m_row_cache.resize(index + 1);
-    while (m_query.has_next() && m_cursor_pos <= index) {
+    while (m_query.is_valid() && m_cursor_pos <= index) {
         m_row_cache[m_cursor_pos] = UserListVmCell {m_cursor_pos, m_query.string_value(0)};
         m_query.next();
         m_cursor_pos++;

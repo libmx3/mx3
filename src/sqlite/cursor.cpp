@@ -14,7 +14,7 @@ namespace {
     }
 }
 
-Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_done) : m_stmt {stmt} , m_is_done {is_done} {}
+Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_valid) : m_stmt {stmt} , m_is_valid {is_valid} {}
 
 string
 Cursor::column_name(int pos) const {
@@ -34,7 +34,7 @@ Cursor::next() {
         case SQLITE_ROW:
             break;
         case SQLITE_DONE:
-            m_is_done = true;
+            m_is_valid = false;
             break;
         default: {
           throw std::runtime_error { "invalid query" };

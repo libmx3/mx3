@@ -18,14 +18,14 @@ TEST(sqlite_db, dtor_closes_db) {
     db1->exec("CREATE TABLE IF NOT EXISTS abc (name TEXT);");
     db1->prepare("INSERT INTO `abc` (`name`) VALUES ('first')")->exec();
     auto cursor = db1->prepare("SELECT * from `abc`;")->exec_query();
-    EXPECT_EQ(cursor.has_next(), true);
+    EXPECT_EQ(cursor.is_valid(), true);
     }
 
     {
     auto db2  = Db::open_memory();
     db2->exec("CREATE TABLE IF NOT EXISTS abc (name TEXT);");
     auto cursor = db2->prepare("SELECT * from `abc`;")->exec_query();
-    EXPECT_EQ(cursor.has_next(), false);
+    EXPECT_EQ(cursor.is_valid(), false);
     }
 }
 

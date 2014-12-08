@@ -29,7 +29,7 @@ SqliteStore::get(const string& key) {
     stmt->bind(1, key);
     auto query = stmt->exec_query();
 
-    if (query.has_next()) {
+    if (query.is_valid()) {
         string value = query.string_value(0);
         string error;
         return Json::parse(value, error);

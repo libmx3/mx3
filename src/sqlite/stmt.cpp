@@ -105,7 +105,7 @@ Stmt::exec_query() {
           break;
         }
     }
-    return Cursor {this->shared_from_this(), result_code == SQLITE_DONE};
+    return Cursor {this->shared_from_this(), result_code != SQLITE_DONE};
 }
 
 void
