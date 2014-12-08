@@ -105,19 +105,27 @@ Db::last_insert_rowid() {
 
 void
 Db::Closer::operator() (sqlite3 * db) {
-    sqlite3_close_v2(db);
+    // we use the sqlite3_close_v2 call since we want to prevent misuse
+    auto error_code = sqlite3_close_v2(db);
+    if (error_code != SQLITE_OK) {
+        // warn about API misuse
+    }
 }
 
 void
 Db::exec(const string& sql) {
     char * error_msg = nullptr;
     auto result = sqlite3_exec(m_db.get(), sql.c_str(), nullptr, nullptr, &error_msg);
-    if (result && error_msg) {
+    if (result != SQLITE_OK) {
+        string message;
         if (error_msg) {
-            throw std::runtime_error { string(error_msg) };
+            message = string(error_msg);
+            sqlite3_free(error_msg);
+            error_msg = nullptr;
         } else {
-            throw std::runtime_error { "Unknown error" };
+            message = "Unknown error";
         }
+        throw std::runtime_error { message };
     }
 }
 

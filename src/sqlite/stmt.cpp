@@ -25,8 +25,9 @@ Stmt::borrow_stmt() {
 
 void
 Stmt::Finalizer::operator() (sqlite3_stmt * stmt) {
-    if (stmt) {
-        /* unused error_code = */ sqlite3_finalize(stmt);
+    auto result_code = sqlite3_finalize(stmt);
+    if (result_code != SQLITE_OK) {
+        // warn about usage
     }
 }
 
