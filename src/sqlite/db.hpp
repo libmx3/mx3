@@ -35,6 +35,8 @@ class Db final : public std::enable_shared_from_this<Db> {
     sqlite3 * borrow_db();
     shared_ptr<Stmt> prepare(const string& sql);
     void exec(const string& sql);
+    int64_t exec_scalar(const string& sql);
+    void close();
   private:
     struct Closer final {
         void operator() (sqlite3 * db);

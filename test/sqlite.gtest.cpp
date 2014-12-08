@@ -34,6 +34,19 @@ TEST(sqlite_db, can_exec) {
     db->exec("SELECT * from sqlite_master");
 }
 
+TEST(sqlite_db, can_exec_scalar) {
+    auto db = Db::open_memory();
+
+    auto result = db->exec_scalar("PRAGMA user_version;");
+    EXPECT_EQ(result, 0);
+
+    db->exec("CREATE TABLE IF NOT EXISTS abc (name TEXT);");
+    result = db->exec_scalar("SELECT COUNT(*) FROM sqlite_master");
+    EXPECT_EQ(result, 1);
+
+    EXPECT_THROW( db->exec_scalar("SELCT * from sqlite_master'"), std::runtime_error );
+}
+
 TEST(sqlite_db, throw_on_bad_exec) {
     auto db = Db::open_memory();
     EXPECT_THROW( db->exec("SELCT * from'"), std::runtime_error );

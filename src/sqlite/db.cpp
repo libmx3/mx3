@@ -113,6 +113,14 @@ Db::Closer::operator() (sqlite3 * db) {
 }
 
 void
+Db::close() {
+    auto error_code = sqlite3_close(m_db.get());
+    if (error_code != SQLITE_OK) {
+        throw std::runtime_error { sqlite3_errstr(error_code) };
+    }
+}
+
+void
 Db::exec(const string& sql) {
     char * error_msg = nullptr;
     auto result = sqlite3_exec(m_db.get(), sql.c_str(), nullptr, nullptr, &error_msg);
@@ -127,6 +135,15 @@ Db::exec(const string& sql) {
         }
         throw std::runtime_error { message };
     }
+}
+
+int64_t
+Db::exec_scalar(const string& sql) {
+    auto cursor = this->prepare(sql)->exec_query();
+    if (cursor.column_count() == 1) {
+        return cursor.int64_value(0);
+    }
+    throw std::runtime_error {"Cant call exec_scalar on query with multiple rows"};
 }
 
 shared_ptr<Stmt>
