@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include "stl.hpp"
 #include "stmt.hpp"
 
@@ -10,6 +11,19 @@ enum class ChangeType {
     DELETE
 };
 
+enum class OpenFlag {
+    READONLY,
+    READWRITE,
+    CREATE,
+    URI,
+    MEMORY,
+    NOMUTEX,
+    FULLMUTEX,
+    SHAREDCACHE,
+    PRIVATECACHE
+};
+
+
 class Db final : public std::enable_shared_from_this<Db> {
   public:
     using UpdateHookFn   = function<void(ChangeType, string, string, int64_t)>;
@@ -18,7 +32,12 @@ class Db final : public std::enable_shared_from_this<Db> {
 
     // use this constructor if you want to simply open the database with default settings
     static shared_ptr<Db> open(const string& path);
+
+    // use this constructor if you want to simply open an in memory database with the default flags
     static shared_ptr<Db> open_memory();
+
+    // the most general Db constructor, directly mirrors sqlite3_open_v2
+    static shared_ptr<Db> open(const string& path, const std::set<OpenFlag>& flags, const optional<string>& vfs_name = nullopt);
 
     // use this constructor if you want to do anything custom to set up your database
     static shared_ptr<Db> inherit_db(sqlite3 * db);

@@ -4,18 +4,46 @@
 using mx3::sqlite::Db;
 using mx3::sqlite::Stmt;
 using mx3::sqlite::ChangeType;
+using mx3::sqlite::OpenFlag;
 
 shared_ptr<Db>
-Db::open(const string& db_path) {
-    constexpr const int flags =
-        SQLITE_OPEN_READWRITE |
-        SQLITE_OPEN_CREATE |
-        // multi-threaded mode
-        SQLITE_OPEN_NOMUTEX |
-        SQLITE_OPEN_PRIVATECACHE;
+Db::open(const string& db_path, const std::set<OpenFlag>& flags, const optional<string>& vfs_name) {
+    int sqlite_flags = 0;
+    for (const auto flag : flags) {
+        switch (flag) {
+            case OpenFlag::READONLY:
+                sqlite_flags |= SQLITE_OPEN_READONLY;
+                break;
+            case OpenFlag::READWRITE:
+                sqlite_flags |= SQLITE_OPEN_READWRITE;
+                break;
+            case OpenFlag::CREATE:
+                sqlite_flags |= SQLITE_OPEN_CREATE;
+                break;
+            case OpenFlag::URI:
+                sqlite_flags |= SQLITE_OPEN_URI;
+                break;
+            case OpenFlag::MEMORY:
+                sqlite_flags |= SQLITE_OPEN_MEMORY;
+                break;
+            case OpenFlag::NOMUTEX:
+                sqlite_flags |= SQLITE_OPEN_NOMUTEX;
+                break;
+            case OpenFlag::FULLMUTEX:
+                sqlite_flags |= SQLITE_OPEN_FULLMUTEX;
+                break;
+            case OpenFlag::SHAREDCACHE:
+                sqlite_flags |= SQLITE_OPEN_SHAREDCACHE;
+                break;
+            case OpenFlag::PRIVATECACHE:
+                sqlite_flags |= SQLITE_OPEN_PRIVATECACHE;
+                break;
+        }
+    }
 
-    sqlite3 * db;
-    auto error_code = sqlite3_open_v2(db_path.c_str(), &db, flags, nullptr);
+    sqlite3 * db = nullptr;
+    const char * vfs_p = vfs_name ? vfs_name->c_str() : nullptr;
+    auto error_code = sqlite3_open_v2(db_path.c_str(), &db, sqlite_flags, vfs_p);
     auto temp_db = unique_ptr<sqlite3, Db::Closer> {db};
 
     if (error_code != SQLITE_OK) {
@@ -23,6 +51,18 @@ Db::open(const string& db_path) {
     }
     return shared_ptr<Db> { new Db{std::move(temp_db)} };
 }
+
+shared_ptr<Db>
+Db::open(const string& db_path) {
+    return Db::open(db_path, {
+        OpenFlag::READWRITE,
+        OpenFlag::CREATE,
+        // multi-threaded mode
+        OpenFlag::NOMUTEX,
+        OpenFlag::PRIVATECACHE
+    });
+}
+
 
 shared_ptr<Db>
 Db::open_memory() {
