@@ -2,9 +2,6 @@
 #include "stl.hpp"
 #include "stmt.hpp"
 
-// forward delcare these structs to keep from having to include paths propigate
-struct sqlite3;
-
 namespace mx3 { namespace sqlite {
 
 enum class ChangeType {

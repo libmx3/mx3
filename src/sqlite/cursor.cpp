@@ -14,27 +14,44 @@ namespace {
     }
 }
 
-Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_valid) : m_stmt {stmt} , m_is_valid {is_valid} {}
+void
+Cursor::Resetter::operator() (sqlite3_stmt * stmt) {
+    auto error_code = sqlite3_reset(stmt);
+    if (error_code != SQLITE_OK) {
+        // this is in the dtor, so don't throw
+    }
+}
+
+Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_valid)
+    : m_stmt {std::move(stmt)}
+    , m_raw_stmt {m_stmt->borrow_stmt()}
+    , m_is_valid {is_valid}
+{}
 
 sqlite3_stmt *
 Cursor::borrow_stmt() const {
-    return m_stmt->borrow_stmt();
+    return m_raw_stmt.get();
+}
+
+sqlite3 *
+Cursor::borrow_db() const {
+    return m_stmt->borrow_db();
 }
 
 string
 Cursor::column_name(int pos) const {
-    auto name = sqlite3_column_name(m_stmt->borrow_stmt(), pos);
+    auto name = sqlite3_column_name(m_raw_stmt.get(), pos);
     return string {name};
 }
 
 int
 Cursor::column_count() const {
-    return sqlite3_column_count(m_stmt->borrow_stmt());
+    return sqlite3_column_count(m_raw_stmt.get());
 }
 
 void
 Cursor::next() {
-    auto result = sqlite3_step(m_stmt->borrow_stmt());
+    auto result = sqlite3_step(m_raw_stmt.get());
     switch (result) {
         case SQLITE_ROW:
             break;
@@ -48,30 +65,35 @@ Cursor::next() {
     }
 }
 
+bool
+Cursor::is_null(int pos) const {
+    return sqlite3_column_type(m_raw_stmt.get(), pos) == SQLITE_NULL;
+}
+
 string
-Cursor::string_value(int pos) {
-    auto data = s_column_or_throw(sqlite3_column_text, m_stmt->borrow_stmt(), SQLITE_TEXT, pos);
+Cursor::string_value(int pos) const {
+    auto data = s_column_or_throw(sqlite3_column_text, m_raw_stmt.get(), SQLITE_TEXT, pos);
     return string { reinterpret_cast<const char *>(data) };
 }
 
 int32_t
-Cursor::int_value(int pos) {
-    return s_column_or_throw(sqlite3_column_int, m_stmt->borrow_stmt(), SQLITE_INTEGER, pos);
+Cursor::int_value(int pos) const {
+    return s_column_or_throw(sqlite3_column_int, m_raw_stmt.get(), SQLITE_INTEGER, pos);
 }
 
 int64_t
-Cursor::int64_value(int pos) {
-    return s_column_or_throw(sqlite3_column_int64, m_stmt->borrow_stmt(), SQLITE_INTEGER, pos);
+Cursor::int64_value(int pos) const {
+    return s_column_or_throw(sqlite3_column_int64, m_raw_stmt.get(), SQLITE_INTEGER, pos);
 }
 
 double
-Cursor::double_value(int pos) {
-    return s_column_or_throw(sqlite3_column_double, m_stmt->borrow_stmt(), SQLITE_FLOAT, pos);
+Cursor::double_value(int pos) const {
+    return s_column_or_throw(sqlite3_column_double, m_raw_stmt.get(), SQLITE_FLOAT, pos);
 }
 
 vector<uint8_t>
-Cursor::blob_value(int pos) {
-    auto stmt = m_stmt->borrow_stmt();
+Cursor::blob_value(int pos) const {
+    auto stmt = m_raw_stmt.get();
     const auto len = s_column_or_throw(sqlite3_column_bytes, stmt, SQLITE_BLOB, pos);
     const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
     return {data, data + len};

@@ -23,6 +23,11 @@ Stmt::borrow_stmt() const {
     return m_stmt.get();
 }
 
+sqlite3 *
+Stmt::borrow_db() const {
+    return m_db->borrow_db();
+}
+
 void
 Stmt::Finalizer::operator() (sqlite3_stmt * stmt) {
     auto result_code = sqlite3_finalize(stmt);
@@ -107,6 +112,16 @@ Stmt::exec_query() {
         }
     }
     return Cursor {this->shared_from_this(), result_code != SQLITE_DONE};
+}
+
+int64_t
+Stmt::exec_scalar() {
+    this->reset();
+    auto cursor = this->exec_query();
+    if (!cursor.is_valid()) {
+        throw std::runtime_error { "not a scalar query" };
+    }
+    return cursor.int64_value(0);
 }
 
 void

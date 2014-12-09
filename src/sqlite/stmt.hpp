@@ -9,6 +9,7 @@ class Db;
 class Stmt final : public std::enable_shared_from_this<Stmt> {
   public:
     sqlite3_stmt * borrow_stmt() const;
+    sqlite3 * borrow_db() const;
 
     // this is how many parameters this statment expects
     int param_count() const;
@@ -20,6 +21,7 @@ class Stmt final : public std::enable_shared_from_this<Stmt> {
 
     int exec();
     Cursor exec_query();
+    int64_t exec_scalar();
     void reset();
     void clear_bindings();
 

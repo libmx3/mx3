@@ -2,6 +2,7 @@
 #include "stl.hpp"
 
 // forward delcare these structs to keep from having to include paths propigate
+struct sqlite3;
 struct sqlite3_stmt;
 
 namespace mx3 { namespace sqlite {
@@ -16,6 +17,7 @@ class Cursor final {
     Cursor& operator=(const Cursor&) = delete;
 
     sqlite3_stmt * borrow_stmt() const;
+    sqlite3 * borrow_db() const;
 
     bool is_valid() const { return m_is_valid; }
     void next();
@@ -23,20 +25,25 @@ class Cursor final {
     string column_name(int pos) const;
     int column_count() const;
 
-    int32_t int_value(int pos);
-    int64_t int64_value(int pos);
-    double double_value(int pos);
-    string string_value(int pos);
-    vector<uint8_t> blob_value(int pos);
+    bool is_null(int pos) const;
+    int32_t int_value(int pos) const;
+    int64_t int64_value(int pos) const;
+    double double_value(int pos) const;
+    string string_value(int pos) const;
+    vector<uint8_t> blob_value(int pos) const;
 
   private:
     friend class Stmt;
+    struct Resetter final {
+        void operator() (sqlite3_stmt * stmt);
+    };
     Cursor(shared_ptr<Stmt> stmt, bool is_valid);
 
     // this keeps the statement alive while we are executing the query
     shared_ptr<Stmt> m_stmt;
+    // a helper used for RAII cursor resetting
+    unique_ptr<sqlite3_stmt, Resetter> m_raw_stmt;
     bool m_is_valid;
-    unique_ptr<bool> m_dont_let_anyone_copy_me;
 };
 
 } }
