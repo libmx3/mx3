@@ -1,8 +1,10 @@
-#include "db.hpp"
+#include "cursor.hpp"
+#include "stmt.hpp"
 #include <sqlite3/sqlite3.h>
 
 using mx3::sqlite::Stmt;
 using mx3::sqlite::Cursor;
+using mx3::sqlite::Value;
 
 namespace {
     template<typename F>
@@ -13,6 +15,55 @@ namespace {
         return std::forward<F>(fn)(stmt, pos);
     }
 }
+
+Value
+Cursor::value_at(int pos) const {
+    sqlite3_stmt * stmt = m_raw_stmt.get();
+    const auto type = sqlite3_column_type(stmt, pos);
+    switch (type) {
+        case SQLITE_NULL: {
+            return Value {nullptr};
+        }
+        case SQLITE_TEXT: {
+            auto data = sqlite3_column_text(stmt, pos);
+            return Value { string { reinterpret_cast<const char *>(data) } };
+        }
+        case SQLITE_INTEGER: {
+            return Value { static_cast<int64_t>( sqlite3_column_int64(stmt, pos) ) };
+        }
+        case SQLITE_FLOAT: {
+            return Value { sqlite3_column_double(stmt, pos) };
+        }
+        case SQLITE_BLOB: {
+            const auto len = sqlite3_column_bytes(stmt, pos);
+            const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
+            return Value { vector<uint8_t> {data, data + len} };
+        }
+    }
+    return Value {nullptr};
+}
+
+vector<Value>
+Cursor::values() const {
+    vector<Value> values;
+    const size_t col_count = this->column_count();
+    values.reserve(col_count);
+    for (size_t i=0; i < col_count; i++) {
+        values.push_back( this->value_at(i) );
+    }
+    return values;
+}
+
+std::map<string, Value>
+Cursor::value_map() const {
+    std::map<string, Value> all_values;
+    const size_t col_count = this->column_count();
+    for (size_t i=0; i < col_count; i++) {
+        all_values.emplace( this->column_name(i), this->value_at(i) );
+    }
+    return all_values;
+}
+
 
 void
 Cursor::Resetter::operator() (sqlite3_stmt * stmt) {
@@ -42,6 +93,17 @@ string
 Cursor::column_name(int pos) const {
     auto name = sqlite3_column_name(m_raw_stmt.get(), pos);
     return string {name};
+}
+
+vector<string>
+Cursor::column_names() const {
+    vector<string> names;
+    const size_t col_count = this->column_count();
+    names.reserve(col_count);
+    for (size_t i=0; i < col_count; i++) {
+        names.push_back( this->column_name(i) );
+    }
+    return names;
 }
 
 int
@@ -96,6 +158,6 @@ Cursor::blob_value(int pos) const {
     auto stmt = m_raw_stmt.get();
     const auto len = s_column_or_throw(sqlite3_column_bytes, stmt, SQLITE_BLOB, pos);
     const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
-    return {data, data + len};
+    return vector<uint8_t> {data, data + len};
 }
 
