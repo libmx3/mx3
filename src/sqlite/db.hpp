@@ -41,6 +41,7 @@ class Db final : public std::enable_shared_from_this<Db> {
 
     // use this constructor if you want to do anything custom to set up your database
     static shared_ptr<Db> inherit_db(sqlite3 * db);
+    ~Db();
 
     void update_hook(UpdateHookFn update_fn);
     void commit_hook(CommitHookFn commit_fn);
@@ -59,10 +60,6 @@ class Db final : public std::enable_shared_from_this<Db> {
     };
     Db(unique_ptr<sqlite3, Closer> db);
     unique_ptr<sqlite3, Closer> m_db;
-
-    UpdateHookFn m_update_hook;
-    CommitHookFn m_commit_hook;
-    RollbackHookFn m_rollback_hook;
 };
 
 } }
