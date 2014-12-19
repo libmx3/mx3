@@ -12,6 +12,71 @@ TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
 }
 
+TEST(sqlite_db, schema_info) {
+    auto db = Db::open(":memory:");
+    auto schema_info = db->schema_info();
+    EXPECT_EQ(schema_info.size(), 0);
+
+    string name = "my_table";
+    string sql = "CREATE TABLE " + name + " (table_id INTEGER, name TEXT NOT NULL, data BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))";
+    db->exec(sql);
+
+    schema_info = db->schema_info();
+    auto t = schema_info[0];
+
+    EXPECT_EQ(t.name, name);
+    EXPECT_EQ(t.sql, sql);
+    EXPECT_EQ(t.columns.size(), 4);
+
+    const auto& c = t.columns;
+    EXPECT_EQ(c[0].name, "table_id");
+    EXPECT_EQ(c[0].type, "INTEGER");
+    EXPECT_EQ(c[0].notnull, false);
+    EXPECT_EQ(c[0].dflt_value, nullopt);
+    EXPECT_EQ(c[0].is_pk(), true);
+
+    EXPECT_EQ(c[1].name, "name");
+    EXPECT_EQ(c[1].type, "TEXT");
+    EXPECT_EQ(c[1].notnull, true);
+    EXPECT_EQ(c[1].dflt_value, nullopt);
+    EXPECT_EQ(c[1].is_pk(), false);
+
+    EXPECT_EQ(c[2].name, "data");
+    EXPECT_EQ(c[2].type, "BLOB");
+    EXPECT_EQ(c[2].notnull, false);
+    EXPECT_EQ(c[2].dflt_value, nullopt);
+    EXPECT_EQ(c[2].is_pk(), false);
+
+    EXPECT_EQ(c[3].name, "price");
+    EXPECT_EQ(c[3].type, "FLOAT");
+    EXPECT_EQ(c[3].notnull, false);
+    EXPECT_EQ(c[3].dflt_value, string {"1.4"});
+    EXPECT_EQ(c[3].is_pk(), false);
+
+}
+
+TEST(sqlite_db, get_set_user_version) {
+    auto db = Db::open_memory();
+    int32_t version = db->user_version();
+    EXPECT_EQ(version, 0);
+    db->set_user_version(493);
+    version = db->user_version();
+    EXPECT_EQ(version, 493);
+    version = db->user_version();
+    EXPECT_EQ(version, 493);
+    db->set_user_version(77);
+    version = db->user_version();
+    EXPECT_EQ(version, 77);
+}
+
+TEST(sqlite_db, get_schema_version) {
+    auto db = Db::open_memory();
+    int32_t v1 = db->schema_version();
+    db->exec("CREATE TABLE IF NOT EXISTS abc (name TEXT);");
+    int32_t v2 = db->schema_version();
+    EXPECT_FALSE( v1 == v2 );
+}
+
 // this test relies on the fact that closing a in memory database loses all of its data
 TEST(sqlite_db, dtor_closes_db) {
     {

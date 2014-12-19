@@ -6,6 +6,7 @@ namespace mx3 { namespace sqlite {
 
 class Value final {
   public:
+    Value();
     Value(std::nullptr_t x);
     Value(int64_t x);
     Value(double x);

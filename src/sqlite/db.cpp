@@ -6,6 +6,31 @@ using mx3::sqlite::Stmt;
 using mx3::sqlite::ChangeType;
 using mx3::sqlite::OpenFlag;
 
+namespace {
+    struct Sqlite3Free final {
+        void operator() (char * sql) const {
+            sqlite3_free(sql);
+        }
+    };
+}
+
+string
+mx3::sqlite::mprintf(const char * format, const string& data) {
+    unique_ptr<char, Sqlite3Free> raw_str {
+        sqlite3_mprintf(format, data.c_str())
+    };
+    return string {raw_str.get()};
+}
+
+string
+mx3::sqlite::mprintf(const char * format, int64_t data) {
+    unique_ptr<char, Sqlite3Free> raw_str {
+        sqlite3_mprintf(format, data)
+    };
+    return string {raw_str.get()};
+}
+
+
 shared_ptr<Db>
 Db::open(const string& db_path, const std::set<OpenFlag>& flags, const optional<string>& vfs_name) {
     int sqlite_flags = 0;
@@ -178,8 +203,82 @@ Db::last_insert_rowid() {
     return sqlite3_last_insert_rowid(m_db.get());
 }
 
+int32_t
+Db::schema_version() {
+    return static_cast<int32_t>( this->prepare("PRAGMA schema_version;")->exec_scalar() );
+}
+
+vector<mx3::sqlite::ColumnInfo>
+Db::column_info(const string& table_name) {
+    using mx3::sqlite::ColumnInfo;
+
+    auto cursor = this->prepare(
+        mx3::sqlite::mprintf("PRAGMA table_info(%Q);", table_name)
+    )->exec_query();
+
+    vector<string> names = cursor.column_names();
+    std::map<string, int32_t> pos_map;
+    for (size_t i = 0; i < names.size(); i++) {
+        pos_map[names[i]] = static_cast<int32_t>(i);
+    }
+
+    const auto cid_pos         = pos_map["cid"];
+    const auto name_pos        = pos_map["name"];
+    const auto type_pos        = pos_map["type"];
+    const auto notnull_pos     = pos_map["notnull"];
+    const auto dflt_value_pos  = pos_map["dflt_value"];
+    const auto pk_pos          = pos_map["pk"];
+
+    vector<ColumnInfo> columns;
+    while (cursor.is_valid()) {
+        ColumnInfo col;
+        col.cid = cursor.int64_value(cid_pos);
+        col.name = cursor.string_value(name_pos);
+        col.type = cursor.string_value(type_pos);
+        col.notnull = cursor.int64_value(notnull_pos) == 1;
+        auto dflt_value = cursor.value_at(dflt_value_pos);
+        col.dflt_value  = dflt_value.is_null()
+                        ? optional<string> {nullopt}
+                        : optional<string> { dflt_value.string_value() };
+        col.pk = cursor.int64_value(pk_pos);
+        columns.push_back( std::move(col) );
+        cursor.next();
+    }
+    return columns;
+}
+
+vector<mx3::sqlite::TableInfo>
+Db::schema_info() {
+    using mx3::sqlite::TableInfo;
+
+    vector<TableInfo> tables;
+    auto table_cursor = this->prepare("SELECT name, rootpage, sql from 'sqlite_master' WHERE type = 'table'")->exec_query();
+    while (table_cursor.is_valid()) {
+        TableInfo current_table;
+        current_table.name     = table_cursor.string_value(0);
+        current_table.rootpage = table_cursor.int64_value(1);
+        current_table.sql      = table_cursor.string_value(2);
+        current_table.columns  = this->column_info(current_table.name);
+        tables.push_back( std::move(current_table) );
+        table_cursor.next();
+    }
+    return tables;
+}
+
+int32_t
+Db::user_version() {
+    return static_cast<int32_t>( this->prepare("PRAGMA user_version;")->exec_scalar() );
+}
+
 void
-Db::Closer::operator() (sqlite3 * db) {
+Db::set_user_version(int32_t user_ver) {
+    this->exec(
+        mx3::sqlite::mprintf("PRAGMA user_version=%d;", user_ver)
+    );
+}
+
+void
+Db::Closer::operator() (sqlite3 * db) const {
     // we use the sqlite3_close_v2 call since we want to prevent misuse
     auto error_code = sqlite3_close_v2(db);
     if (error_code != SQLITE_OK) {
@@ -193,6 +292,11 @@ Db::close() {
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     }
+}
+
+void
+Db::enable_wal() {
+    this->exec("PRAGMA journal_mode=WAL");
 }
 
 void

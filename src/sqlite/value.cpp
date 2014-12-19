@@ -94,6 +94,7 @@ Value::operator==(const Value& other) const {
     return false;
 }
 
+Value::Value()                  : m_type {Type::NUL} {}
 Value::Value(std::nullptr_t)    : m_type {Type::NUL} {}
 Value::Value(int64_t x)         : m_type {Type::INT},    m_int64  {x} {}
 Value::Value(double x)          : m_type {Type::DOUBLE}, m_double {x} {}
