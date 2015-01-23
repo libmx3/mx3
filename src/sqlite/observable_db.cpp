@@ -3,7 +3,7 @@
 #include <iostream>
 
 using mx3::sqlite::Db;
-using mx3::sqlite::TransactionDb;
+using mx3::sqlite::detail::TransactionDb;
 using mx3::sqlite::ColumnInfo;
 using mx3::sqlite::ObservableDb;
 using mx3::sqlite::Stmt;
@@ -25,7 +25,7 @@ namespace {
     }
 
     shared_ptr<Db> s_open_wal(const string& path) {
-        const auto db = Db::open(path {
+        const auto db = Db::open(path, {
             OpenFlag::READWRITE,
             OpenFlag::NOMUTEX,
             OpenFlag::PRIVATECACHE
@@ -36,9 +36,10 @@ namespace {
 }
 
 TransactionDb::TransactionDb(const string& path)
-    : db       { s_open_wal(path) }
-    , m_begin  { db->prepare("BEGIN TRANSACTION") }
-    , m_commit { db->prepare("COMMIT TRANSACTION") }
+    : db { s_open_wal(path) }
+    , m_begin { db->prepare("BEGIN") }
+    , m_commit { db->prepare("COMMIT") }
+    , m_rollback { db->prepare("ROLLBACK") }
     , m_schema_version { db->schema_version() }
 {}
 
@@ -64,14 +65,16 @@ TransactionDb::read_by_id(const string& table_name, int32_t schema_ver, int64_t 
     return stmt->exec_one();
 }
 
-void
-TransactionDb::begin() {
+void TransactionDb::begin() {
     m_begin->exec();
 }
 
-void
-TransactionDb::commit() {
+void TransactionDb::commit() {
     m_commit->exec();
+}
+
+void TransactionDb::rollback() {
+    m_rollback->exec();
 }
 
 ObservableDb::ObservableDb(const string& path) : m_write {path}, m_read {path} {
@@ -84,6 +87,7 @@ void
 ObservableDb::transaction(function<void(const shared_ptr<Db>&)> t_fn) {
     m_read.begin();
     m_write.begin();
+    // todo(kabbes) make exception safe - automatically rollback transaction on exception
     t_fn(m_write.db);
     m_write.commit();
 
