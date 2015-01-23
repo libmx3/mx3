@@ -44,7 +44,6 @@ struct TableInfo final {
     vector<ColumnInfo> columns;
 };
 
-
 class Db final : public std::enable_shared_from_this<Db> {
   public:
     using UpdateHookFn   = function<void(ChangeType, string, string, int64_t)>;
@@ -72,6 +71,7 @@ class Db final : public std::enable_shared_from_this<Db> {
     int32_t schema_version();
 
     vector<TableInfo> schema_info();
+    optional<TableInfo> table_info(const string& table_name);
     vector<ColumnInfo> column_info(const string& table_name);
 
     int32_t user_version();

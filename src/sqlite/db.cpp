@@ -244,6 +244,10 @@ Db::column_info(const string& table_name) {
         columns.push_back( std::move(col) );
         cursor.next();
     }
+    // sort the columns by cid (which is the natural order of the table)
+    std::sort(columns.begin(), columns.end(), [] (const ColumnInfo& c1, const ColumnInfo& c2) -> bool {
+        return c1.cid < c2.cid;
+    });
     return columns;
 }
 
@@ -252,17 +256,32 @@ Db::schema_info() {
     using mx3::sqlite::TableInfo;
 
     vector<TableInfo> tables;
-    auto table_cursor = this->prepare("SELECT name, rootpage, sql from 'sqlite_master' WHERE type = 'table'")->exec_query();
+    auto table_cursor = this->prepare("SELECT name from 'sqlite_master' WHERE type = 'table'")->exec_query();
     while (table_cursor.is_valid()) {
-        TableInfo current_table;
-        current_table.name     = table_cursor.string_value(0);
-        current_table.rootpage = table_cursor.int64_value(1);
-        current_table.sql      = table_cursor.string_value(2);
-        current_table.columns  = this->column_info(current_table.name);
-        tables.push_back( std::move(current_table) );
+        string name = table_cursor.string_value(0);
+        auto info = this->table_info(name);
+        if (info) {
+            tables.push_back( std::move(*info) );
+        }
         table_cursor.next();
     }
     return tables;
+}
+
+optional<mx3::sqlite::TableInfo>
+Db::table_info(const string& table_name) {
+    auto table_stmt = this->prepare("SELECT name, rootpage, sql from 'sqlite_master' WHERE type = 'table' AND name = ?1");
+    table_stmt->bind(1, table_name);
+    auto cursor = table_stmt->exec_query();
+    if (cursor.is_valid()) {
+        return TableInfo {
+            .name     = cursor.string_value(0),
+            .rootpage = cursor.int64_value(1),
+            .sql      = cursor.string_value(2),
+            .columns  = this->column_info(table_name)
+        };
+    }
+    return nullopt;
 }
 
 int32_t
@@ -303,12 +322,12 @@ void
 Db::exec(const string& sql) {
     char * error_msg = nullptr;
     auto result = sqlite3_exec(m_db.get(), sql.c_str(), nullptr, nullptr, &error_msg);
+    unique_ptr<char, Sqlite3Free> raw_msg { error_msg };
+
     if (result != SQLITE_OK) {
         string message;
-        if (error_msg) {
-            message = string(error_msg);
-            sqlite3_free(error_msg);
-            error_msg = nullptr;
+        if (raw_msg) {
+            message = string { raw_msg.get() };
         } else {
             message = "Unknown error";
         }

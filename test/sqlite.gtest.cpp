@@ -2,6 +2,8 @@
 
 #include "stl.hpp"
 #include "src/sqlite/db.hpp"
+#include "src/sqlite/observable_db.hpp"
+#include <cstdio>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -10,6 +12,22 @@ using namespace mx3::sqlite;
 
 TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
+}
+
+TEST(sqlite_db, can_observe) {
+    const string filename{"test.db"};
+
+    {
+    std::remove(filename.c_str());
+    const auto db = Db::open("test.db");
+    db->exec("CREATE TABLE IF NOT EXISTS fake_table (table_id INTEGER, name TEXT NOT NULL, data BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
+    }
+
+    ObservableDb db {"test.db"};
+    db.transaction([&] (const shared_ptr<Db>& write_db) {
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (1, \"hello\");");
+    });
+    std::remove(filename.c_str());
 }
 
 TEST(sqlite_db, schema_info) {

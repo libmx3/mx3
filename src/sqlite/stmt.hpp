@@ -1,5 +1,6 @@
 #pragma once
 #include "stl.hpp"
+#include "value.hpp"
 #include "cursor.hpp"
 
 namespace mx3 { namespace sqlite {
@@ -22,6 +23,7 @@ class Stmt final : public std::enable_shared_from_this<Stmt> {
     int exec();
     Cursor exec_query();
     int64_t exec_scalar();
+    optional<vector<Value>> exec_one();
     void reset();
     void clear_bindings();
 

@@ -1,3 +1,4 @@
+#include "stmt.hpp"
 #include "db.hpp"
 #include <sqlite3/sqlite3.h>
 
@@ -122,6 +123,13 @@ Stmt::exec_scalar() {
         throw std::runtime_error { "not a scalar query" };
     }
     return cursor.int64_value(0);
+}
+
+optional<vector<mx3::sqlite::Value>>
+Stmt::exec_one() {
+    this->reset();
+    const auto cursor = this->exec_query();
+    return cursor.is_valid() ? cursor.values() : optional<vector<Value>> {};
 }
 
 void
