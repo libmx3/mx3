@@ -19,13 +19,19 @@ TEST(sqlite_db, can_observe) {
 
     {
     std::remove(filename.c_str());
-    const auto db = Db::open("test.db");
-    db->exec("CREATE TABLE IF NOT EXISTS fake_table (table_id INTEGER, name TEXT NOT NULL, data BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
+    const auto db = Db::open(filename);
+    db->enable_wal();
+    db->exec("CREATE TABLE fake_table (table_id INTEGER, name TEXT NOT NULL, data BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
     }
 
-    ObservableDb db {"test.db"};
+    ObservableDb db {filename};
     db.transaction([&] (const shared_ptr<Db>& write_db) {
-        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (1, \"hello\");");
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (1, \"hello1\");");
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (5, \"hello5\");");
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (6, \"hello6\");");
+    });
+    db.transaction([&] (const shared_ptr<Db>& write_db) {
+        write_db->exec("UPDATE fake_table SET name = \"hello2\";");
     });
     std::remove(filename.c_str());
 }

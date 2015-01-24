@@ -8,7 +8,7 @@
 #include "interface/api.hpp"
 
 namespace mx3 {
-
+    
 // the "api" of how the UI is allowed to talk to the c++ code
 class Api final : public mx3_gen::Api {
   public:

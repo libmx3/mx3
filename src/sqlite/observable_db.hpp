@@ -32,11 +32,30 @@ public:
     void rollback();
     shared_ptr<Db> db;
 private:
+    friend class TransactionGuard;
     shared_ptr<Stmt> m_begin;
     shared_ptr<Stmt> m_commit;
     shared_ptr<Stmt> m_rollback;
     int32_t m_schema_version;
     std::map<string, shared_ptr<Stmt>> m_read_stmts;
+};
+
+class TransactionGuard final {
+public:
+    TransactionGuard(TransactionDb& db);
+    ~TransactionGuard();
+    void commit();
+    void rollback();
+private:
+    enum class State {
+        NONE,
+        COMMIT,
+        ROLLBACK
+    };
+    TransactionGuard(const TransactionGuard& other) = delete;
+    TransactionGuard& operator=(const TransactionGuard& other) = delete;
+    TransactionDb& m_db;
+    State m_state;
 };
 
 } // end namespace detail
@@ -48,6 +67,7 @@ class ObservableDb final {
   private:
     detail::TransactionDb m_write;
     detail::TransactionDb m_read;
+    shared_ptr<Stmt> m_begin_read_snapshot;
     vector<std::tuple<ChangeType, string, string, int64_t>> m_changes;
 };
 
