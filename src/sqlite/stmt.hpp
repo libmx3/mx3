@@ -23,7 +23,6 @@ class Stmt final : public std::enable_shared_from_this<Stmt> {
     int exec();
     Cursor exec_query();
     int64_t exec_scalar();
-    optional<vector<Value>> exec_one();
     void reset();
     void clear_bindings();
 

@@ -24,17 +24,6 @@ namespace {
         sql += " FROM \"" + table_name + "\" WHERE rowid = ?1";
         return sql;
     }
-    void s_print_row(const optional<mx3::sqlite::Row>& row) {
-        if (row) {
-            for (const auto& val : *row) {
-                std::cout << val << " ";
-            }
-            std::cout << std::endl;
-        } else {
-            std::cout << "[null]" << std::endl;
-        }
-    }
-
     shared_ptr<Db> s_open_wal(const string& path) {
         const auto db = Db::open(path, {
             OpenFlag::CREATE,
@@ -58,6 +47,17 @@ TransactionDb::TransactionDb(const string& path)
 
 optional<mx3::sqlite::Row>
 TransactionDb::read_by_id(const string& table_name, int32_t schema_ver, int64_t rowid) {
+    Cursor c = _read_cursor(table_name, schema_ver, rowid);
+    return c.is_valid() ? c.values() : optional<mx3::sqlite::Row>{};
+}
+
+std::pair<vector<string>, optional<mx3::sqlite::Row>>
+TransactionDb::read_by_id_with_cols(const string& table_name, int32_t schema_ver, int64_t rowid) {
+    Cursor c = _read_cursor(table_name, schema_ver, rowid);
+    return {c.column_names(), c.is_valid() ? c.values() : optional<mx3::sqlite::Row>{}};
+}
+
+mx3::sqlite::Cursor TransactionDb::_read_cursor(const string& table_name, int32_t schema_ver, int64_t rowid) {
     if (schema_ver != m_schema_version) {
         throw std::runtime_error {"schema must be stable"};
     }
@@ -75,7 +75,7 @@ TransactionDb::read_by_id(const string& table_name, int32_t schema_ver, int64_t 
     const auto& stmt = it->second;
     stmt->reset();
     stmt->bind(1, rowid);
-    return stmt->exec_one();
+    return stmt->exec_query();
 }
 
 TransactionGuard::TransactionGuard(TransactionDb& db)
@@ -90,8 +90,8 @@ TransactionGuard::~TransactionGuard() {
 }
 
 void TransactionGuard::commit() {
-    if (m_state ==  TransactionGuard::State::NONE) {
-        m_state =  TransactionGuard::State::COMMIT;
+    if (m_state == TransactionGuard::State::NONE) {
+        m_state = TransactionGuard::State::COMMIT;
         m_db.m_commit->exec();
     }
 }
@@ -103,12 +103,16 @@ void TransactionGuard::rollback() {
     }
 }
 
-ObservableDb::ObservableDb(const string& path)
+ObservableDb::ObservableDb(const string& path, const function<void(DbChanges)>& fn)
+    : ObservableDb(path, make_shared<FnDbListener>(fn)) {}
+
+ObservableDb::ObservableDb(const string& path, const shared_ptr<DbListener>& listener)
     : m_write {path}
     , m_read {path}
     // In order to actually create a read snapshot, you need to issue a BEGIN
     // _and_ an actual select statement.  This select statement will work for any database.
-    , m_begin_read_snapshot {m_read.db->prepare("SELECT 1 FROM sqlite_master LIMIT 1") }
+    , m_begin_read_snapshot {m_read.db->prepare("SELECT 1 FROM sqlite_master LIMIT 1")}
+    , m_listener {listener}
 {
     m_write.db->update_hook([this] (ChangeType type, string db_name, string table_name, int64_t rowid) {
         m_changes.emplace_back(type, std::move(db_name), std::move(table_name), rowid);
@@ -129,22 +133,33 @@ ObservableDb::transaction(function<void(const shared_ptr<Db>&)> t_fn) {
     const auto read_schema_version = m_read.db->schema_version();
     const auto write_schema_version = m_write.db->schema_version();
 
-    // group the changes by rowid
-    for (const auto& c : m_changes) {
-        const ChangeType type = std::get<0>(c);
-        const string& db_name = std::get<1>(c);
+    DbChanges db_changes;
+
+    decltype(m_changes) changes_copy;
+    std::swap(m_changes, changes_copy);
+
+    for (const auto& c : changes_copy) {
+        const ChangeType type    = std::get<0>(c);
+        const string& db_name    = std::get<1>(c);
         const string& table_name = std::get<2>(c);
-        int64_t rowid = std::get<3>(c);
+        int64_t rowid            = std::get<3>(c);
+        (void)db_name;
+        (void)type;
 
-        std::cout << int(type) << " " << db_name << ", " << table_name << ", " << rowid << std::endl;
-
-        const auto old_row = m_read.read_by_id(table_name, read_schema_version, rowid);
-        const auto new_row = m_write.read_by_id(table_name, write_schema_version, rowid);
-
-        s_print_row(old_row);
-        s_print_row(new_row);
+        RowChange current_change;
+        auto table_changes_it = db_changes.find(table_name);
+        if (table_changes_it == db_changes.end()) {
+            auto p = m_read.read_by_id_with_cols(table_name, read_schema_version, rowid);
+            current_change.old_row = std::move(p.second);
+            TableChanges table_changes;
+            table_changes.column_names = std::move(p.first);
+            table_changes_it = db_changes.emplace(table_name, std::move(table_changes)).first;
+        } else {
+            current_change.old_row = m_read.read_by_id(table_name, read_schema_version, rowid);
+        }
+        current_change.new_row = m_write.read_by_id(table_name, write_schema_version, rowid);
+        table_changes_it->second.row_changes.emplace_back( std::move(current_change) );
     }
-
-    m_changes.clear();
     read_transaction.commit();
+    m_listener->on_change(std::move(db_changes));
 }

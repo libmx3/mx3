@@ -10,6 +10,18 @@ using std::endl;
 
 using namespace mx3::sqlite;
 
+static void s_print_row(const optional<mx3::sqlite::Row>& row) {
+    if (row) {
+        for (const auto& val : *row) {
+            cout << val << " ";
+        }
+        cout << endl;
+    } else {
+        cout << "[null]" << endl;
+    }
+}
+
+
 TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
 }
@@ -18,21 +30,44 @@ TEST(sqlite_db, can_observe) {
     const string filename{"test.db"};
 
     {
+    // database set up must be done outside of the observable databse
     std::remove(filename.c_str());
     const auto db = Db::open(filename);
     db->enable_wal();
     db->exec("CREATE TABLE fake_table (table_id INTEGER, name TEXT NOT NULL, data BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
     }
 
-    ObservableDb db {filename};
-    db.transaction([&] (const shared_ptr<Db>& write_db) {
+    auto db = make_unique<ObservableDb>(filename, [] (DbChanges db_changes) {
+        for (const auto& table : db_changes) {
+            cout << table.first << " had " << table.second.row_changes.size() << " changes" << endl;
+            for (const auto& col : table.second.column_names) {
+                cout << col << ", ";
+            }
+            cout << endl;
+            cout << "==============================================" << endl;
+            size_t change_num = 0;
+            for (const auto& row_change : table.second.row_changes) {
+                cout << "Change " << change_num << endl;
+                cout << "    ";
+                s_print_row(row_change.old_row);
+                cout << "    ";
+                s_print_row(row_change.new_row);
+                change_num++;
+            }
+        }
+    });
+
+
+    db->transaction([&] (const shared_ptr<Db>& write_db) {
         write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (1, \"hello1\");");
         write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (5, \"hello5\");");
         write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (6, \"hello6\");");
     });
-    db.transaction([&] (const shared_ptr<Db>& write_db) {
-        write_db->exec("UPDATE fake_table SET name = \"hello2\";");
+    db->transaction([&] (const shared_ptr<Db>& write_db) {
+        write_db->exec("UPDATE fake_table SET name = \"hello2\" WHERE table_id != 5;");
     });
+    // close the database
+    db = nullptr;
     std::remove(filename.c_str());
 }
 

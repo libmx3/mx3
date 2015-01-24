@@ -1,5 +1,6 @@
 #include "db.hpp"
 #include <sqlite3/sqlite3.h>
+#include <algorithm>
 
 using mx3::sqlite::Db;
 using mx3::sqlite::Stmt;
@@ -239,7 +240,7 @@ Db::column_info(const string& table_name) {
         auto dflt_value = cursor.value_at(dflt_value_pos);
         col.dflt_value  = dflt_value.is_null()
                         ? optional<string> {nullopt}
-                        : optional<string> { dflt_value.string_value() };
+                        : optional<string> {dflt_value.string_value()};
         col.pk = cursor.int64_value(pk_pos);
         columns.push_back( std::move(col) );
         cursor.next();
@@ -274,12 +275,12 @@ Db::table_info(const string& table_name) {
     table_stmt->bind(1, table_name);
     auto cursor = table_stmt->exec_query();
     if (cursor.is_valid()) {
-        return TableInfo {
-            .name     = cursor.string_value(0),
-            .rootpage = cursor.int64_value(1),
-            .sql      = cursor.string_value(2),
-            .columns  = this->column_info(table_name)
-        };
+        TableInfo info;
+        info.name     = cursor.string_value(0);
+        info.rootpage = cursor.int64_value(1);
+        info.sql      = cursor.string_value(2);
+        info.columns  = this->column_info(table_name);
+        return info;
     }
     return nullopt;
 }

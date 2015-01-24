@@ -125,13 +125,6 @@ Stmt::exec_scalar() {
     return cursor.int64_value(0);
 }
 
-optional<vector<mx3::sqlite::Value>>
-Stmt::exec_one() {
-    this->reset();
-    const auto cursor = this->exec_query();
-    return cursor.is_valid() ? cursor.values() : optional<vector<Value>> {};
-}
-
 void
 Stmt::reset() {
     auto error_code = sqlite3_reset(m_stmt.get());
