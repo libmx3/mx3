@@ -55,27 +55,6 @@ string escape_column(const string& column) {
     return result;
 }
 
-vector<std::tuple<ChangeType, string, string, int64_t>>
-collapse_by_rowid(vector<std::tuple<ChangeType, string, string, int64_t>> changes) {
-    vector<std::tuple<ChangeType, string, string, int64_t>> new_changes;
-    new_changes.reserve(changes.size());
-    std::set<std::tuple<int64_t, string, string>> seen;
-    const auto r_begin = changes.rbegin();
-    const auto r_end   = changes.rend();
-    for (auto it = r_begin; it != r_end; it++) {
-        const bool did_insert = seen.emplace(
-                std::get<3>(*it),
-                std::get<2>(*it),
-                std::get<1>(*it)).second;
-        if (did_insert) {
-            new_changes.push_back(std::move(*it));
-        }
-    }
-    // reverse the final output to preserve the original ordering (as much as possible)
-    std::reverse(new_changes.begin(), new_changes.end());
-    return new_changes;
-}
-
 // Post process RowChanges to squash duplicate modifications (based on rowid)
 vector<RowChange> collapse_by_rowid(vector<RowChange>&& changes) {
     // Iterate changes in reverse and push into the new vector if no duplicates have been
@@ -159,7 +138,7 @@ ObservableDb::~ObservableDb() {
 
 void
 ObservableDb::transaction(function<void(const shared_ptr<Db>&)> transaction_fn) {
-    const unique_ptr<decltype(m_changes), ChangeClearer> clean_on_exit {&m_changes};
+    unique_ptr<decltype(m_changes), ChangeClearer> clean_on_exit {&m_changes};
     TransactionGuard read_guard {m_read_conn.transaction_stmts};
     // Although this line appears to do nothing, sqlite defers opening a read transaction until
     // a select statement has been issued.
@@ -178,21 +157,40 @@ ObservableDb::transaction(function<void(const shared_ptr<Db>&)> transaction_fn) 
     // Reopen a transaction on the write database, to ensure a consistent view of the
     // rows that we will be requerying.
     TransactionGuard write_guard {m_write_conn.transaction_stmts};
+    DbChanges db_changes = _collect_changes();
 
+    // this calls m_changes.clear(), but ensures it is only called once
+    clean_on_exit.release();
+
+    write_guard.commit();
+    read_guard.commit();
+    m_listener->on_change(std::move(db_changes));
+}
+
+void ObservableDb::_collect_changes() {
     DbChanges db_changes;
-    decltype(m_changes) changes_copy;
-    std::swap(m_changes, changes_copy);
-    changes_copy = collapse_by_rowid(std::move(changes_copy));
+    // todo(kabbes) sorted vector will likely be faster
+    std::set<std::tuple<int64_t, string, string>> seen;
+    const auto r_begin = m_change.rbegin();
+    const auto r_end   = m_change.rend();
 
-    for (const auto& c : changes_copy) {
-        // const ChangeType type    = std::get<0>(c);
-        // const string& db_name    = std::get<1>(c);
-        const string& table_name = std::get<2>(c);
-        int64_t rowid            = std::get<3>(c);
+    for (auto it = r_begin; it != r_end; it++) {
+        const ChangeType type    = std::get<0>(*it);
+        const string& db_name    = std::get<1>(*it);
+        const string& table_name = std::get<2>(*it);
+        int64_t rowid            = std::get<3>(*it);
+        const bool did_insert = seen.emplace(rowid, table_name, db_name).second;
+
+        // we have already seen this same change before
+        if (!did_insert) {
+            continue;
+        }
 
         RowChange current_change;
         current_change.rowid = rowid;
         auto table_changes_it = db_changes.find(table_name);
+        // todo(kabbes) can prevent some reads by inspecting the ChangeType
+        (void)type;
         if (table_changes_it == db_changes.end()) {
             auto p = m_read_conn.read_by_id_with_cols(table_name, rowid);
             current_change.old_row = std::move(p.second);
@@ -203,14 +201,22 @@ ObservableDb::transaction(function<void(const shared_ptr<Db>&)> transaction_fn) 
             current_change.old_row = m_read_conn.read_by_id(table_name, rowid);
         }
         current_change.new_row = m_write_conn.read_by_id(table_name, rowid);
-        if (current_change.old_row) {
-            std::cout << "Change: " << current_change.old_row.value()[0] << std::endl;
+
+        // If both are null, then we know that this entity has been added and deleted in
+        // the same transaction, so we can safely ignore it.
+        if (current_change.old_row || current_change.new_row) {
+            table_changes_it->second.row_changes.emplace_back( std::move(current_change) );
         }
-        table_changes_it->second.row_changes.emplace_back( std::move(current_change) );
     }
-    write_guard.commit();
-    read_guard.commit();
-    m_listener->on_change(std::move(db_changes));
+
+    // Flip the order of changes back again, since we collected them in reverse order.
+    for (auto& mapping : db_changes) {
+        vector<RowChange>& row_changes = mapping.second.row_changes;
+        std::reverse(row_changes.begin(), row_changes.end());
+    }
+
+
+    return db_changes;
 }
 
 } } // end namespace mx3::sqlite

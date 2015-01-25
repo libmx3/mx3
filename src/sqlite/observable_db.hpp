@@ -22,12 +22,6 @@ struct TableChanges final {
     vector<RowChange> row_changes;
 };
 
-vector<RowChange> collapse_by_rowid(vector<RowChange>&& data);
-vector<RowChange> collapse_by_pk(vector<RowChange>&& data, const vector<size_t>& pks);
-
-vector<std::tuple<ChangeType, string, string, int64_t>>
-collapse_by_rowid(vector<std::tuple<ChangeType, string, string, int64_t>> changes);
-
 // a map of table to rows changed
 using DbChanges = std::map<string, TableChanges>;
 
@@ -65,11 +59,11 @@ class ObservableDb final {
     ~ObservableDb();
     void transaction(function<void(const shared_ptr<Db>&)> t_fn);
   private:
+    DbChanges _collect_changes();
     ObserveConnection m_write_conn;
     ObserveConnection m_read_conn;
     shared_ptr<Stmt> m_begin_read_snapshot;
     const int32_t m_schema_version;
-
     vector<std::tuple<ChangeType, string, string, int64_t>> m_changes;
     shared_ptr<DbListener> m_listener;
 };

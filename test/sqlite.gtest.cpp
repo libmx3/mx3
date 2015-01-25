@@ -36,6 +36,7 @@ static vector<Value> trivial_row(const int x) {
     return vector<Value> {{x}};
 }
 
+/*
 TEST(sqlite_db, can_collapse_trivial) {
     {
         // empty collapse
@@ -133,6 +134,7 @@ TEST(sqlite_db, can_collapse_complex) {
         EXPECT_EQ(row_changes, expected_changes);
     }
 }
+*/
 
 
 TEST(sqlite_db, can_open_close) {
@@ -178,6 +180,10 @@ TEST(sqlite_db, can_observe) {
     });
     db->transaction([&] (const shared_ptr<Db>& write_db) {
         write_db->exec("UPDATE fake_table SET name = \"hello2\" WHERE table_id != 5;");
+        write_db->exec("UPDATE fake_table SET price = 1.234 WHERE table_id == 1;");
+
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (7, \"i_should_be_delete\");");
+        write_db->exec("DELETE FROM fake_table WHERE table_id = 7");
     });
     // close the database
     db = nullptr;
