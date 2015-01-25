@@ -47,7 +47,12 @@ class Stmt final : public std::enable_shared_from_this<Stmt> {
     struct Finalizer final {
         void operator() (sqlite3_stmt * stmt);
     };
-    Stmt(sqlite3_stmt * stmt, shared_ptr<Db> db);
+    struct only_for_internal_make_shared_t;
+  public:
+    // make_shared ctor
+    Stmt(only_for_internal_make_shared_t flag, sqlite3_stmt * stmt, const shared_ptr<Db>& db);
+  private:
+    static shared_ptr<Stmt> create(sqlite3_stmt * stmt, const shared_ptr<Db>& db);
     shared_ptr<Db> m_db;
     unique_ptr<sqlite3_stmt, Finalizer> m_stmt;
 };

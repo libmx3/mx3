@@ -73,8 +73,8 @@ Cursor::Resetter::operator() (sqlite3_stmt * stmt) {
     }
 }
 
-Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_valid)
-    : m_stmt {std::move(stmt)}
+Cursor::Cursor(const shared_ptr<Stmt>& stmt, bool is_valid)
+    : m_stmt {stmt}
     , m_raw_stmt {m_stmt->borrow_stmt()}
     , m_is_valid {is_valid}
 {}

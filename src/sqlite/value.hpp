@@ -8,8 +8,10 @@ class Value final {
   public:
     Value();
     Value(std::nullptr_t x);
+    Value(int x);
     Value(int64_t x);
     Value(double x);
+    Value(const char * x);
     Value(string x);
     Value(vector<uint8_t> x);
     Value(Value&& other);

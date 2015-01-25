@@ -10,6 +10,17 @@ using std::endl;
 
 using namespace mx3::sqlite;
 
+template<typename FromType, typename F>
+auto map(const vector<FromType>& data, F&& map_fn) -> vector<decltype(map_fn(*data.begin()))> {
+    using ToType  = decltype(map_fn(*data.begin()));
+    vector<ToType> result;
+    result.reserve(data.size());
+    for (const auto& d : data) {
+        result.push_back(map_fn(d));
+    }
+    return result;
+}
+
 static void s_print_row(const optional<mx3::sqlite::Row>& row) {
     if (row) {
         for (const auto& val : *row) {
@@ -18,6 +29,108 @@ static void s_print_row(const optional<mx3::sqlite::Row>& row) {
         cout << endl;
     } else {
         cout << "[null]" << endl;
+    }
+}
+
+static vector<Value> trivial_row(const int x) {
+    return vector<Value> {{x}};
+}
+
+TEST(sqlite_db, can_collapse_trivial) {
+    {
+        // empty collapse
+        vector<RowChange> row_changes;
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 0);
+    }
+    {
+        // single item, collapse null->null
+        vector<RowChange> row_changes {{1, nullopt, nullopt}};
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 0);
+    }
+    {
+        // single item, no collapse (row -> null)
+        vector<RowChange> row_changes {{1, trivial_row(5), nullopt}};
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 1);
+        EXPECT_TRUE(row_changes[0].old_row == trivial_row(5));
+        EXPECT_TRUE(row_changes[0].new_row == nullopt);
+    }
+
+    {
+        // single item, no collapse (null -> row)
+        vector<RowChange> row_changes {{1, nullopt, trivial_row(8)}};
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 1);
+        EXPECT_TRUE(row_changes[0].old_row == nullopt);
+        EXPECT_TRUE(row_changes[0].new_row == trivial_row(8));
+    }
+
+    {
+        // single item, no collapse (row -> row)
+        vector<RowChange> row_changes {{1, trivial_row(7), trivial_row(8)}};
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 1);
+        EXPECT_TRUE(row_changes[0].old_row == trivial_row(7));
+        EXPECT_TRUE(row_changes[0].new_row == trivial_row(8));
+    }
+}
+
+TEST(sqlite_db, can_collapse_complex) {
+    {
+        // lots of updates, single rowid
+        vector<RowChange> row_changes {
+            {1, nullopt, trivial_row(11)},
+            {1, nullopt, nullopt},
+            {1, trivial_row(93), trivial_row(13)}
+        };
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 1);
+        EXPECT_TRUE(row_changes[0].old_row == trivial_row(93));
+        EXPECT_TRUE(row_changes[0].new_row == trivial_row(13));
+    }
+    {
+        // lots of updates, ending in (null, null)
+        vector<RowChange> row_changes {
+            {1, nullopt, trivial_row(11)},
+            {1, trivial_row(93), trivial_row(13)},
+            {1, nullopt, nullopt}
+        };
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes.size(), 0);
+    }
+    {
+        // multiple rowids
+        vector<RowChange> row_changes {
+            {4, nullopt, trivial_row(4)},
+            {1, nullopt, trivial_row(1)},
+            {2, nullopt, trivial_row(2)},
+            {3, nullopt, trivial_row(3)}
+        };
+        const auto copy = row_changes;
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes, copy);
+    }
+    {
+        // multiple rowids, multiple collapse
+        vector<RowChange> row_changes {
+            {2, nullopt, trivial_row(2)},
+            {2, nullopt, trivial_row(22)},
+            {1, trivial_row(1), nullopt},
+            {4, nullopt, trivial_row(4)},
+            {3, nullopt, nullopt},
+            {4, nullopt, nullopt},
+            {3, nullopt, trivial_row(3)}
+        };
+        const vector<RowChange> expected_changes {
+            {2, nullopt, trivial_row(22)},
+            {1, trivial_row(1), nullopt},
+            {3, nullopt, trivial_row(3)}
+        };
+        const auto copy = row_changes;
+        row_changes = collapse_by_rowid( std::move(row_changes) );
+        EXPECT_EQ(row_changes, expected_changes);
     }
 }
 
@@ -34,7 +147,7 @@ TEST(sqlite_db, can_observe) {
     std::remove(filename.c_str());
     const auto db = Db::open(filename);
     db->enable_wal();
-    db->exec("CREATE TABLE fake_table (table_id INTEGER, name TEXT NOT NULL, data BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
+    db->exec("CREATE TABLE fake_table (table_id INTEGER, name TEXT NOT NULL, `data` BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
     }
 
     auto db = make_unique<ObservableDb>(filename, [] (DbChanges db_changes) {

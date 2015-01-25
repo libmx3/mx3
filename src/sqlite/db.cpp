@@ -2,10 +2,7 @@
 #include <sqlite3/sqlite3.h>
 #include <algorithm>
 
-using mx3::sqlite::Db;
-using mx3::sqlite::Stmt;
-using mx3::sqlite::ChangeType;
-using mx3::sqlite::OpenFlag;
+namespace mx3 { namespace sqlite {
 
 namespace {
     struct Sqlite3Free final {
@@ -16,7 +13,7 @@ namespace {
 }
 
 string
-mx3::sqlite::mprintf(const char * format, const string& data) {
+mprintf(const char * format, const string& data) {
     unique_ptr<char, Sqlite3Free> raw_str {
         sqlite3_mprintf(format, data.c_str())
     };
@@ -24,13 +21,14 @@ mx3::sqlite::mprintf(const char * format, const string& data) {
 }
 
 string
-mx3::sqlite::mprintf(const char * format, int64_t data) {
+mprintf(const char * format, int64_t data) {
     unique_ptr<char, Sqlite3Free> raw_str {
         sqlite3_mprintf(format, data)
     };
     return string {raw_str.get()};
 }
 
+struct Db::only_for_internal_make_shared_t {};
 
 shared_ptr<Db>
 Db::open(const string& db_path, const std::set<OpenFlag>& flags, const optional<string>& vfs_name) {
@@ -69,13 +67,12 @@ Db::open(const string& db_path, const std::set<OpenFlag>& flags, const optional<
 
     sqlite3 * db = nullptr;
     const char * vfs_p = vfs_name ? vfs_name->c_str() : nullptr;
-    auto error_code = sqlite3_open_v2(db_path.c_str(), &db, sqlite_flags, vfs_p);
-    auto temp_db = unique_ptr<sqlite3, Db::Closer> {db};
-
+    const auto error_code = sqlite3_open_v2(db_path.c_str(), &db, sqlite_flags, vfs_p);
+    auto temp_db = unique_ptr<sqlite3, Closer> {db};
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     }
-    return shared_ptr<Db> { new Db{std::move(temp_db)} };
+    return make_shared<Db>(only_for_internal_make_shared_t{}, std::move(temp_db));
 }
 
 shared_ptr<Db>
@@ -97,11 +94,10 @@ Db::open_memory() {
 
 shared_ptr<Db>
 Db::inherit_db(sqlite3 * db) {
-    auto temp_db = unique_ptr<sqlite3, Db::Closer> {db};
-    return shared_ptr<Db> { new Db{std::move(temp_db)} };
+    return make_shared<Db>(only_for_internal_make_shared_t{}, unique_ptr<sqlite3, Db::Closer> {db});
 }
 
-Db::Db(unique_ptr<sqlite3, Closer> db) : m_db { std::move(db) } {}
+Db::Db(only_for_internal_make_shared_t, unique_ptr<sqlite3, Closer> db) : m_db { std::move(db) } {}
 
 Db::~Db() {
     // setting the hooks to nullptr
@@ -209,12 +205,10 @@ Db::schema_version() {
     return static_cast<int32_t>( this->prepare("PRAGMA schema_version;")->exec_scalar() );
 }
 
-vector<mx3::sqlite::ColumnInfo>
+vector<ColumnInfo>
 Db::column_info(const string& table_name) {
-    using mx3::sqlite::ColumnInfo;
-
     auto cursor = this->prepare(
-        mx3::sqlite::mprintf("PRAGMA table_info(%Q);", table_name)
+        mprintf("PRAGMA table_info(%Q);", table_name)
     )->exec_query();
 
     vector<string> names = cursor.column_names();
@@ -252,10 +246,8 @@ Db::column_info(const string& table_name) {
     return columns;
 }
 
-vector<mx3::sqlite::TableInfo>
+vector<TableInfo>
 Db::schema_info() {
-    using mx3::sqlite::TableInfo;
-
     vector<TableInfo> tables;
     auto table_cursor = this->prepare("SELECT name from 'sqlite_master' WHERE type = 'table'")->exec_query();
     while (table_cursor.is_valid()) {
@@ -269,7 +261,7 @@ Db::schema_info() {
     return tables;
 }
 
-optional<mx3::sqlite::TableInfo>
+optional<TableInfo>
 Db::table_info(const string& table_name) {
     auto table_stmt = this->prepare("SELECT name, rootpage, sql from 'sqlite_master' WHERE type = 'table' AND name = ?1");
     table_stmt->bind(1, table_name);
@@ -293,7 +285,7 @@ Db::user_version() {
 void
 Db::set_user_version(int32_t user_ver) {
     this->exec(
-        mx3::sqlite::mprintf("PRAGMA user_version=%d;", user_ver)
+        mprintf("PRAGMA user_version=%d;", user_ver)
     );
 }
 
@@ -308,7 +300,7 @@ Db::Closer::operator() (sqlite3 * db) const {
 
 void
 Db::close() {
-    auto error_code = sqlite3_close(m_db.get());
+    const auto error_code = sqlite3_close(m_db.get());
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     }
@@ -322,8 +314,8 @@ Db::enable_wal() {
 void
 Db::exec(const string& sql) {
     char * error_msg = nullptr;
-    auto result = sqlite3_exec(m_db.get(), sql.c_str(), nullptr, nullptr, &error_msg);
-    unique_ptr<char, Sqlite3Free> raw_msg { error_msg };
+    const auto result = sqlite3_exec(m_db.get(), sql.c_str(), nullptr, nullptr, &error_msg);
+    const unique_ptr<char, Sqlite3Free> raw_msg { error_msg };
 
     if (result != SQLITE_OK) {
         string message;
@@ -338,7 +330,7 @@ Db::exec(const string& sql) {
 
 int64_t
 Db::exec_scalar(const string& sql) {
-    auto cursor = this->prepare(sql)->exec_query();
+    const auto cursor = this->prepare(sql)->exec_query();
     if (cursor.column_count() == 1) {
         return cursor.int64_value(0);
     }
@@ -349,15 +341,13 @@ shared_ptr<Stmt>
 Db::prepare(const string& sql) {
     sqlite3_stmt * stmt = nullptr;
     const char * end_point = nullptr;
-    auto error_code = sqlite3_prepare_v2(m_db.get(), sql.c_str(), static_cast<int>(sql.length()), &stmt, &end_point);
-
-    // we don't use make_shared here since we want to be able hide the ctor
-    auto raw_stmt = new Stmt {stmt, this->shared_from_this()};
-    shared_ptr<Stmt> wrapped_stmt {raw_stmt};
-
+    const auto error_code = sqlite3_prepare_v2(m_db.get(), sql.c_str(), static_cast<int>(sql.length()), &stmt, &end_point);
+    const shared_ptr<Stmt> wrapped_stmt = Stmt::create(stmt, shared_from_this());
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     } else {
         return wrapped_stmt;
     }
 }
+
+} } // end namespace mx3::sqlite

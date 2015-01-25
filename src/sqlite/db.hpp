@@ -8,6 +8,7 @@ namespace mx3 { namespace sqlite {
 // single param helpers for sqlite3_mprintf
 string mprintf(const char * format, const string& data);
 string mprintf(const char * format, int64_t data);
+string escape_column(const string& col);
 
 enum class ChangeType {
     INSERT,
@@ -88,7 +89,11 @@ class Db final : public std::enable_shared_from_this<Db> {
     struct Closer final {
         void operator() (sqlite3 * db) const;
     };
-    Db(unique_ptr<sqlite3, Closer> db);
+    struct only_for_internal_make_shared_t;
+  public:
+    // make_shared constructor
+    Db(only_for_internal_make_shared_t flag, unique_ptr<sqlite3, Closer> db);
+  private:
     unique_ptr<sqlite3, Closer> m_db;
 };
 

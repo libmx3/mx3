@@ -46,7 +46,7 @@ class Cursor final {
     struct Resetter final {
         void operator() (sqlite3_stmt * stmt);
     };
-    Cursor(shared_ptr<Stmt> stmt, bool is_valid);
+    Cursor(const shared_ptr<Stmt>& stmt, bool is_valid);
 
     // this keeps the statement alive while we are executing the query
     shared_ptr<Stmt> m_stmt;
