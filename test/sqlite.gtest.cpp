@@ -174,8 +174,8 @@ TEST(sqlite_db, can_observe) {
 
 
     db->transaction([&] (const shared_ptr<Db>& write_db) {
-        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (1, \"hello1\");");
         write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (5, \"hello5\");");
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (1, \"hello1\");");
         write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (6, \"hello6\");");
     });
     db->transaction([&] (const shared_ptr<Db>& write_db) {

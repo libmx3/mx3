@@ -14,31 +14,62 @@ namespace {
             changes->clear();
         }
     };
-
-    string s_select_by_rowid(const string& table_name, const vector<ColumnInfo>& columns) {
-        string sql = "SELECT ";
-        for (const auto& c : columns) {
-            if (&c != &columns[0]) {
-                sql += ", " + escape_column(c.name);
-            } else {
-                sql += escape_column(c.name);
-            }
-        }
-        sql += " FROM " + escape_column(table_name) + " WHERE rowid = ?1";
-        return sql;
-    }
-    shared_ptr<Db> s_open_wal(const string& path) {
-        const auto db = Db::open(path, {
-            OpenFlag::CREATE,
-            OpenFlag::READWRITE,
-            // multi-threaded mode
-            OpenFlag::NOMUTEX,
-            OpenFlag::PRIVATECACHE
-        });
-        db->enable_wal();
-        return db;
-    }
 } // end anon namespace
+
+static string s_select_by_rowid(const string& table_name, const vector<ColumnInfo>& columns) {
+    string sql = "SELECT ";
+    for (const auto& c : columns) {
+        if (&c != &columns[0]) {
+            sql += ", " + escape_column(c.name);
+        } else {
+            sql += escape_column(c.name);
+        }
+    }
+    sql += " FROM " + escape_column(table_name) + " WHERE rowid = ?1";
+    return sql;
+}
+
+static shared_ptr<Db> s_open_wal(const string& path) {
+    const auto db = Db::open(path, {
+        OpenFlag::READWRITE,
+        // multi-threaded mode
+        OpenFlag::NOMUTEX,
+        OpenFlag::PRIVATECACHE
+    });
+    db->enable_wal();
+    return db;
+}
+
+namespace detail {
+
+vector<size_t> get_pk_pos(const TableInfo& table_info) {
+    vector<std::pair<int32_t, size_t>> pks;
+    size_t i = 0;
+    for (const auto& col : table_info.columns) {
+        if (col.is_pk()) {
+            pks.emplace_back(col.pk, i);
+        }
+        i++;
+    }
+    // Sort the pks by their primary key 'importance'
+    std::sort(pks.begin(), pks.end());
+    vector<size_t> pk_idx;
+    pk_idx.reserve(pks.size());
+    for (const auto p : pks) {
+        pk_idx.push_back(p.second);
+    }
+    return pk_idx;
+}
+
+std::map<string, vector<size_t>> get_pk_pos(const vector<TableInfo>& schema_info) {
+    std::map<string, vector<size_t>> pks_by_table;
+    for (const auto& table_info : schema_info) {
+        pks_by_table.emplace(table_info.name, get_pk_pos(table_info));
+    }
+    return pks_by_table;
+}
+
+} // end namespace detail
 
 string escape_column(const string& column) {
     string result;
@@ -53,32 +84,6 @@ string escape_column(const string& column) {
     }
     result += '"';
     return result;
-}
-
-// Post process RowChanges to squash duplicate modifications (based on rowid)
-vector<RowChange> collapse_by_rowid(vector<RowChange>&& changes) {
-    // Iterate changes in reverse and push into the new vector if no duplicates have been
-    // found yet. Then, reverse the output array to maintain stability.
-    vector<RowChange> new_changes;
-    new_changes.reserve(changes.size());
-    std::unordered_set<int64_t> seen;
-    seen.reserve(changes.size());
-
-    // going backwards, mark latest
-    const auto r_begin = changes.rbegin();
-    const auto r_end   = changes.rend();
-    for (auto it = r_begin; it != r_end; it++) {
-        const bool did_insert = seen.emplace(it->rowid).second;
-        // If there is an update that is (null -> null), then swallow it.
-        // It was an insert followed by a delete in the same transaction.
-        if (did_insert && (it->old_row || it->new_row)) {
-            new_changes.push_back(std::move(*it));
-        }
-    }
-
-    // reverse the final output to preserve the original ordering (as much as possible)
-    std::reverse(new_changes.begin(), new_changes.end());
-    return new_changes;
 }
 
 ObserveConnection::ObserveConnection(const shared_ptr<Db>& set_db)
@@ -124,7 +129,9 @@ ObservableDb::ObservableDb(const string& path, const shared_ptr<DbListener>& lis
     // In order to actually create a read snapshot, you need to issue a BEGIN
     // _and_ an actual select statement.  This select statement will work for any database.
     , m_begin_read_snapshot {m_read_conn.db->prepare("SELECT 1 FROM sqlite_master LIMIT 1")}
+    , m_schema_info {m_write_conn.db->schema_info()}
     , m_schema_version {m_write_conn.db->schema_version()}
+    , m_primary_keys {detail::get_pk_pos(m_schema_info)}
     , m_listener {listener}
 {
     m_write_conn.db->update_hook([this] (ChangeType type, string db_name, string table_name, int64_t rowid) {
@@ -158,21 +165,19 @@ ObservableDb::transaction(function<void(const shared_ptr<Db>&)> transaction_fn) 
     // rows that we will be requerying.
     TransactionGuard write_guard {m_write_conn.transaction_stmts};
     DbChanges db_changes = _collect_changes();
-
-    // this calls m_changes.clear(), but ensures it is only called once
-    clean_on_exit.release();
+    m_changes.clear();
 
     write_guard.commit();
     read_guard.commit();
     m_listener->on_change(std::move(db_changes));
 }
 
-void ObservableDb::_collect_changes() {
+DbChanges ObservableDb::_collect_changes() {
     DbChanges db_changes;
     // todo(kabbes) sorted vector will likely be faster
     std::set<std::tuple<int64_t, string, string>> seen;
-    const auto r_begin = m_change.rbegin();
-    const auto r_end   = m_change.rend();
+    const auto r_begin = m_changes.rbegin();
+    const auto r_end   = m_changes.rend();
 
     for (auto it = r_begin; it != r_end; it++) {
         const ChangeType type    = std::get<0>(*it);
@@ -189,6 +194,7 @@ void ObservableDb::_collect_changes() {
         RowChange current_change;
         current_change.rowid = rowid;
         auto table_changes_it = db_changes.find(table_name);
+
         // todo(kabbes) can prevent some reads by inspecting the ChangeType
         (void)type;
         if (table_changes_it == db_changes.end()) {
@@ -214,7 +220,6 @@ void ObservableDb::_collect_changes() {
         vector<RowChange>& row_changes = mapping.second.row_changes;
         std::reverse(row_changes.begin(), row_changes.end());
     }
-
 
     return db_changes;
 }

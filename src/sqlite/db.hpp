@@ -8,6 +8,12 @@ namespace mx3 { namespace sqlite {
 // single param helpers for sqlite3_mprintf
 string mprintf(const char * format, const string& data);
 string mprintf(const char * format, int64_t data);
+
+/* Use this when you want to escape a column or table name when building a query.
+ * Example:
+ *   from -> "from"
+ *   hell"o -> "hell""o"
+ */
 string escape_column(const string& col);
 
 enum class ChangeType {

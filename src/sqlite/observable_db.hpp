@@ -39,6 +39,11 @@ private:
     function<void(DbChanges)> m_fn;
 };
 
+namespace detail {
+std::map<string, vector<size_t>> get_pk_pos(const vector<TableInfo>& schema_info);
+vector<size_t> get_pk_pos(const TableInfo& table_info);
+}
+
 
 class ObserveConnection final {
 public:
@@ -63,7 +68,9 @@ class ObservableDb final {
     ObserveConnection m_write_conn;
     ObserveConnection m_read_conn;
     shared_ptr<Stmt> m_begin_read_snapshot;
+    const vector<TableInfo> m_schema_info;
     const int32_t m_schema_version;
+    const std::map<string, vector<size_t>> m_primary_keys;
     vector<std::tuple<ChangeType, string, string, int64_t>> m_changes;
     shared_ptr<DbListener> m_listener;
 };

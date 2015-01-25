@@ -3,3 +3,4 @@
 #include "cursor.hpp"
 #include "stmt.hpp"
 #include "db.hpp"
+#include "transaction.hpp"
