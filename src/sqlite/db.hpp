@@ -53,7 +53,14 @@ struct TableInfo final {
 
 class Db final : public std::enable_shared_from_this<Db> {
   public:
-    using UpdateHookFn   = function<void(ChangeType, string, string, int64_t)>;
+    // todo(kabbes) explore whether exposing const char * is worth the perf
+    struct Change final {
+        ChangeType type;
+        string db_name;
+        string table_name;
+        int64_t rowid;
+    };
+    using UpdateHookFn   = function<void(Db::Change)>;
     using CommitHookFn   = function<bool()>;
     using RollbackHookFn = function<void()>;
 
@@ -70,9 +77,9 @@ class Db final : public std::enable_shared_from_this<Db> {
     static shared_ptr<Db> inherit_db(sqlite3 * db);
     ~Db();
 
-    void update_hook(UpdateHookFn update_fn);
-    void commit_hook(CommitHookFn commit_fn);
-    void rollback_hook(RollbackHookFn rollback_fn);
+    void update_hook(const UpdateHookFn& update_fn);
+    void commit_hook(const CommitHookFn& commit_fn);
+    void rollback_hook(const RollbackHookFn& rollback_fn);
     int64_t last_insert_rowid();
 
     int32_t schema_version();

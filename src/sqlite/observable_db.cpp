@@ -10,7 +10,7 @@ namespace sqlite {
 
 namespace {
     struct ChangeClearer final {
-        void operator() (vector<std::tuple<ChangeType, string, string, int64_t>> * changes) const {
+        void operator() (vector<Db::Change> * changes) const {
             changes->clear();
         }
     };
@@ -67,6 +67,73 @@ std::map<string, vector<size_t>> get_pk_pos(const vector<TableInfo>& schema_info
         pks_by_table.emplace(table_info.name, get_pk_pos(table_info));
     }
     return pks_by_table;
+}
+
+vector<Db::Change> collapse_by_rowid(vector<Db::Change> changes) {
+    std::set<std::tuple<int64_t, string, string>> seen;
+    std::reverse(changes.begin(), changes.end());
+    const auto new_end = std::remove_if(changes.begin(), changes.end(), [&seen] (const Db::Change& c) -> bool {
+        const bool did_insert = seen.emplace(c.rowid, c.table_name, c.db_name).second;
+        // Remove this if we weren't the first instance of (rowid, table, db)
+        // this means "last writer wins".
+        return !did_insert;
+    });
+    changes.erase(new_end, changes.end());
+    std::reverse(changes.begin(), changes.end());
+    return changes;
+}
+
+optional<vector<Value>> extract_primary_key(const optional<vector<Value>>& row, const vector<size_t>& pk_positions) {
+    if (row) {
+        vector<Value> primary_key;
+        primary_key.reserve(pk_positions.size());
+        for (const auto pos : pk_positions) {
+            if (pos >= row->size()) {
+                throw std::runtime_error {"Bad state to extract primary key"};
+            }
+            primary_key.push_back((*row)[pos]);
+        }
+        return primary_key;
+    }
+    return nullopt;
+}
+
+vector<Value> extract_primary_key(const RowChange& change, const vector<size_t>& pk_positions) {
+    if (!change.old_row && !change.new_row) {
+        throw std::runtime_error {"Cannot extract primary of an empty update"};
+    }
+    const auto old_primary_key = extract_primary_key(change.old_row, pk_positions);
+    const auto new_primary_key = extract_primary_key(change.new_row, pk_positions);
+    if (old_primary_key && new_primary_key && old_primary_key != new_primary_key) {
+        throw std::runtime_error {"Bad state same update classified different primary key"};
+    }
+    return old_primary_key ? old_primary_key.value() : new_primary_key.value();
+}
+
+TableChanges allow_first_change(TableChanges&& changes, const vector<size_t>& pk_positions) {
+    std::set<std::vector<Value>> seen;
+    auto& row_changes = changes.row_changes;
+    const auto new_end = std::remove_if(row_changes.begin(), row_changes.end(), [&seen, &pk_positions] (const RowChange& c) {
+        vector<Value> primary_key = extract_primary_key(c, pk_positions);
+        const bool did_insert = seen.insert(std::move(primary_key)).second;
+        return !did_insert;
+    });
+    row_changes.erase(new_end, row_changes.end());
+    return changes;
+}
+
+DbChanges allow_first_change(DbChanges&& changes, const std::map<string, vector<size_t>>& pk_positions) {
+    for (auto& table_mapping : changes) {
+        const auto it = pk_positions.find(table_mapping.first);
+        if (it == pk_positions.end()) {
+            throw std::runtime_error {"table not found" + table_mapping.first};
+        }
+        // if the pk positions are empty, no update collapsing needs to happen
+        if (!it->second.empty()) {
+            table_mapping.second = allow_first_change( std::move(table_mapping.second), it->second );
+        }
+    }
+    return changes;
 }
 
 } // end namespace detail
@@ -129,13 +196,11 @@ ObservableDb::ObservableDb(const string& path, const shared_ptr<DbListener>& lis
     // In order to actually create a read snapshot, you need to issue a BEGIN
     // _and_ an actual select statement.  This select statement will work for any database.
     , m_begin_read_snapshot {m_read_conn.db->prepare("SELECT 1 FROM sqlite_master LIMIT 1")}
-    , m_schema_info {m_write_conn.db->schema_info()}
     , m_schema_version {m_write_conn.db->schema_version()}
-    , m_primary_keys {detail::get_pk_pos(m_schema_info)}
     , m_listener {listener}
 {
-    m_write_conn.db->update_hook([this] (ChangeType type, string db_name, string table_name, int64_t rowid) {
-        m_changes.emplace_back(type, std::move(db_name), std::move(table_name), rowid);
+    m_write_conn.db->update_hook([this] (Db::Change change) {
+        m_changes.push_back(std::move(change));
     });
 }
 
@@ -164,54 +229,43 @@ ObservableDb::transaction(function<void(const shared_ptr<Db>&)> transaction_fn) 
     // Reopen a transaction on the write database, to ensure a consistent view of the
     // rows that we will be requerying.
     TransactionGuard write_guard {m_write_conn.transaction_stmts};
-    DbChanges db_changes = _collect_changes();
-    m_changes.clear();
+
+    decltype(m_changes) changes_copy;
+    std::swap(m_changes, changes_copy);
+    DbChanges db_changes = _collect_changes(std::move(changes_copy));
 
     write_guard.commit();
     read_guard.commit();
+    // need to release this before calling on_change, since the callback could modify m_changes
+    clean_on_exit = nullptr;
     m_listener->on_change(std::move(db_changes));
 }
 
-DbChanges ObservableDb::_collect_changes() {
+DbChanges ObservableDb::_collect_changes(vector<Db::Change> changes) {
+    changes = detail::collapse_by_rowid(std::move(changes));
+
     DbChanges db_changes;
-    // todo(kabbes) sorted vector will likely be faster
-    std::set<std::tuple<int64_t, string, string>> seen;
-    const auto r_begin = m_changes.rbegin();
-    const auto r_end   = m_changes.rend();
-
-    for (auto it = r_begin; it != r_end; it++) {
-        const ChangeType type    = std::get<0>(*it);
-        const string& db_name    = std::get<1>(*it);
-        const string& table_name = std::get<2>(*it);
-        int64_t rowid            = std::get<3>(*it);
-        const bool did_insert = seen.emplace(rowid, table_name, db_name).second;
-
-        // we have already seen this same change before
-        if (!did_insert) {
-            continue;
-        }
-
+    for (const auto& c : changes) {
         RowChange current_change;
-        current_change.rowid = rowid;
-        auto table_changes_it = db_changes.find(table_name);
+        current_change.rowid = c.rowid;
+        auto table_changes_it = db_changes.find(c.table_name);
 
         // todo(kabbes) can prevent some reads by inspecting the ChangeType
-        (void)type;
         if (table_changes_it == db_changes.end()) {
-            auto p = m_read_conn.read_by_id_with_cols(table_name, rowid);
+            auto p = m_read_conn.read_by_id_with_cols(c.table_name, c.rowid);
             current_change.old_row = std::move(p.second);
             TableChanges table_changes;
             table_changes.column_names = std::move(p.first);
-            table_changes_it = db_changes.emplace(table_name, std::move(table_changes)).first;
+            table_changes_it = db_changes.emplace(c.table_name, std::move(table_changes)).first;
         } else {
-            current_change.old_row = m_read_conn.read_by_id(table_name, rowid);
+            current_change.old_row = m_read_conn.read_by_id(c.table_name, c.rowid);
         }
-        current_change.new_row = m_write_conn.read_by_id(table_name, rowid);
+        current_change.new_row = m_write_conn.read_by_id(c.table_name, c.rowid);
 
         // If both are null, then we know that this entity has been added and deleted in
         // the same transaction, so we can safely ignore it.
         if (current_change.old_row || current_change.new_row) {
-            table_changes_it->second.row_changes.emplace_back( std::move(current_change) );
+            table_changes_it->second.row_changes.emplace_back(std::move(current_change));
         }
     }
 

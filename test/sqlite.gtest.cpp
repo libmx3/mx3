@@ -41,19 +41,19 @@ TEST(sqlite_db, can_collapse_trivial) {
     {
         // empty collapse
         vector<RowChange> row_changes;
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 0);
     }
     {
         // single item, collapse null->null
         vector<RowChange> row_changes {{1, nullopt, nullopt}};
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 0);
     }
     {
         // single item, no collapse (row -> null)
         vector<RowChange> row_changes {{1, trivial_row(5), nullopt}};
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 1);
         EXPECT_TRUE(row_changes[0].old_row == trivial_row(5));
         EXPECT_TRUE(row_changes[0].new_row == nullopt);
@@ -62,7 +62,7 @@ TEST(sqlite_db, can_collapse_trivial) {
     {
         // single item, no collapse (null -> row)
         vector<RowChange> row_changes {{1, nullopt, trivial_row(8)}};
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 1);
         EXPECT_TRUE(row_changes[0].old_row == nullopt);
         EXPECT_TRUE(row_changes[0].new_row == trivial_row(8));
@@ -71,7 +71,7 @@ TEST(sqlite_db, can_collapse_trivial) {
     {
         // single item, no collapse (row -> row)
         vector<RowChange> row_changes {{1, trivial_row(7), trivial_row(8)}};
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 1);
         EXPECT_TRUE(row_changes[0].old_row == trivial_row(7));
         EXPECT_TRUE(row_changes[0].new_row == trivial_row(8));
@@ -86,7 +86,7 @@ TEST(sqlite_db, can_collapse_complex) {
             {1, nullopt, nullopt},
             {1, trivial_row(93), trivial_row(13)}
         };
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 1);
         EXPECT_TRUE(row_changes[0].old_row == trivial_row(93));
         EXPECT_TRUE(row_changes[0].new_row == trivial_row(13));
@@ -98,7 +98,7 @@ TEST(sqlite_db, can_collapse_complex) {
             {1, trivial_row(93), trivial_row(13)},
             {1, nullopt, nullopt}
         };
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes.size(), 0);
     }
     {
@@ -110,7 +110,7 @@ TEST(sqlite_db, can_collapse_complex) {
             {3, nullopt, trivial_row(3)}
         };
         const auto copy = row_changes;
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes, copy);
     }
     {
@@ -130,12 +130,11 @@ TEST(sqlite_db, can_collapse_complex) {
             {3, nullopt, trivial_row(3)}
         };
         const auto copy = row_changes;
-        row_changes = collapse_by_rowid( std::move(row_changes) );
+        row_changes = detail::collapse_by_rowid( std::move(row_changes) );
         EXPECT_EQ(row_changes, expected_changes);
     }
 }
 */
-
 
 TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
@@ -149,7 +148,7 @@ TEST(sqlite_db, can_observe) {
     std::remove(filename.c_str());
     const auto db = Db::open(filename);
     db->enable_wal();
-    db->exec("CREATE TABLE fake_table (table_id INTEGER, name TEXT NOT NULL, `data` BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
+    db->exec("CREATE TABLE fake_table (table_id TEXT, name TEXT NOT NULL, `data` BLOB, price FLOAT DEFAULT 1.4, PRIMARY KEY (table_id))");
     }
 
     auto db = make_unique<ObservableDb>(filename, [] (DbChanges db_changes) {
@@ -185,6 +184,16 @@ TEST(sqlite_db, can_observe) {
         write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (7, \"i_should_be_delete\");");
         write_db->exec("DELETE FROM fake_table WHERE table_id = 7");
     });
+
+    db->transaction([&] (const shared_ptr<Db>& write_db) {
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (15, \"fifteen\");");
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (16, \"sixteen\");");
+        write_db->exec("UPDATE fake_table SET name = \"fifteen_6\"  WHERE table_id == 15;");
+        write_db->exec("DELETE FROM fake_table WHERE table_id = 15");
+        write_db->exec("INSERT INTO fake_table (table_id, name) VALUES (15, \"fifteen_2\");");
+        write_db->exec("UPDATE fake_table SET name = \"fifteen_3\"  WHERE table_id == 15;");
+    });
+
     // close the database
     db = nullptr;
     std::remove(filename.c_str());
@@ -315,10 +324,10 @@ TEST(sqlite_db, update_hook_insert) {
     db->exec("CREATE TABLE abc (name TEXT, PRIMARY KEY(name) )");
 
     size_t times_called = 0;
-    db->update_hook([&] (ChangeType type, string db_name, string table_name, int64_t row_id) {
+    db->update_hook([&] (Db::Change c) {
         times_called++;
-        EXPECT_EQ(type, ChangeType::INSERT);
-        EXPECT_EQ(table_name, "abc");
+        EXPECT_EQ(c.type, ChangeType::INSERT);
+        EXPECT_EQ(c.table_name, "abc");
     });
     db->prepare("INSERT INTO `abc` (`name`) VALUES ('first')")->exec();
     EXPECT_EQ(times_called, 1);
@@ -331,11 +340,11 @@ TEST(sqlite_db, update_hook_delete) {
     int64_t insert_row_id = db->last_insert_rowid();
 
     size_t times_called = 0;
-    db->update_hook([&] (ChangeType type, string db_name, string table_name, int64_t row_id) {
+    db->update_hook([&] (Db::Change c) {
         times_called++;
-        EXPECT_EQ(insert_row_id, row_id);
-        EXPECT_EQ(type, ChangeType::DELETE);
-        EXPECT_EQ(table_name, "abc");
+        EXPECT_EQ(insert_row_id, c.rowid);
+        EXPECT_EQ(c.type, ChangeType::DELETE);
+        EXPECT_EQ(c.table_name, "abc");
     });
     db->prepare("DELETE FROM `abc` WHERE 1")->exec();
     EXPECT_EQ(times_called, 1);
@@ -348,11 +357,11 @@ TEST(sqlite_db, update_hook_update) {
     int64_t insert_row_id = db->last_insert_rowid();
 
     size_t times_called = 0;
-    db->update_hook([&] (ChangeType type, string db_name, string table_name, int64_t row_id) {
+    db->update_hook([&] (Db::Change c) {
         times_called++;
-        EXPECT_EQ(insert_row_id, row_id);
-        EXPECT_EQ(type, ChangeType::UPDATE);
-        EXPECT_EQ(table_name, "abc");
+        EXPECT_EQ(insert_row_id, c.rowid);
+        EXPECT_EQ(c.type, ChangeType::UPDATE);
+        EXPECT_EQ(c.table_name, "abc");
     });
     auto stmt = db->prepare("UPDATE `abc` SET `name` = 'second' WHERE rowid = ?1");
     stmt->bind(1, insert_row_id);

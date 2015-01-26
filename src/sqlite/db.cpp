@@ -112,10 +112,10 @@ Db::borrow_db() {
 }
 
 void
-Db::update_hook(UpdateHookFn update_fn) {
+Db::update_hook(const UpdateHookFn& update_fn) {
     unique_ptr<UpdateHookFn> new_hook = nullptr;
     if (update_fn) {
-        new_hook = make_unique<UpdateHookFn>( std::move(update_fn) );
+        new_hook = make_unique<UpdateHookFn>(update_fn);
     }
 
     unique_ptr<UpdateHookFn> old_update_hook {
@@ -142,7 +142,12 @@ Db::update_hook(UpdateHookFn update_fn) {
                     if (!type) {
                         throw std::runtime_error {"Unexpected update type from sqlite"};
                     }
-                    update_hook(*type, string {db_name}, string {table_name}, static_cast<int64_t>(row_id));
+                    update_hook(Db::Change {
+                        .type = *type,
+                        .db_name = string{db_name},
+                        .table_name  = string{table_name},
+                        .rowid = static_cast<int64_t>(row_id)
+                    });
                 }
             }, new_hook.release())
         )
@@ -151,7 +156,7 @@ Db::update_hook(UpdateHookFn update_fn) {
 }
 
 void
-Db::commit_hook(function<bool()> commit_fn) {
+Db::commit_hook(const CommitHookFn& commit_fn) {
     unique_ptr<CommitHookFn> new_hook = nullptr;
     if (commit_fn) {
         // move this function to the heap, so we can insert it directly into the db
@@ -175,7 +180,7 @@ Db::commit_hook(function<bool()> commit_fn) {
 }
 
 void
-Db::rollback_hook(function<void()> rollback_fn) {
+Db::rollback_hook(const RollbackHookFn& rollback_fn) {
     unique_ptr<RollbackHookFn> new_hook = nullptr;
     if (rollback_fn) {
         new_hook = make_unique<RollbackHookFn>( std::move(rollback_fn) );

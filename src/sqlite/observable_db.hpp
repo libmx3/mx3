@@ -40,8 +40,14 @@ private:
 };
 
 namespace detail {
+vector<Db::Change> collapse_by_rowid(vector<Db::Change> changes);
+
 std::map<string, vector<size_t>> get_pk_pos(const vector<TableInfo>& schema_info);
 vector<size_t> get_pk_pos(const TableInfo& table_info);
+optional<vector<Value>> extract_primary_key(const optional<vector<Value>>& row, const vector<size_t>& pk_positions);
+vector<Value> extract_primary_key(const RowChange& change, const vector<size_t>& pk_positions);
+TableChanges allow_first_change(TableChanges&& changes, const vector<size_t>& pk_positions);
+DbChanges allow_first_change(DbChanges&& changes, const std::map<string, vector<size_t>>& pk_positions);
 }
 
 
@@ -64,14 +70,12 @@ class ObservableDb final {
     ~ObservableDb();
     void transaction(function<void(const shared_ptr<Db>&)> t_fn);
   private:
-    DbChanges _collect_changes();
+    DbChanges _collect_changes(vector<Db::Change> changes);
     ObserveConnection m_write_conn;
     ObserveConnection m_read_conn;
     shared_ptr<Stmt> m_begin_read_snapshot;
-    const vector<TableInfo> m_schema_info;
     const int32_t m_schema_version;
-    const std::map<string, vector<size_t>> m_primary_keys;
-    vector<std::tuple<ChangeType, string, string, int64_t>> m_changes;
+    vector<Db::Change> m_changes;
     shared_ptr<DbListener> m_listener;
 };
 
