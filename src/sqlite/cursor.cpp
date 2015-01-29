@@ -46,9 +46,9 @@ Cursor::value_at(int pos) const {
 vector<Value>
 Cursor::values() const {
     vector<Value> values;
-    const size_t col_count = this->column_count();
+    const auto col_count = this->column_count();
     values.reserve(col_count);
-    for (size_t i=0; i < col_count; i++) {
+    for (int i=0; i < col_count; i++) {
         values.push_back( this->value_at(i) );
     }
     return values;
@@ -57,8 +57,8 @@ Cursor::values() const {
 std::map<string, Value>
 Cursor::value_map() const {
     std::map<string, Value> all_values;
-    const size_t col_count = this->column_count();
-    for (size_t i=0; i < col_count; i++) {
+    const auto col_count = this->column_count();
+    for (int i=0; i < col_count; i++) {
         all_values.emplace( this->column_name(i), this->value_at(i) );
     }
     return all_values;
@@ -98,9 +98,9 @@ Cursor::column_name(int pos) const {
 vector<string>
 Cursor::column_names() const {
     vector<string> names;
-    const size_t col_count = this->column_count();
+    const auto col_count = this->column_count();
     names.reserve(col_count);
-    for (size_t i=0; i < col_count; i++) {
+    for (int i=0; i < col_count; i++) {
         names.push_back( this->column_name(i) );
     }
     return names;

@@ -240,7 +240,7 @@ Db::column_info(const string& table_name) {
         col.dflt_value  = dflt_value.is_null()
                         ? optional<string> {nullopt}
                         : optional<string> { dflt_value.string_value() };
-        col.pk = cursor.int64_value(pk_pos);
+        col.pk = static_cast<int32_t>(cursor.int64_value(pk_pos));
         columns.push_back( std::move(col) );
         cursor.next();
     }

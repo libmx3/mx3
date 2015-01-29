@@ -1,9 +1,8 @@
 #include "user_list_vm.hpp"
 #include "../github/client.hpp"
+#include "../sqlite/sqlite.hpp"
 #include <iostream>
 #include <thread>
-using mx3::UserListVm;
-using mx3::UserListVmHandle;
 using mx3_gen::UserListVmObserver;
 using mx3_gen::UserListVmCell;
 
@@ -16,7 +15,9 @@ namespace {
     const string s_list_stmt  { "SELECT `login` FROM `github_users` ORDER BY id;" };
 }
 
-UserListVm::UserListVm(shared_ptr<mx3::sqlite::Db> db)
+namespace mx3 {
+
+UserListVm::UserListVm(shared_ptr<sqlite::Db> db)
     : m_count{nullopt}
     , m_cursor_pos {0}
     , m_db {db}
@@ -83,7 +84,9 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
     github::get_users(m_http, nullopt, [db, ui_thread, observer] (vector<github::User> users) mutable {
         auto update_stmt = db->prepare("UPDATE `github_users` SET `login` = ?2 WHERE `id` = ?1;");
         auto insert_stmt = db->prepare("INSERT INTO `github_users` (`id`, `login`) VALUES (?1, ?2);");
-        db->exec("BEGIN TRANSACTION");
+        sqlite::TransactionStmts transaction_stmts {db};
+        sqlite::TransactionGuard guard {transaction_stmts};
+
         for (const auto& user : users) {
             update_stmt->reset();
             update_stmt->bind(1, user.id);
@@ -95,7 +98,7 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
                 insert_stmt->exec();
             }
         }
-        db->exec("COMMIT TRANSACTION");
+        guard.commit();
         ui_thread.post([db, observer] () {
             // todo(kabbes) make sure to check if this has been stopped
             observer->on_update( make_shared<UserListVm>(db) );
@@ -106,4 +109,6 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
 void
 UserListVmHandle::stop() {
     // this isn't implemented yet :(
+}
+
 }
