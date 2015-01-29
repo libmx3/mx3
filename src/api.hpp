@@ -6,6 +6,7 @@
 #include "sqlite/sqlite.hpp"
 #include "http.hpp"
 #include "interface/api.hpp"
+#include "interface/thread_launcher.hpp"
 
 namespace mx3 {
 
@@ -14,8 +15,9 @@ class Api final : public mx3_gen::Api {
   public:
     Api(
         const string & root_path,
-        const shared_ptr<mx3_gen::EventLoop>& main_thread,
-        const shared_ptr<mx3_gen::Http> & http_impl
+        const shared_ptr<mx3_gen::EventLoop> & main_thread,
+        const shared_ptr<mx3_gen::Http> & http_impl,
+        const shared_ptr<mx3_gen::ThreadLauncher> & launcher
     );
 
     // whether a user already exists

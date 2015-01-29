@@ -17,20 +17,22 @@ shared_ptr<mx3_gen::Api>
 mx3_gen::Api::create_api(
     const string& root_path,
     const shared_ptr<mx3_gen::EventLoop>& ui_thread,
-    const std::shared_ptr<Http> & http_impl
+    const shared_ptr<Http> & http_impl,
+    const shared_ptr<ThreadLauncher> & launcher
 ) {
-    return make_shared<mx3::Api>(root_path, ui_thread, http_impl);
+    return make_shared<mx3::Api>(root_path, ui_thread, http_impl, launcher);
 }
 
 Api::Api(
     const string& root_path,
     const shared_ptr<mx3_gen::EventLoop>& main_thread,
-    const shared_ptr<mx3_gen::Http>& http_client
+    const shared_ptr<mx3_gen::Http>& http_client,
+    const shared_ptr<mx3_gen::ThreadLauncher> & launcher
 ) :
     // todo this needs to use a fs/path abstraction (not yet built)
     m_db { std::make_unique<mx3::SqliteStore>(root_path + "/kv.sqlite") },
     m_ui_thread {main_thread},
-    m_bg_thread {make_shared<mx3::EventLoopCpp>()},
+    m_bg_thread {make_shared<mx3::EventLoopCpp>(launcher)},
     m_bg_http {http_client, m_bg_thread}
 {
     m_sqlite = mx3::sqlite::Db::open(root_path + "/example.sqlite");
