@@ -2,11 +2,12 @@
 
 using mx3::EventLoopCpp;
 using mx3::EventLoopRef;
+using mx3::FnTask;
 
-EventLoopRef::Task::Task(function<void()> run_me) : m_fn {std::move(run_me)} {}
+FnTask::FnTask(function<void()> run_me) : m_fn {std::move(run_me)} {}
 
 void
-EventLoopRef::Task::execute() {
+FnTask::execute() {
     m_fn();
 }
 
@@ -14,33 +15,45 @@ EventLoopRef::EventLoopRef(shared_ptr<mx3_gen::EventLoop> loop) : m_loop {std::m
 
 void
 EventLoopRef::post(function<void()> run_fn) {
-    m_loop->post( make_shared<EventLoopRef::Task>(std::move(run_fn)) );
+    m_loop->post( make_shared<FnTask>(std::move(run_fn)) );
 }
 
-EventLoopCpp::EventLoopCpp() : m_stop(false), m_thread(&EventLoopCpp::_run_loop, this) {}
+EventLoopCpp::EventLoopCpp(const shared_ptr<mx3_gen::ThreadLauncher> & launcher) : m_stop(false), m_done(false) {
+    auto task = make_shared<FnTask>([this](){
+        _run_loop();
+    });
+    launcher->start_thread(string{"background_event_loop"}, task);
+}
 
 EventLoopCpp::~EventLoopCpp() {
+    {
+    std::lock_guard<std::mutex> task_lk(m_task_mutex);
     m_stop = true;
-    m_cv.notify_one();
-    m_thread.join();
+    }
+    m_task_cv.notify_one();
+
+    std::unique_lock<std::mutex> done_lk(m_done_mutex);
+    m_done_cv.wait(done_lk, [this] () { return m_done; });
 }
 
 void
 EventLoopCpp::post(const shared_ptr<mx3_gen::AsyncTask>& task) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    {
+    std::lock_guard<std::mutex> lock(m_task_mutex);
     m_queue.emplace(task);
-    m_cv.notify_one();
+    }
+    m_task_cv.notify_one();
 }
 
 void
 EventLoopCpp::_run_loop() {
     while (true) {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        m_cv.wait(lk, [this] {
+        std::unique_lock<std::mutex> lk(m_task_mutex);
+        m_task_cv.wait(lk, [this] {
             return m_stop == true || !m_queue.empty();
         });
         if (m_stop == true) {
-            return;
+            break;
         }
 
         // copy the function off, so we can run it without holding the lock
@@ -49,6 +62,12 @@ EventLoopCpp::_run_loop() {
         lk.unlock();
         task->execute();
     }
+
+    {
+    std::lock_guard<std::mutex> lock(m_done_mutex);
+    m_done = true;
+    }
+    m_done_cv.notify_one();
 }
 
 

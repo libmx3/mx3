@@ -31,7 +31,8 @@ public class GithubUsers extends Activity {
 
         Http httpImpl = new AndroidHttp();
         EventLoop mainThread = new AndroidEventLoop();
-        mApi = Api.createApi(this.getFilesDir().getAbsolutePath(), mainThread, httpImpl);
+        ThreadLauncher threadLauncher = new AndroidThreadLauncher();
+        mApi = Api.createApi(this.getFilesDir().getAbsolutePath(), mainThread, httpImpl, threadLauncher);
 
         mUserListHandle = mApi.observerUserList();
         mUserListHandle.start(new UserListVmObserver() {
