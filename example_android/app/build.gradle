@@ -45,7 +45,10 @@ task ndkBuild(type: Exec) {
     if (!ndkBuildExecutable.exists()) {
         throw new GradleException("Could not find ndk-build. The configured NDK directory ${ndkDir} may not be correct.")
     }
-    environment("NDK_PROJECT_PATH", MainDirectory)
+    // Since this project actually follows the standard jni project layout, we don't need to set
+    // the project path.  There would be no problem setting it, except I can't figure out how to
+    // properly escape paths as env variables :(
+    // environment("NDK_PROJECT_PATH", MainDirectory)
     environment("GYP_CONFIGURATION", "Release")
     commandLine(ndkBuildExecutable, "-j8")
 }
