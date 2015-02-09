@@ -1,5 +1,6 @@
 #import "MXSampleDataTableViewController.h"
 #import "gen/MX3UserListVmCell.h"
+#import "gen/MX3ListChange.h"
 
 NSString *const CellIdentifier = @"MX3Cell";
 
@@ -38,10 +39,30 @@ NSString *const CellIdentifier = @"MX3Cell";
     [self.handle stop];
 }
 
-- (void)onUpdate:(id <MX3UserListVm>)newData {
-    self.viewModel = newData;
-    // todo(kabbes) this would be awesome to automatically perform animations
-    [self.tableView reloadData];
+- (void)onUpdate:(NSMutableArray *)changes newData:(id <MX3UserListVm>)newData {
+    if (changes) {
+        [self.tableView beginUpdates];
+        for (MX3ListChange *change in changes) {
+            if (change.fromIndex >= 0 && change.toIndex >= 0) {
+                NSUInteger indexes[] = {0, change.toIndex};
+                NSIndexPath *path = [NSIndexPath indexPathWithIndexes:indexes length:2];
+                [self.tableView reloadRowsAtIndexPaths:@[path] withRowAnimation:UITableViewRowAnimationAutomatic];
+            } else if (change.fromIndex >= 0) {
+                NSUInteger indexes[] = {0, change.fromIndex};
+                NSIndexPath *path = [NSIndexPath indexPathWithIndexes:indexes length:2];
+                [self.tableView deleteRowsAtIndexPaths:@[path] withRowAnimation:UITableViewRowAnimationAutomatic];
+            } else {
+                NSUInteger indexes[] = {0, change.toIndex};
+                NSIndexPath *path = [NSIndexPath indexPathWithIndexes:indexes length:2];
+                [self.tableView insertRowsAtIndexPaths:@[path] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+        }
+        self.viewModel = newData;
+        [self.tableView endUpdates];
+    } else {
+        self.viewModel = newData;
+        [self.tableView reloadData];
+    }
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

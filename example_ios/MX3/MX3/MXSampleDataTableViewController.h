@@ -4,5 +4,5 @@
 
 @interface MXSampleDataTableViewController : UITableViewController <MX3UserListVmObserver>
 - (instancetype) initWithApi:(id <MX3Api>) api;
-- (void)onUpdate:(id <MX3UserListVm>)newData;
+- (void)onUpdate:(NSMutableArray *)changes newData:(id <MX3UserListVm>)newData;
 @end

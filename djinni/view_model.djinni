@@ -1,3 +1,8 @@
+list_change = record {
+    from_index: i32;
+    to_index: i32;
+}
+
 user_list_vm_cell = record {
     user_id: i64;
     name: string;
@@ -11,7 +16,7 @@ user_list_vm = interface +c {
 }
 
 user_list_vm_observer = interface +o +j {
-    on_update(new_data: user_list_vm);
+    on_update(changes: optional<list<list_change>>, new_data: user_list_vm);
 }
 
 user_list_vm_handle = interface +c {

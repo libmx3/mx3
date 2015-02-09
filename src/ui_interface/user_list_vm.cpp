@@ -101,7 +101,7 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
         guard.commit();
         ui_thread.post([db, observer] () {
             // todo(kabbes) make sure to check if this has been stopped
-            observer->on_update( make_shared<UserListVm>(db) );
+            observer->on_update(nullopt, make_shared<UserListVm>(db) );
         });
     });
 }
