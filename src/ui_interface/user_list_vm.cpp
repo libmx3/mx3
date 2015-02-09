@@ -85,7 +85,7 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
         auto update_stmt = db->prepare("UPDATE `github_users` SET `login` = ?2 WHERE `id` = ?1;");
         auto insert_stmt = db->prepare("INSERT INTO `github_users` (`id`, `login`) VALUES (?1, ?2);");
         sqlite::TransactionStmts transaction_stmts {db};
-        sqlite::TransactionGuard guard {transaction_stmts};
+        sqlite::WriteTransaction guard {transaction_stmts};
 
         for (const auto& user : users) {
             update_stmt->reset();
