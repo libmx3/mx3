@@ -5,13 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 
 public class GithubUsers extends Activity {
@@ -37,11 +37,11 @@ public class GithubUsers extends Activity {
         mUserListHandle = mApi.observerUserList();
         mUserListHandle.start(new UserListVmObserver() {
             @Override
-            public void onUpdate(UserListVm newData) {
-            mAdapter = new GithubUserAdapter(GithubUsers.this, newData);
-            Log.d("USERS", "count: " + mAdapter.getCount());
-            mListView.setAdapter(mAdapter);
-            mListView.deferNotifyDataSetChanged();
+            public void onUpdate(ArrayList<ListChange> changes, UserListVm newData) {
+                mAdapter = new GithubUserAdapter(GithubUsers.this, newData);
+                Log.d("USERS", "count: " + mAdapter.getCount());
+                mListView.setAdapter(mAdapter);
+                mListView.deferNotifyDataSetChanged();
             }
         });
 
