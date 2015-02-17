@@ -57,13 +57,17 @@ Make targets:
 
 ### Directory structure
 
-* mx3.gyp - gyp meta-build file for per-target settings
-* common.gypi - a gyp _include_ which defines project wide settings
-* Application.mk - the android make file
-* Makefile - helper for interacting with gyp, and using command line builds (no xcode!!)
-* deps/ - third party dependencies
-* example\_mac/ - a _external_ xcodeproj which uses libmx3 ("the client" in a client/server model)
-* include/ - header include paths, no code here
-* objc/ - objc bindings to mx3::Api. Very simple api translation (NSString * -> std::string, lowerCamel -> under_lower, etc.)
-* src/ - the c++ library, there should be no objc/java code here ("the server" in a client/server model)
-* test/ - c++ tests
+```bash
+├── Application.mk # the android make file
+├── Makefile # helper for interacting with gyp, and using command line builds (no xcode!!)
+├── android/ # Java bindings to mx3::Api
+├── common.gypi # a gyp include which defines project wide settings
+├── deps/ # third party dependencies
+├── example_android/ # the Android example project
+├── example_ios/ # an external xcodeproj which uses libmx3 ("the client" in a client/server model)
+├── include/ # header include paths, no code here
+├── mx3.gyp # gyp meta-build file for per-target settings
+├── objc/ # objc bindings to mx3::Api. Very simple api translation (NSString * -> std::string, lowerCamel -> under_lower, etc.)
+├── src/ # the c++ library, there should be no objc/java code here ("the server" in a client/server model)
+└── test/ # c++ tests
+```
