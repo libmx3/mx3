@@ -8,8 +8,6 @@
         "SQLiteCpp/src/Transaction.cpp",
       ],
       'cflags': [
-        '-DHAVE_USLEEP=1',
-        '-Wno-unused-const-variable',
       ],
       'all_dependent_settings': {
         'include_dirs': [
@@ -18,6 +16,8 @@
         ]
       },
       'include_dirs': [
+        '.',
+        './sqlite3',      
         'SQLiteCpp/include',
       ],
     },
