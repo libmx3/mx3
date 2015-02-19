@@ -18,9 +18,9 @@ Http::Request::Request(function<void(HttpResponse)> cb, const EventLoopRef& on_t
     , m_cb {std::move(cb)} {}
 
 void
-Http::Request::on_network_error() {
+Http::Request::on_network_error(int16_t code) {
     HttpResponse resp;
-    resp.error = true;
+    resp.error = code;
     _cb_with(std::move(resp));
 }
 

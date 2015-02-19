@@ -11,7 +11,7 @@
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
-            [callback onNetworkError];
+            [callback onNetworkError: [error code]];
         } else {
             int16_t httpCode = [(NSHTTPURLResponse*) response statusCode];
             NSString * strData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];

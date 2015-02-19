@@ -1,5 +1,5 @@
 http_callback = interface +c {
-    on_network_error();
+    on_network_error(code: i16);
     on_success(http_code: i16, data: string);
 }
 
