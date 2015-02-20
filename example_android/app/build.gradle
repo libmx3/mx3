@@ -37,10 +37,16 @@ task ndkBuild(type: Exec) {
     String MainDirectory = System.getProperty("user.dir") + '/app/'
     File ndkDir = project.getPlugins().getPlugin('android').ndkFolder
     if (ndkDir == null) {
+        ndkDir = System.env.ANDROID_NDK
+    }
+
+    if (ndkDir == null) {
         def gradle_project_root = project.rootProject.rootDir
         throw new GradleException("NDK is not configured. Make sure there is a local.properties " +
-                "file with an ndk.dir entry in the directory ${gradle_project_root}.")
+                "file with an ndk.dir entry in the directory ${gradle_project_root}, or set the " +
+                "ANDROID_NDK envrionment variable")
     }
+
     def ndkBuildExecutable = new File(ndkDir, 'ndk-build')
     if (!ndkBuildExecutable.exists()) {
         throw new GradleException("Could not find ndk-build. The configured NDK directory ${ndkDir} may not be correct.")
