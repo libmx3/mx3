@@ -7,7 +7,7 @@
 namespace mx3 {
 
 struct HttpResponse {
-    bool error;
+    int16_t  error;
     uint16_t http_code;
     string data;
 };
@@ -20,7 +20,7 @@ class Http final {
     class Request final : public mx3_gen::HttpCallback {
       public:
         Request(function<void(HttpResponse)> cb, const EventLoopRef& on_thread);
-        virtual void on_network_error();
+        virtual void on_network_error(int16_t code);
         virtual void on_success(int16_t http_code, const string& data);
         void _cb_with(HttpResponse resp);
       private:

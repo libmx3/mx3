@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 15
+    compileSdkVersion 21
     buildToolsVersion "21.1.1"
 
     defaultConfig {
@@ -34,23 +34,13 @@ dependencies {
 }
 
 task ndkBuild(type: Exec) {
-    String MainDirectory = System.getProperty("user.dir") + '/app/'
-    File ndkDir = project.getPlugins().getPlugin('android').ndkFolder
-    if (ndkDir == null) {
-        def gradle_project_root = project.rootProject.rootDir
-        throw new GradleException("NDK is not configured. Make sure there is a local.properties " +
-                "file with an ndk.dir entry in the directory ${gradle_project_root}.")
-    }
-    def ndkBuildExecutable = new File(ndkDir, 'ndk-build')
-    if (!ndkBuildExecutable.exists()) {
-        throw new GradleException("Could not find ndk-build. The configured NDK directory ${ndkDir} may not be correct.")
-    }
-    // Since this project actually follows the standard jni project layout, we don't need to set
-    // the project path.  There would be no problem setting it, except I can't figure out how to
-    // properly escape paths as env variables :(
-    // environment("NDK_PROJECT_PATH", MainDirectory)
-    environment("GYP_CONFIGURATION", "Release")
-    commandLine(ndkBuildExecutable, "-j8")
+   if (System.env.ANDROID_NDK != null) {
+        def ndkBuild = new File(System.env.ANDROID_NDK, 'ndk-build')
+        environment("GYP_CONFIGURATION", "Release")
+        commandLine(ndkBuild, "-j8")
+    } else {
+        throw new GradleException("****************************************************************\r\n******** Please set up ANDROID_NDK environment variable ********")
+    }    
 }
 
 tasks.withType(JavaCompile) {
