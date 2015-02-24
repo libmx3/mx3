@@ -6,37 +6,29 @@ using mx3::sqlite::Stmt;
 using mx3::sqlite::Cursor;
 using mx3::sqlite::Value;
 
-namespace {
-    template<typename F>
-    inline auto s_column_or_throw(F&& fn, sqlite3_stmt * stmt, int expected_type, int pos) -> decltype(fn(stmt, pos)) {
-        if (sqlite3_column_type(stmt, pos) != expected_type) {
-            throw std::runtime_error {"invalid type for column"};
-        }
-        return std::forward<F>(fn)(stmt, pos);
-    }
-}
-
 Value
 Cursor::value_at(int pos) const {
     sqlite3_stmt * stmt = m_raw_stmt.get();
-    const auto type = sqlite3_column_type(stmt, pos);
+    sqlite3_value * value = sqlite3_column_value(stmt, pos);
+    const auto type = sqlite3_value_type(value);
+
     switch (type) {
         case SQLITE_NULL: {
             return Value {nullptr};
         }
         case SQLITE_TEXT: {
-            auto data = sqlite3_column_text(stmt, pos);
+            auto data = sqlite3_value_text(value);
             return Value { string { reinterpret_cast<const char *>(data) } };
         }
         case SQLITE_INTEGER: {
-            return Value { static_cast<int64_t>( sqlite3_column_int64(stmt, pos) ) };
+            return Value { static_cast<int64_t>( sqlite3_value_int64(value) ) };
         }
         case SQLITE_FLOAT: {
-            return Value { sqlite3_column_double(stmt, pos) };
+            return Value { sqlite3_value_double(value) };
         }
         case SQLITE_BLOB: {
-            const auto len = sqlite3_column_bytes(stmt, pos);
-            const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
+            const auto len = sqlite3_value_bytes(value);
+            const uint8_t * data = static_cast<const uint8_t*>( sqlite3_value_blob(value) );
             return Value { vector<uint8_t> {data, data + len} };
         }
     }
@@ -91,7 +83,7 @@ Cursor::borrow_db() const {
 
 string
 Cursor::column_name(int pos) const {
-    auto name = sqlite3_column_name(m_raw_stmt.get(), pos);
+    const char * name = sqlite3_column_name(m_raw_stmt.get(), pos);
     return string {name};
 }
 
@@ -129,35 +121,31 @@ Cursor::next() {
 
 bool
 Cursor::is_null(int pos) const {
-    return sqlite3_column_type(m_raw_stmt.get(), pos) == SQLITE_NULL;
+    return this->value_at(pos).is_null();
 }
 
 string
 Cursor::string_value(int pos) const {
-    auto data = s_column_or_throw(sqlite3_column_text, m_raw_stmt.get(), SQLITE_TEXT, pos);
-    return string { reinterpret_cast<const char *>(data) };
+    return this->value_at(pos).string_value();
 }
 
 int32_t
 Cursor::int_value(int pos) const {
-    return s_column_or_throw(sqlite3_column_int, m_raw_stmt.get(), SQLITE_INTEGER, pos);
+    return this->value_at(pos).int_value();
 }
 
 int64_t
 Cursor::int64_value(int pos) const {
-    return s_column_or_throw(sqlite3_column_int64, m_raw_stmt.get(), SQLITE_INTEGER, pos);
+    return this->value_at(pos).int64_value();
 }
 
 double
 Cursor::double_value(int pos) const {
-    return s_column_or_throw(sqlite3_column_double, m_raw_stmt.get(), SQLITE_FLOAT, pos);
+    return this->value_at(pos).double_value();
 }
 
 vector<uint8_t>
 Cursor::blob_value(int pos) const {
-    auto stmt = m_raw_stmt.get();
-    const auto len = s_column_or_throw(sqlite3_column_bytes, stmt, SQLITE_BLOB, pos);
-    const uint8_t * data = static_cast<const uint8_t*>( sqlite3_column_blob(stmt, pos) );
-    return vector<uint8_t> {data, data + len};
+    return this->value_at(pos).blob_value();
 }
 

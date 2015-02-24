@@ -91,7 +91,7 @@ Value::operator==(const Value& other) const {
                    (other.m_type == Type::INT    && m_double == other.m_int64);
     }
     // all cases handled above, but the android compiler complains about this
-    return false;
+    __builtin_unreachable();
 }
 
 Value::Value()                  : m_type {Type::NUL} {}
