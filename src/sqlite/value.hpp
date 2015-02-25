@@ -8,8 +8,10 @@ class Value final {
   public:
     Value();
     Value(std::nullptr_t x);
+    Value(int x);
     Value(int64_t x);
     Value(double x);
+    Value(const char * x);
     Value(string x);
     Value(vector<uint8_t> x);
     Value(Value&& other);
@@ -54,6 +56,7 @@ class Value final {
 // a comparison operator that also compares double and int values correctly
 bool operator<(const Value& l, const Value& r);
 std::ostream& operator <<(std::ostream& os, const mx3::sqlite::Value& v);
+std::ostream& operator <<(std::ostream& os, const vector<mx3::sqlite::Value>& v);
 
 } } // end mx3::sqlite
 

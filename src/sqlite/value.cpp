@@ -15,7 +15,7 @@ namespace {
                 return Value::Type::INT;
         }
         // need to add this to make android compiler happy
-        return t;
+        __builtin_unreachable();
     }
 }
 
@@ -93,6 +93,9 @@ Value::operator==(const Value& other) const {
     // all cases handled above, but the android compiler complains about this
     __builtin_unreachable();
 }
+
+Value::Value(int x)             : Value(static_cast<int64_t>(x)) {}
+Value::Value(const char * x)    : Value(string{x}) {}
 
 Value::Value()                  : m_type {Type::NUL} {}
 Value::Value(std::nullptr_t)    : m_type {Type::NUL} {}
@@ -226,4 +229,17 @@ mx3::sqlite::operator <<(std::ostream& os, const Value& v) {
             break;
     }
     return os << "null";
+}
+
+std::ostream&
+mx3::sqlite::operator <<(std::ostream& os, const vector<Value>& values) {
+    os << "(";
+    for (const auto& v : values) {
+        if (&v == &values[0]) {
+            os << v;
+        } else {
+            os << ", " << v;
+        }
+    }
+    return os << ")";
 }

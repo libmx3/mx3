@@ -1,3 +1,4 @@
+#include "stmt.hpp"
 #include "db.hpp"
 #include <sqlite3/sqlite3.h>
 
@@ -16,7 +17,14 @@ namespace {
     }
 }
 
-Stmt::Stmt(sqlite3_stmt * stmt, shared_ptr<Db> db) : m_db {db}, m_stmt {stmt} {}
+struct Stmt::only_for_internal_make_shared_t {};
+
+Stmt::Stmt(only_for_internal_make_shared_t, sqlite3_stmt * stmt, const shared_ptr<Db>& db)
+    : m_db {db}, m_stmt {stmt} {}
+
+shared_ptr<Stmt> Stmt::create(sqlite3_stmt * stmt, const shared_ptr<Db>& db) {
+    return make_shared<Stmt>(only_for_internal_make_shared_t{}, stmt, db);
+}
 
 sqlite3_stmt *
 Stmt::borrow_stmt() const {

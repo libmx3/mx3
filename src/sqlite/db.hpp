@@ -64,14 +64,16 @@ class Db final : public std::enable_shared_from_this<Db> {
     static shared_ptr<Db> inherit_db(sqlite3 * db);
     ~Db();
 
-    void update_hook(UpdateHookFn update_fn);
-    void commit_hook(CommitHookFn commit_fn);
-    void rollback_hook(RollbackHookFn rollback_fn);
+    void update_hook(const UpdateHookFn& update_fn);
+    void commit_hook(const CommitHookFn& commit_fn);
+    void rollback_hook(const RollbackHookFn& rollback_fn);
+    string journal_mode();
     int64_t last_insert_rowid();
 
     int32_t schema_version();
 
     vector<TableInfo> schema_info();
+    optional<TableInfo> table_info(const string& table_name);
     vector<ColumnInfo> column_info(const string& table_name);
 
     int32_t user_version();
@@ -88,7 +90,11 @@ class Db final : public std::enable_shared_from_this<Db> {
     struct Closer final {
         void operator() (sqlite3 * db) const;
     };
-    Db(unique_ptr<sqlite3, Closer> db);
+    struct only_for_internal_make_shared_t;
+  public:
+    // make_shared constructor
+    Db(only_for_internal_make_shared_t flag, unique_ptr<sqlite3, Closer> db);
+  private:
     unique_ptr<sqlite3, Closer> m_db;
 };
 

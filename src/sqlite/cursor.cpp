@@ -38,7 +38,7 @@ Cursor::value_at(int pos) const {
 vector<Value>
 Cursor::values() const {
     vector<Value> values;
-    const auto col_count = this->column_count();
+    const int col_count = this->column_count();
     values.reserve(col_count);
     for (int i=0; i < col_count; i++) {
         values.push_back( this->value_at(i) );
@@ -46,10 +46,20 @@ Cursor::values() const {
     return values;
 }
 
+vector<vector<Value>>
+Cursor::all_rows() {
+    vector<vector<Value>> rows;
+    while (this->is_valid()) {
+        rows.push_back(this->values());
+        this->next();
+    }
+    return rows;
+}
+
 std::map<string, Value>
 Cursor::value_map() const {
     std::map<string, Value> all_values;
-    const auto col_count = this->column_count();
+    const int col_count = this->column_count();
     for (int i=0; i < col_count; i++) {
         all_values.emplace( this->column_name(i), this->value_at(i) );
     }
@@ -65,8 +75,8 @@ Cursor::Resetter::operator() (sqlite3_stmt * stmt) {
     }
 }
 
-Cursor::Cursor(shared_ptr<Stmt> stmt, bool is_valid)
-    : m_stmt {std::move(stmt)}
+Cursor::Cursor(const shared_ptr<Stmt>& stmt, bool is_valid)
+    : m_stmt {stmt}
     , m_raw_stmt {m_stmt->borrow_stmt()}
     , m_is_valid {is_valid}
 {}
@@ -90,7 +100,7 @@ Cursor::column_name(int pos) const {
 vector<string>
 Cursor::column_names() const {
     vector<string> names;
-    const auto col_count = this->column_count();
+    const int col_count = this->column_count();
     names.reserve(col_count);
     for (int i=0; i < col_count; i++) {
         names.push_back( this->column_name(i) );

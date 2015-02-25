@@ -28,6 +28,8 @@ class Cursor final {
     // the size of the vector will exactly be the number of columns see `column_count`
     vector<Value> values() const;
 
+    vector<vector<Value>> all_rows();
+
     // gives a map of column_name -> value
     // this is a convenience method, and combining `column_names` `values` will be more efficient
     // please note that if you have a query with repeated values, this will not capture them
@@ -46,7 +48,7 @@ class Cursor final {
     struct Resetter final {
         void operator() (sqlite3_stmt * stmt);
     };
-    Cursor(shared_ptr<Stmt> stmt, bool is_valid);
+    Cursor(const shared_ptr<Stmt>& stmt, bool is_valid);
 
     // this keeps the statement alive while we are executing the query
     shared_ptr<Stmt> m_stmt;
