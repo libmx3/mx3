@@ -29,6 +29,7 @@ class Cursor final {
     vector<Value> values() const;
 
     vector<vector<Value>> all_rows();
+    vector<vector<Value>> limit_rows(size_t limit);
 
     // gives a map of column_name -> value
     // this is a convenience method, and combining `column_names` `values` will be more efficient

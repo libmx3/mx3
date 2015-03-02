@@ -69,33 +69,33 @@ Stmt::param_index(const string& name) const {
 }
 
 void
-Stmt::bind(int pos, const vector<uint8_t>& value) {
-    s_throw_on_sqlite_error(sqlite3_bind_blob, m_stmt.get(), pos, value.data(), static_cast<int>(value.size()), SQLITE_TRANSIENT);
-}
-
-void
-Stmt::bind(int pos, double value) {
-    s_throw_on_sqlite_error(sqlite3_bind_double, m_stmt.get(), pos, value);
-}
-
-void
-Stmt::bind(int pos, int32_t value) {
-    s_throw_on_sqlite_error(sqlite3_bind_int, m_stmt.get(), pos, value);
-}
-
-void
-Stmt::bind(int pos, int64_t value) {
-    s_throw_on_sqlite_error(sqlite3_bind_int64, m_stmt.get(), pos, value);
-}
-
-void
-Stmt::bind(int pos, std::nullptr_t) {
-    s_throw_on_sqlite_error(sqlite3_bind_null, m_stmt.get(), pos);
-}
-
-void
-Stmt::bind(int pos, const string& value) {
-    s_throw_on_sqlite_error(sqlite3_bind_text, m_stmt.get(), pos, value.c_str(), static_cast<int>(value.length()), SQLITE_TRANSIENT);
+Stmt::bind(int pos, const Value& value) {
+    switch (value.type()) {
+    case Value::Type::NUL: {
+        s_throw_on_sqlite_error(sqlite3_bind_null, m_stmt.get(), pos);
+        break;
+    }
+    case Value::Type::INT: {
+        s_throw_on_sqlite_error(sqlite3_bind_int64, m_stmt.get(), pos, value.int64_value());
+        break;
+    }
+    case Value::Type::DOUBLE: {
+        s_throw_on_sqlite_error(sqlite3_bind_double, m_stmt.get(), pos, value.double_value());
+        break;
+    }
+    case Value::Type::STRING: {
+        const string& str_value = value.string_value();
+        s_throw_on_sqlite_error(sqlite3_bind_text, m_stmt.get(), pos, str_value.c_str(),
+                                static_cast<int>(str_value.length()), SQLITE_TRANSIENT);
+        break;
+    }
+    case Value::Type::BLOB: {
+        const vector<uint8_t>& blob_value = value.blob_value();
+        s_throw_on_sqlite_error(sqlite3_bind_blob, m_stmt.get(), pos, blob_value.data(),
+                                static_cast<int>(blob_value.size()), SQLITE_TRANSIENT);
+        break;
+    }
+    }
 }
 
 int

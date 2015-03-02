@@ -26,12 +26,7 @@ class Stmt final : public std::enable_shared_from_this<Stmt> {
     void reset();
     void clear_bindings();
 
-    void bind(int pos, const vector<uint8_t>& value);
-    void bind(int pos, double value);
-    void bind(int pos, int32_t value);
-    void bind(int pos, int64_t value);
-    void bind(int pos, std::nullptr_t value);
-    void bind(int pos, const string& value);
+    void bind(int pos, const Value& value);
 
     // allow optional types to be bound
     template<typename WrappedType>

@@ -48,8 +48,13 @@ Cursor::values() const {
 
 vector<vector<Value>>
 Cursor::all_rows() {
+    return this->limit_rows(std::numeric_limits<size_t>::max());
+}
+
+vector<vector<Value>>
+Cursor::limit_rows(size_t limit) {
     vector<vector<Value>> rows;
-    while (this->is_valid()) {
+    for (size_t i = 0; i < limit && this->is_valid(); i++) {
         rows.push_back(this->values());
         this->next();
     }
