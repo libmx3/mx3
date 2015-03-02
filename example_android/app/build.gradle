@@ -37,7 +37,7 @@ task ndkBuild(type: Exec) {
     String MainDirectory = System.getProperty("user.dir") + '/app/'
     File ndkDir = project.getPlugins().getPlugin('android').ndkFolder
     if (ndkDir == null) {
-        ndkDir = System.env.ANDROID_NDK
+        ndkDir = file(System.env.ANDROID_NDK)
     }
 
     if (ndkDir == null) {
