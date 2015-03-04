@@ -28,6 +28,18 @@ mprintf(const char * format, int64_t data) {
     return string {raw_str.get()};
 }
 
+string libversion() {
+    return {sqlite3_libversion()};
+}
+
+string sourceid() {
+    return {sqlite3_sourceid()};
+}
+
+int libversion_number() {
+    return sqlite3_libversion_number();
+}
+
 struct Db::only_for_internal_make_shared_t {};
 
 shared_ptr<Db>
@@ -111,18 +123,6 @@ Db::~Db() {
 sqlite3 *
 Db::borrow_db() {
     return m_db.get();
-}
-
-string Db::libversion() {
-    return {sqlite3_libversion()};
-}
-
-string Db::sourceid() {
-    return {sqlite3_sourceid()};
-}
-
-int Db::libversion_number() {
-    return sqlite3_libversion_number();
 }
 
 string

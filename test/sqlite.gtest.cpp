@@ -8,6 +8,12 @@ using std::endl;
 
 using namespace mx3::sqlite;
 
+TEST(sqlite_lib, can_query_version_info) {
+    EXPECT_EQ(libversion(), "3.8.4.3");
+    EXPECT_EQ(sourceid(), "2014-04-03 16:53:12 a611fa96c4a848614efe899130359c9f6fb889c3");
+    EXPECT_EQ(libversion_number(), 3008004);
+}
+
 TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
 }

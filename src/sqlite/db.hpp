@@ -8,6 +8,9 @@ namespace mx3 { namespace sqlite {
 // single param helpers for sqlite3_mprintf
 string mprintf(const char * format, const string& data);
 string mprintf(const char * format, int64_t data);
+string libversion();
+string sourceid();
+int libversion_number();
 
 enum class ChangeType {
     INSERT,
@@ -70,10 +73,6 @@ class Db final : public std::enable_shared_from_this<Db> {
     // use this constructor if you want to do anything custom to set up your database
     static shared_ptr<Db> inherit_db(sqlite3 * db);
     ~Db();
-
-    string libversion();
-    string sourceid();
-    int libversion_number();
 
     void update_hook(const UpdateHookFn& update_fn);
     void commit_hook(const CommitHookFn& commit_fn);
