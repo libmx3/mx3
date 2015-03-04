@@ -12,6 +12,14 @@ TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
 }
 
+TEST(sqlite_db, wal_hook) {
+    auto db = Db::open(":memory:");
+    db->wal_hook([] (const string&, int) {
+
+    });
+    db = nullptr;
+}
+
 TEST(sqlite_db, schema_info) {
     auto db = Db::open(":memory:");
     auto schema_info = db->schema_info();

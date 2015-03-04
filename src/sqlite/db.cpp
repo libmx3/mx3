@@ -105,11 +105,24 @@ Db::~Db() {
     this->update_hook(nullptr);
     this->commit_hook(nullptr);
     this->rollback_hook(nullptr);
+    this->wal_hook(nullptr);
 }
 
 sqlite3 *
 Db::borrow_db() {
     return m_db.get();
+}
+
+string Db::libversion() {
+    return {sqlite3_libversion()};
+}
+
+string Db::sourceid() {
+    return {sqlite3_sourceid()};
+}
+
+int Db::libversion_number() {
+    return sqlite3_libversion_number();
 }
 
 string
@@ -124,36 +137,33 @@ Db::update_hook(const UpdateHookFn& update_fn) {
     if (update_fn) {
         new_hook = make_unique<UpdateHookFn>(update_fn);
     }
+    std::swap(new_hook, m_update_hook);
 
-    unique_ptr<UpdateHookFn> old_update_hook {
-        static_cast<UpdateHookFn*>(
-            sqlite3_update_hook(m_db.get(), [] (void * self, int change_type, const char * db_name, const char * table_name, sqlite3_int64 row_id) {
-                UpdateHookFn * current_hook = static_cast<UpdateHookFn*>(self);
-                if (current_hook) {
-                    auto update_hook = *current_hook;
-                    optional<ChangeType> type = nullopt;
-                    switch (change_type) {
-                        case SQLITE_INSERT: {
-                            type = ChangeType::INSERT;
-                            break;
-                        }
-                        case SQLITE_UPDATE: {
-                            type = ChangeType::UPDATE;
-                            break;
-                        }
-                        case SQLITE_DELETE: {
-                            type = ChangeType::DELETE;
-                            break;
-                        }
-                    }
-                    if (!type) {
-                        throw std::runtime_error {"Unexpected update type from sqlite"};
-                    }
-                    update_hook(*type, string {db_name}, string {table_name}, static_cast<int64_t>(row_id));
+    sqlite3_update_hook(m_db.get(), [] (void * self, int change_type, const char * db_name, const char * table_name, sqlite3_int64 row_id) {
+        UpdateHookFn * current_hook = static_cast<UpdateHookFn*>(self);
+        if (current_hook) {
+            auto update_hook = *current_hook;
+            optional<ChangeType> type = nullopt;
+            switch (change_type) {
+                case SQLITE_INSERT: {
+                    type = ChangeType::INSERT;
+                    break;
                 }
-            }, new_hook.release())
-        )
-    };
+                case SQLITE_UPDATE: {
+                    type = ChangeType::UPDATE;
+                    break;
+                }
+                case SQLITE_DELETE: {
+                    type = ChangeType::DELETE;
+                    break;
+                }
+            }
+            if (!type) {
+                throw std::runtime_error {"Unexpected update type from sqlite"};
+            }
+            update_hook(*type, string {db_name}, string {table_name}, static_cast<int64_t>(row_id));
+        }
+    }, m_update_hook.get());
 }
 
 void
@@ -163,21 +173,17 @@ Db::commit_hook(const CommitHookFn& commit_fn) {
         // move this function to the heap, so we can insert it directly into the db
         new_hook = make_unique<CommitHookFn>(commit_fn);
     }
+    std::swap(new_hook, m_commit_hook);
 
-    unique_ptr<CommitHookFn> old_commit_hook {
-        static_cast<CommitHookFn*>(
-            sqlite3_commit_hook(m_db.get(), [] (void * self) -> int {
-                auto current_hook = static_cast<CommitHookFn*>(self);
-                if (current_hook) {
-                    auto commit_hook = *current_hook;
-                    bool result = commit_hook();
-                    return result ? 0 : 1;
-                }
-                return 0;
-            }, new_hook.release())
-        )
-    };
-
+    sqlite3_commit_hook(m_db.get(), [] (void * self) -> int {
+        auto current_hook = static_cast<CommitHookFn*>(self);
+        if (current_hook) {
+            auto commit_hook = *current_hook;
+            bool result = commit_hook();
+            return result ? 0 : 1;
+        }
+        return 0;
+    }, m_commit_hook.get());
 }
 
 void
@@ -186,19 +192,58 @@ Db::rollback_hook(const RollbackHookFn& rollback_fn) {
     if (rollback_fn) {
         new_hook = make_unique<RollbackHookFn>(rollback_fn);
     }
+    std::swap(new_hook, m_rollback_hook);
 
-    unique_ptr<RollbackHookFn> old_rollback_hook {
-        static_cast<RollbackHookFn*>(
-            sqlite3_rollback_hook(m_db.get(), [] (void * self) {
-                auto current_hook = static_cast<RollbackHookFn*>(self);
-                if (current_hook) {
-                    auto rollback_hook = *current_hook;
-                    rollback_hook();
-                }
-            } , new_hook.release())
-        )
-    };
+    sqlite3_rollback_hook(m_db.get(), [] (void * self) {
+        auto current_hook = static_cast<RollbackHookFn*>(self);
+        if (current_hook) {
+            auto rollback_hook = *current_hook;
+            rollback_hook();
+        }
+    }, m_rollback_hook.get());
+}
 
+void
+Db::wal_hook(const WalHookFn& wal_fn) {
+    unique_ptr<WalHookFn> new_hook = nullptr;
+    if (wal_fn) {
+        new_hook = make_unique<WalHookFn>(wal_fn);
+    }
+    std::swap(m_wal_hook, new_hook);
+
+    sqlite3_wal_hook(m_db.get(), [] (void * self, sqlite3*, const char* db_name, int pages) -> int {
+        const auto current_hook = static_cast<WalHookFn*>(self);
+        if (current_hook) {
+            // Copy to the stack before calling, saves a lot of headaches.
+            const auto wal_hook = *current_hook;
+            const string name {db_name};
+            wal_hook(name, pages);
+        }
+        return SQLITE_OK;
+    }, m_wal_hook.get());
+}
+
+std::pair<int, int>
+Db::wal_checkpoint_v2(const optional<string>& db_name, Checkpoint mode) {
+    int sqlite_mode;
+    switch (mode) {
+    case Checkpoint::PASSIVE:
+        sqlite_mode = SQLITE_CHECKPOINT_PASSIVE;
+        break;
+    case Checkpoint::FULL:
+        sqlite_mode = SQLITE_CHECKPOINT_FULL;
+        break;
+    case Checkpoint::RESTART:
+        sqlite_mode = SQLITE_CHECKPOINT_RESTART;
+        break;
+    }
+    std::pair<int, int> result;
+    const char * sqlite_db_name = db_name ? db_name->data() : nullptr;
+    const int error_code = sqlite3_wal_checkpoint_v2(m_db.get(), sqlite_db_name, sqlite_mode, &result.first, &result.second);
+    if (error_code != SQLITE_OK) {
+        throw std::runtime_error { sqlite3_errstr(error_code) };
+    }
+    return result;
 }
 
 int64_t

@@ -27,6 +27,12 @@ enum class OpenFlag {
     PRIVATECACHE
 };
 
+enum class Checkpoint {
+    PASSIVE,
+    FULL,
+    RESTART
+};
+
 struct ColumnInfo final {
     int64_t cid;
     string name;
@@ -47,9 +53,10 @@ struct TableInfo final {
 
 class Db final : public std::enable_shared_from_this<Db> {
   public:
-    using UpdateHookFn   = function<void(ChangeType, string, string, int64_t)>;
-    using CommitHookFn   = function<bool()>;
+    using UpdateHookFn = function<void(ChangeType, string, string, int64_t)>;
+    using CommitHookFn = function<bool()>;
     using RollbackHookFn = function<void()>;
+    using WalHookFn = function<void(const string&, int)>;
 
     // use this constructor if you want to simply open the database with default settings
     static shared_ptr<Db> open(const string& path);
@@ -64,12 +71,18 @@ class Db final : public std::enable_shared_from_this<Db> {
     static shared_ptr<Db> inherit_db(sqlite3 * db);
     ~Db();
 
+    string libversion();
+    string sourceid();
+    int libversion_number();
+
     void update_hook(const UpdateHookFn& update_fn);
     void commit_hook(const CommitHookFn& commit_fn);
     void rollback_hook(const RollbackHookFn& rollback_fn);
+    void wal_hook(const WalHookFn& wal_fn);
+    std::pair<int, int> wal_checkpoint_v2(const optional<string>& db_name, Checkpoint mode);
+
     string journal_mode();
     int64_t last_insert_rowid();
-
     int32_t schema_version();
 
     vector<TableInfo> schema_info();
@@ -96,6 +109,11 @@ class Db final : public std::enable_shared_from_this<Db> {
     Db(only_for_internal_make_shared_t flag, unique_ptr<sqlite3, Closer> db);
   private:
     unique_ptr<sqlite3, Closer> m_db;
+    // To ensure proper memory management, these hooks are owned by the database.
+    unique_ptr<UpdateHookFn> m_update_hook;
+    unique_ptr<CommitHookFn> m_commit_hook;
+    unique_ptr<RollbackHookFn> m_rollback_hook;
+    unique_ptr<WalHookFn> m_wal_hook;
 };
 
 } }
