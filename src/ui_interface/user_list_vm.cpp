@@ -1,6 +1,8 @@
 #include "user_list_vm.hpp"
 #include "../github/client.hpp"
 #include "../sqlite/sqlite.hpp"
+#include "../sqlite_query/query_diff.hpp"
+
 #include <iostream>
 #include <thread>
 using mx3_gen::UserListVmObserver;
@@ -11,58 +13,35 @@ namespace chrono {
 }
 
 namespace {
-    const string s_count_stmt { "SELECT COUNT(1) FROM `github_users` ORDER BY id;" };
-    const string s_list_stmt  { "SELECT `login` FROM `github_users` ORDER BY id;" };
+    const string s_list_stmt  { "SELECT `login`, `id` FROM `github_users` ORDER BY id;" };
 }
 
 namespace mx3 {
 
-UserListVm::UserListVm(shared_ptr<sqlite::Db> db)
-    : m_count{nullopt}
-    , m_cursor_pos {0}
-    , m_db {db}
-    , m_count_stmt { m_db->prepare(s_count_stmt) }
-    , m_list_stmt  { m_db->prepare(s_list_stmt) }
-    , m_query { m_list_stmt->exec_query() }
+UserListVm::UserListVm(const vector<sqlite::Row>& rows, const std::weak_ptr<UserListVmHandle> & handle)
+    : m_rows(rows)
+    , m_handle(handle)
 {}
 
 int32_t
 UserListVm::count() {
-    if (m_count) {
-        return *m_count;
+    return static_cast<int32_t>(m_rows.size());
+}
+
+void UserListVm::delete_row(int32_t index) {
+    const string github_login = this->get(index)->name;
+    const auto handle = m_handle.lock();
+    if (handle) {
+        handle->delete_login(github_login);
     }
-    auto start = chrono::steady_clock::now();
-    m_count = m_count_stmt->exec_query().int_value(0);
-    auto end = chrono::steady_clock::now();
-    double millis = chrono::duration_cast<chrono::nanoseconds>( end - start ).count() / 1000000.0;
-    std::cout << "Count: " << *m_count << " (" << millis << ") milliseconds" << std::endl;
-    return *m_count;
 }
 
 optional<UserListVmCell>
 UserListVm::get(int32_t index) {
-    auto start = chrono::steady_clock::now();
-
-    if (index < static_cast<int32_t>(m_row_cache.size())) {
-        return m_row_cache[index];
+    if (index < this->count()) {
+        return UserListVmCell {index, m_rows[index][0].string_value()};
     }
-
-    m_row_cache.resize(index + 1);
-    while (m_query.is_valid() && m_cursor_pos <= index) {
-        m_row_cache[m_cursor_pos] = UserListVmCell {m_cursor_pos, m_query.string_value(0)};
-        m_query.next();
-        m_cursor_pos++;
-    }
-
-    auto end = chrono::steady_clock::now();
-
-    if (m_cursor_pos == index + 1) {
-        double millis = chrono::duration_cast<chrono::nanoseconds>( end - start ).count() / 1000000.0;
-        std::cout << millis << " milliseconds" << std::endl;
-        return *(m_row_cache[index]);
-    } else {
-        return nullopt;
-    }
+    return nullopt;
 }
 
 UserListVmHandle::UserListVmHandle(
@@ -71,15 +50,22 @@ UserListVmHandle::UserListVmHandle(
     mx3::EventLoopRef ui_thread
 )
     : m_db(db)
+    , m_monitor(sqlite::QueryMonitor::create_shared(m_db))
+    , m_list_stmt(m_db->prepare(s_list_stmt))
     , m_http(http)
-    , m_stop(false)
     , m_observer(nullptr)
-    , m_ui_thread(std::move(ui_thread)) {}
+    , m_ui_thread(std::move(ui_thread))
+{
+    m_monitor->listen_to_changes([this] () {
+        this->_notify_new_data();
+    });
+}
 
 void
 UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
     auto db = m_db;
     auto ui_thread = m_ui_thread;
+    m_observer = observer;
 
     github::get_users(m_http, nullopt, [db, ui_thread, observer] (vector<github::User> users) mutable {
         auto update_stmt = db->prepare("UPDATE `github_users` SET `login` = ?2 WHERE `id` = ?1;");
@@ -99,11 +85,15 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
             }
         }
         guard.commit();
-        ui_thread.post([db, observer] () {
-            // todo(kabbes) make sure to check if this has been stopped
-            observer->on_update(nullopt, make_shared<UserListVm>(db) );
-        });
     });
+}
+
+void
+UserListVmHandle::delete_login(const string& github_login) {
+    // todo(kabbes) put this on a background thread
+    const auto delete_stmt = m_db->prepare("DELETE FROM `github_users` WHERE `login` = ?1");
+    delete_stmt->bind(1, github_login);
+    delete_stmt->exec();
 }
 
 void
@@ -111,4 +101,39 @@ UserListVmHandle::stop() {
     // this isn't implemented yet :(
 }
 
+
+void
+UserListVmHandle::_notify_new_data() {
+    // todo(kabbes) this isn't thread safe
+
+    optional<vector<mx3_gen::ListChange>> diff;
+
+    decltype(m_prev_rows) prev_rows;
+    std::swap(m_prev_rows, prev_rows);
+    auto new_rows = m_list_stmt->exec_query().all_rows();
+
+    if (prev_rows) {
+        constexpr const size_t ID_POS = 1;
+        const auto is_same_entity = [] (const sqlite::Row& a, const sqlite::Row& b) {
+            return a[ID_POS] == b[ID_POS];
+        };
+        const auto less_than = [] (const sqlite::Row& a, const sqlite::Row& b) {
+            return a[ID_POS] < b[ID_POS];
+        };
+        const auto sql_diff = sqlite::calculate_diff(*prev_rows, new_rows, is_same_entity, less_than);
+        vector<mx3_gen::ListChange> final_diff;
+        final_diff.reserve(sql_diff.size());
+        for (const auto& c : sql_diff) {
+            final_diff.push_back({c.from_index, c.to_index});
+        }
+        diff = std::move(final_diff);
+    }
+
+    m_prev_rows = std::move(new_rows);
+    const std::weak_ptr<UserListVmHandle> weak_self = shared_from_this();
+    m_ui_thread.post([diff = std::move(diff), weak_self, observer = m_observer, new_rows = *m_prev_rows] () {
+        // todo(kabbes) make sure to check if this has been stopped
+        observer->on_update(diff, make_shared<UserListVm>(new_rows, weak_self));
+    });
+}
 }

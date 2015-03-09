@@ -225,7 +225,7 @@ Db::wal_hook(const WalHookFn& wal_fn) {
 
 std::pair<int, int>
 Db::wal_checkpoint_v2(const optional<string>& db_name, Checkpoint mode) {
-    int sqlite_mode;
+    int sqlite_mode = 0;
     switch (mode) {
     case Checkpoint::PASSIVE:
         sqlite_mode = SQLITE_CHECKPOINT_PASSIVE;

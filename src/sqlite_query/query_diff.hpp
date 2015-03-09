@@ -1,11 +1,10 @@
 #pragma once
 #include "stl.hpp"
 #include "../sqlite/value.hpp"
+#include <algorithm>
 
 namespace mx3 {
 namespace sqlite {
-
-using Row = vector<Value>;
 
 /* A representation of a change between 2 different row-based sets of data.
  */

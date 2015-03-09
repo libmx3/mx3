@@ -53,6 +53,8 @@ class Value final {
     };
 };
 
+using Row = vector<Value>;
+
 // a comparison operator that also compares double and int values correctly
 bool operator<(const Value& l, const Value& r);
 std::ostream& operator <<(std::ostream& os, const mx3::sqlite::Value& v);

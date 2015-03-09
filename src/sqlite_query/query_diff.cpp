@@ -1,5 +1,4 @@
 #include "query_diff.hpp"
-#include <algorithm>
 
 namespace mx3 { namespace sqlite {
 

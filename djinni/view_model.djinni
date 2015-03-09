@@ -13,6 +13,10 @@ user_list_vm = interface +c {
     count(): i32;
     # get the data for an individual user
     get(index: i32): optional<user_list_vm_cell>;
+
+    # Delete a row from the view model.  This view model will still remain immutable but a
+    # new view model will be sent through the observer interface.
+    delete_row(index: i32);
 }
 
 user_list_vm_observer = interface +o +j {

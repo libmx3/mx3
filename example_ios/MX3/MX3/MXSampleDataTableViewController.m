@@ -65,6 +65,10 @@ NSString *const CellIdentifier = @"MX3Cell";
     }
 }
 
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.viewModel deleteRow: (int32_t)indexPath.row];
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.viewModel != nil ? [self.viewModel count] : 0;
 }
@@ -73,7 +77,7 @@ NSString *const CellIdentifier = @"MX3Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier
                                                             forIndexPath:indexPath];
 
-    MX3UserListVmCell * cellData = [self.viewModel get:indexPath.row];
+    MX3UserListVmCell * cellData = [self.viewModel get:(int32_t)indexPath.row];
     cell.textLabel.text = [cellData name];
     cell.detailTextLabel.text = @"If you manage to get the deps right";
     return cell;

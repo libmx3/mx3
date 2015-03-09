@@ -27,6 +27,55 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B024F7A71AAD5BFA008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E7E6BC8A67A80E09A179E565;
+			remoteInfo = libmx3_android;
+		};
+		B024F7AF1AAD5BFA008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 92E822B5EA37A89C8AAD9BB4;
+			remoteInfo = libmx3;
+		};
+		B024F7B11AAD5BFA008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 39EA06E18557EEFB64C5347F;
+			remoteInfo = libmx3_objc;
+		};
+		B024F7B31AAD5BFA008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E7E6BC8A67A80E09A179E565;
+			remoteInfo = libmx3_android;
+		};
+		B024F7B51AAD5BFA008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6FCBE719222158C1FBFFBADD;
+			remoteInfo = play_objc;
+		};
+		B024F7B71AAD5BFA008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8E5AC5F54A231F301800298F;
+			remoteInfo = test;
+		};
+		B024F7B91AAD5C01008B8BB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 05EB53E0AEA2C8B114F5F0A6;
+			remoteInfo = libmx3;
+		};
 		B0F70B2E1A222B2200E36720 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
@@ -72,6 +121,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = mx3.xcodeproj; path = ../../build_ios/mx3.xcodeproj; sourceTree = "<group>"; };
 		B02CAAE8192CFB0C007D3B2F /* libCppSQLite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCppSQLite.a; path = "../../deps/build/Debug-iphoneos/libCppSQLite.a"; sourceTree = "<group>"; };
 		B09B174E1A1CD61100C8D6A7 /* libdjinni_objc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdjinni_objc.a; path = "../../deps/djinni/support-lib/build/Debug-iphoneos/libdjinni_objc.a"; sourceTree = "<group>"; };
 		F0C7716F192A7821006469AB /* MX3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MX3.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -130,9 +180,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B024F7A01AAD5BFA008B8BB9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B024F7B01AAD5BFA008B8BB9 /* libmx3.a */,
+				B024F7B21AAD5BFA008B8BB9 /* libmx3_objc.a */,
+				B024F7B41AAD5BFA008B8BB9 /* libmx3_android.dylib */,
+				B024F7B61AAD5BFA008B8BB9 /* play_objc */,
+				B024F7B81AAD5BFA008B8BB9 /* test */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		F0C77166192A7821006469AB = {
 			isa = PBXGroup;
 			children = (
+				B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */,
 				F0C77178192A7821006469AB /* MX3 */,
 				F0C77191192A7821006469AB /* MX3Tests */,
 				F0C77171192A7821006469AB /* Frameworks */,
@@ -215,6 +278,7 @@
 			children = (
 				F0C771BC192A79CC006469AB /* libmx3.a */,
 				F0C771BE192A79CC006469AB /* libmx3_objc.a */,
+				B024F7A81AAD5BFA008B8BB9 /* libmx3_android.dylib */,
 				F0C771C0192A79CC006469AB /* play_objc */,
 				F0C771C4192A79CC006469AB /* test */,
 			);
@@ -235,6 +299,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B024F7BA1AAD5C01008B8BB9 /* PBXTargetDependency */,
 				B0F70B2F1A222B2200E36720 /* PBXTargetDependency */,
 			);
 			name = MX3;
@@ -289,6 +354,10 @@
 					ProductGroup = F0C771AF192A79CC006469AB /* Products */;
 					ProjectRef = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
 				},
+				{
+					ProductGroup = B024F7A01AAD5BFA008B8BB9 /* Products */;
+					ProjectRef = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -299,6 +368,48 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		B024F7A81AAD5BFA008B8BB9 /* libmx3_android.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libmx3_android.dylib;
+			remoteRef = B024F7A71AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B024F7B01AAD5BFA008B8BB9 /* libmx3.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libmx3.a;
+			remoteRef = B024F7AF1AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B024F7B21AAD5BFA008B8BB9 /* libmx3_objc.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libmx3_objc.a;
+			remoteRef = B024F7B11AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B024F7B41AAD5BFA008B8BB9 /* libmx3_android.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libmx3_android.dylib;
+			remoteRef = B024F7B31AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B024F7B61AAD5BFA008B8BB9 /* play_objc */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = play_objc;
+			remoteRef = B024F7B51AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B024F7B81AAD5BFA008B8BB9 /* test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = test;
+			remoteRef = B024F7B71AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		F0C771BC192A79CC006469AB /* libmx3.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -369,6 +480,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B024F7BA1AAD5C01008B8BB9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libmx3;
+			targetProxy = B024F7B91AAD5C01008B8BB9 /* PBXContainerItemProxy */;
+		};
 		B0F70B2F1A222B2200E36720 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = libmx3_objc;

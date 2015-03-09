@@ -94,4 +94,5 @@ Api::_setup_db() {
     for (const auto& cmd : setup_commands) {
         m_sqlite->exec(cmd);
     }
+    m_sqlite->enable_wal();
 }
