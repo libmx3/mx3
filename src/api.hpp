@@ -6,7 +6,7 @@
 #include "sqlite/sqlite.hpp"
 #include "http.hpp"
 #include "interface/api.hpp"
-#include "interface/thread_launcher.hpp"
+#include "single_thread_task_runner.hpp"
 
 namespace mx3 {
 
@@ -15,9 +15,9 @@ class Api final : public mx3_gen::Api {
   public:
     Api(
         const string & root_path,
-        const shared_ptr<mx3_gen::EventLoop> & main_thread,
-        const shared_ptr<mx3_gen::Http> & http_impl,
-        const shared_ptr<mx3_gen::ThreadLauncher> & launcher
+        const shared_ptr<SingleThreadTaskRunner>& ui_runner,
+        const shared_ptr<SingleThreadTaskRunner>& bg_runner,
+        const shared_ptr<mx3_gen::Http> & http_impl
     );
 
     // whether a user already exists
@@ -25,7 +25,6 @@ class Api final : public mx3_gen::Api {
     // get the current username, or "" if none exists
     virtual string get_username() override;
     virtual void set_username(const string& name) override;
-
     virtual shared_ptr<mx3_gen::UserListVmHandle> observer_user_list() override;
 
   private:
@@ -36,8 +35,8 @@ class Api final : public mx3_gen::Api {
     shared_ptr<sqlite::Db> m_read_db;
 
     unique_ptr<mx3::JsonStore> m_db;
-    mx3::EventLoopRef m_ui_thread;
-    mx3::EventLoopRef m_bg_thread;
+    const shared_ptr<SingleThreadTaskRunner> m_ui_thread;
+    const shared_ptr<SingleThreadTaskRunner> m_bg_thread;
     mx3::Http m_bg_http;
 };
 

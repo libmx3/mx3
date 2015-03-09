@@ -4,7 +4,6 @@
 #include "../interface/user_list_vm_handle.hpp"
 #include "../interface/user_list_vm_observer.hpp"
 #include "../http.hpp"
-#include "../event_loop.hpp"
 #include "stl.hpp"
 #include <atomic>
 #include "../sqlite/sqlite.hpp"
@@ -31,7 +30,8 @@ class UserListVmHandle final : public mx3_gen::UserListVmHandle,
     UserListVmHandle(
         shared_ptr<sqlite::Db> db,
         const mx3::Http& http,
-        mx3::EventLoopRef ui_thread
+        const shared_ptr<SingleThreadTaskRunner> & ui_thread,
+        const shared_ptr<SingleThreadTaskRunner> & bg_thread
     );
     virtual void start(const shared_ptr<mx3_gen::UserListVmObserver>& observer) override;
     virtual void stop() override;
@@ -46,7 +46,8 @@ class UserListVmHandle final : public mx3_gen::UserListVmHandle,
     optional<vector<sqlite::Row>> m_prev_rows;
     mx3::Http m_http;
     shared_ptr<mx3_gen::UserListVmObserver> m_observer;
-    mx3::EventLoopRef m_ui_thread;
+    const shared_ptr<SingleThreadTaskRunner> m_ui_thread;
+    const shared_ptr<SingleThreadTaskRunner> m_bg_thread;
 };
 
 } // namespace mx3

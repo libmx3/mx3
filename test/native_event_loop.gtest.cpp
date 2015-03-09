@@ -17,7 +17,7 @@ public:
     }
 };
 
-shared_ptr<mx3_gen::EventLoop> make_loop() {
+shared_ptr<SingleThreadTaskRunner> make_loop() {
     return make_shared<EventLoopCpp>( make_shared<CppThreadLauncher>() );
 }
 
@@ -26,7 +26,7 @@ TEST(EventLoopCpp, ctor_dtor) {
 }
 
 TEST(EventLoopCpp, dtor_when_blocked) {
-    auto loop = new mx3::EventLoopRef { make_loop() };
+    auto loop = make_loop();
     semaphore ready_sem;
     std::atomic_bool finished {false};
     loop->post( [&] () {
@@ -35,15 +35,15 @@ TEST(EventLoopCpp, dtor_when_blocked) {
         finished = true;
     });
     ready_sem.wait();
-    delete loop;
+    loop = nullptr;
     EXPECT_EQ(finished, true);
 }
 
 TEST(EventLoopCpp, runs_functions) {
-    auto loop = mx3::EventLoopRef { make_loop() };
+    auto loop = make_loop();
     std::atomic_int count{41};
     semaphore ready_sem;
-    loop.post( [&] () {
+    loop->post( [&] () {
         count++;
         ready_sem.notify();
     });
@@ -52,17 +52,17 @@ TEST(EventLoopCpp, runs_functions) {
 }
 
 TEST(EventLoopCpp, runs_multi_functions) {
-    auto loop = mx3::EventLoopRef { make_loop() };
+    auto loop = make_loop();
     std::atomic_bool a_ran{false};
     std::atomic_bool b_ran{false};
 
     semaphore ready_sem;
-    loop.post( [&] () {
+    loop->post( [&] () {
         EXPECT_EQ(a_ran, false);
         EXPECT_EQ(b_ran, false);
         a_ran = true;
     });
-    loop.post( [&] () {
+    loop->post( [&] () {
         EXPECT_EQ(a_ran, true);
         EXPECT_EQ(b_ran, false);
         b_ran = true;
@@ -77,11 +77,11 @@ TEST(EventLoopCpp, runs_multi_functions) {
 TEST(EventLoopCpp, runs_nested_functions) {
     // a slightly tricky example, because an implementation
     // might accidentally hold the lock while calling the fn
-    auto loop = mx3::EventLoopRef { make_loop() };
+    auto loop = make_loop();
     std::atomic_int count{41};
     semaphore ready_sem;
-    loop.post( [&] () {
-        loop.post( [&] () {
+    loop->post( [&] () {
+        loop->post( [&] () {
             count++;
             EXPECT_EQ(count, 43);
             ready_sem.notify();

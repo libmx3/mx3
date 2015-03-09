@@ -1,8 +1,6 @@
 #include "event_loop.hpp"
 
-using mx3::EventLoopCpp;
-using mx3::EventLoopRef;
-using mx3::FnTask;
+namespace mx3 {
 
 FnTask::FnTask(function<void()> run_me) : m_fn {std::move(run_me)} {}
 
@@ -14,8 +12,8 @@ FnTask::execute() {
 EventLoopRef::EventLoopRef(shared_ptr<mx3_gen::EventLoop> loop) : m_loop {std::move(loop)} {}
 
 void
-EventLoopRef::post(function<void()> run_fn) {
-    m_loop->post( make_shared<FnTask>(std::move(run_fn)) );
+EventLoopRef::post(const SingleThreadTaskRunner::Task & task) {
+    m_loop->post(make_shared<FnTask>(task));
 }
 
 EventLoopCpp::EventLoopCpp(const shared_ptr<mx3_gen::ThreadLauncher> & launcher) : m_stop(false), m_done(false) {
@@ -36,8 +34,7 @@ EventLoopCpp::~EventLoopCpp() {
     m_done_cv.wait(done_lk, [this] () { return m_done; });
 }
 
-void
-EventLoopCpp::post(const shared_ptr<mx3_gen::AsyncTask>& task) {
+void EventLoopCpp::post(const SingleThreadTaskRunner::Task & task) {
     {
     std::lock_guard<std::mutex> lock(m_task_mutex);
     m_queue.emplace(task);
@@ -60,7 +57,7 @@ EventLoopCpp::_run_loop() {
         auto task = std::move(m_queue.front());
         m_queue.pop();
         lk.unlock();
-        task->execute();
+        task();
     }
 
     {
@@ -70,4 +67,4 @@ EventLoopCpp::_run_loop() {
     m_done_cv.notify_one();
 }
 
-
+}

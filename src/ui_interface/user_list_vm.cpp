@@ -47,14 +47,16 @@ UserListVm::get(int32_t index) {
 UserListVmHandle::UserListVmHandle(
     shared_ptr<mx3::sqlite::Db> db,
     const mx3::Http& http,
-    mx3::EventLoopRef ui_thread
+    const shared_ptr<SingleThreadTaskRunner> & ui_thread,
+    const shared_ptr<SingleThreadTaskRunner> & bg_thread
 )
     : m_db(db)
     , m_monitor(sqlite::QueryMonitor::create_shared(m_db))
     , m_list_stmt(m_db->prepare(s_list_stmt))
     , m_http(http)
     , m_observer(nullptr)
-    , m_ui_thread(std::move(ui_thread))
+    , m_ui_thread(ui_thread)
+    , m_bg_thread(bg_thread)
 {
     m_monitor->listen_to_changes([this] () {
         this->_notify_new_data();
@@ -90,10 +92,13 @@ UserListVmHandle::start(const shared_ptr<UserListVmObserver>& observer) {
 
 void
 UserListVmHandle::delete_login(const string& github_login) {
-    // todo(kabbes) put this on a background thread
-    const auto delete_stmt = m_db->prepare("DELETE FROM `github_users` WHERE `login` = ?1");
-    delete_stmt->bind(1, github_login);
-    delete_stmt->exec();
+    const auto self = shared_from_this();
+    m_bg_thread->post([self, github_login] () {
+        const auto delete_stmt = self->m_db->prepare("DELETE FROM `github_users` WHERE `login` = ?1");
+        delete_stmt->bind(1, github_login);
+        // This exec will automatically trigger the commit hook.
+        delete_stmt->exec();
+    });
 }
 
 void
@@ -131,7 +136,7 @@ UserListVmHandle::_notify_new_data() {
 
     m_prev_rows = std::move(new_rows);
     const std::weak_ptr<UserListVmHandle> weak_self = shared_from_this();
-    m_ui_thread.post([diff = std::move(diff), weak_self, observer = m_observer, new_rows = *m_prev_rows] () {
+    m_ui_thread->post([diff = std::move(diff), weak_self, observer = m_observer, new_rows = *m_prev_rows] () {
         // todo(kabbes) make sure to check if this has been stopped
         observer->on_update(diff, make_shared<UserListVm>(new_rows, weak_self));
     });
