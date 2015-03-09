@@ -161,7 +161,7 @@ Db::update_hook(const UpdateHookFn& update_fn) {
             if (!type) {
                 throw std::runtime_error {"Unexpected update type from sqlite"};
             }
-            update_hook(*type, string {db_name}, string {table_name}, static_cast<int64_t>(row_id));
+            update_hook({*type, string {db_name}, string {table_name}, static_cast<int64_t>(row_id)});
         }
     }, m_update_hook.get());
 }

@@ -56,7 +56,13 @@ struct TableInfo final {
 
 class Db final : public std::enable_shared_from_this<Db> {
   public:
-    using UpdateHookFn = function<void(ChangeType, string, string, int64_t)>;
+    struct Change final {
+        ChangeType type;
+        string db_name;
+        string table_name;
+        int64_t rowid;
+    };
+    using UpdateHookFn = function<void(Change)>;
     using CommitHookFn = function<bool()>;
     using RollbackHookFn = function<void()>;
     using WalHookFn = function<void(const string&, int)>;

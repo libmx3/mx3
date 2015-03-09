@@ -151,10 +151,10 @@ TEST(sqlite_db, update_hook_insert) {
     db->exec("CREATE TABLE abc (name TEXT, PRIMARY KEY(name) )");
 
     size_t times_called = 0;
-    db->update_hook([&] (ChangeType type, string db_name, string table_name, int64_t row_id) {
+    db->update_hook([&] (Db::Change change) {
         times_called++;
-        EXPECT_EQ(type, ChangeType::INSERT);
-        EXPECT_EQ(table_name, "abc");
+        EXPECT_EQ(change.type, ChangeType::INSERT);
+        EXPECT_EQ(change.table_name, "abc");
     });
     db->prepare("INSERT INTO `abc` (`name`) VALUES ('first')")->exec();
     EXPECT_EQ(times_called, 1);
@@ -167,11 +167,11 @@ TEST(sqlite_db, update_hook_delete) {
     int64_t insert_row_id = db->last_insert_rowid();
 
     size_t times_called = 0;
-    db->update_hook([&] (ChangeType type, string db_name, string table_name, int64_t row_id) {
+    db->update_hook([&] (Db::Change change) {
         times_called++;
-        EXPECT_EQ(insert_row_id, row_id);
-        EXPECT_EQ(type, ChangeType::DELETE);
-        EXPECT_EQ(table_name, "abc");
+        EXPECT_EQ(insert_row_id, change.rowid);
+        EXPECT_EQ(change.type, ChangeType::DELETE);
+        EXPECT_EQ(change.table_name, "abc");
     });
     db->prepare("DELETE FROM `abc` WHERE 1")->exec();
     EXPECT_EQ(times_called, 1);
@@ -184,11 +184,11 @@ TEST(sqlite_db, update_hook_update) {
     int64_t insert_row_id = db->last_insert_rowid();
 
     size_t times_called = 0;
-    db->update_hook([&] (ChangeType type, string db_name, string table_name, int64_t row_id) {
+    db->update_hook([&] (Db::Change change) {
         times_called++;
-        EXPECT_EQ(insert_row_id, row_id);
-        EXPECT_EQ(type, ChangeType::UPDATE);
-        EXPECT_EQ(table_name, "abc");
+        EXPECT_EQ(insert_row_id, change.rowid);
+        EXPECT_EQ(change.type, ChangeType::UPDATE);
+        EXPECT_EQ(change.table_name, "abc");
     });
     auto stmt = db->prepare("UPDATE `abc` SET `name` = 'second' WHERE rowid = ?1");
     stmt->bind(1, insert_row_id);
