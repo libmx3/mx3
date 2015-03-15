@@ -4,6 +4,9 @@ build_ios/
 build_mac/
 build_win/
 
+#gradle
+.gradle
+
 # gyp + android
 deps/gyp
 GypAndroid.mk

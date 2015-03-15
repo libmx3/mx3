@@ -25,7 +25,8 @@ gyp: ./deps/gyp
 djinni-output-temp/gen.stamp mx3.cidl:
 	./run_djinni.sh
 
-djinni: djinni-output-temp/gen.stamp mx3.cidl
+djinni:
+	./gradlew djinni
 
 # instruct gyp to build using the "xcode" build generator, also specify the OS
 # (so we can conditionally compile using that var later)

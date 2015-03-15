@@ -1,0 +1,110 @@
+plugins {
+    id 'com.github.jlouns.cpe' version '0.1.0'
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.2'
+}
+
+task djinniBuild(type: Exec) {
+	description = 'Building Djinni.'
+    inputs.files file("deps/djinni/src/source"), file("deps/djinni/src/build.sbt"), file("deps/djinni/src/project/plugins.sbt")
+    outputs.file file("deps/djinni/src/target")
+    
+    workingDir = file("deps/djinni/src")
+    executable = "java"
+	args = [
+	    "-Xms512M",
+	    "-Xmx1024M",
+	    "-Xss1M",
+	    "-XX:+CMSClassUnloadingEnabled",
+	    "-XX:MaxPermSize=256M",
+	    "-Djava.security.manager",
+	    "-Djava.security.policy=support/sbt.security.policy",
+	    "-jar", "support/sbt-launch.jar",
+	    "-Dsbt.override.build.repos=true",
+	    "-Dsbt.repository.config=support/sbt.resolvers.properties",
+	    "compile", "start-script"]
+}
+
+File temp_out = file("djinni-output-temp")
+File input = file("djinni/mx3.djinni")
+
+File cpp_out = file("src/interface")
+File objc_out = file("objc/gen")
+File jni_out = file("android/jni_gen")
+File java_out = file("android/java_gen/com/mx3")
+
+File tmp_cpp_out = new File(temp_out.getPath(), "cpp")
+File tmp_objc_out = new File(temp_out.getPath(), "objc")
+File tmp_jni_out = new File(temp_out.getPath(), "jni")
+File tmp_java_out = new File(temp_out.getPath(), "java")
+
+task djinniGen(type: CrossPlatformExec, dependsOn: djinniBuild) {
+	description = 'Compiling djinni interfaces.'
+	inputs.dir file("djinni")
+	outputs.files tmp_cpp_out, tmp_objc_out, tmp_jni_out, tmp_java_out
+
+	executable = file("deps/djinni/src/target/start")
+	args = [
+		"--cpp-out", tmp_cpp_out,
+		"--cpp-namespace", "mx3_gen",
+		"--ident-cpp-enum-type", "foo_bar",
+		"--cpp-optional-header", "<optional/optional.hpp> ", // HACK: without space gradle will not put arg in quotes	
+		"--cpp-optional-template", "std::experimental::optional",
+
+		"--objc-out", tmp_objc_out,
+		"--objcpp-namespace", "djinni_generated",
+		"--objc-type-prefix", "MX3",
+
+		"--java-out", tmp_java_out,
+		"--java-package", "com.mx3",
+		"--ident-java-field", "mFooBar",
+		"--jni-out", tmp_jni_out,
+		"--ident-jni-class", "NativeFooBar",
+		"--ident-jni-file", "native_foo_bar",
+
+		"--idl", input]
+}
+
+task djinniOutSyncCpp(type: Sync) {
+    from tmp_cpp_out
+    into cpp_out
+}
+
+task djinniOutSyncObjc(type: Sync) {
+	from tmp_objc_out
+	into objc_out
+}
+
+task djinniOutSyncJava(type: Sync) {
+	from tmp_java_out
+	into java_out
+}
+
+task djinniOutSyncJni(type: Sync) {
+	from tmp_jni_out
+	into jni_out
+}
+
+task djinniOutSync(dependsOn: [djinniOutSyncCpp, djinniOutSyncObjc, djinniOutSyncJava, djinniOutSyncJni])
+task djinni(dependsOn: [djinniGen, djinniOutSync]) {
+	description = "Runs djinni to generate glue code between C++ and platforms."
+}
+
+task clean(type: Delete) {
+	delete fileTree(dir: '.').matching { include '*.target.mk' }
+	delete fileTree(dir: 'deps/').matching { include '*.target.mk' }
+	delete (
+	 	"build/",
+	 	"deps/build/",
+	 	"build_mac/",
+	 	"build_ios/",
+	 	"obj/",
+	 	"libs/",
+	 	"GypAndroid.mk",
+	 	"test_ldb",
+	 	"test.sqlite",
+	 	"play"
+		)
+}
