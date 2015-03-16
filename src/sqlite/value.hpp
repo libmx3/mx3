@@ -33,12 +33,10 @@ class Value final {
     bool is_numeric() const { return m_type == Type::INT || m_type == Type::DOUBLE; }
 
     string move_string();
-    string string_value() &&;
-    const string& string_value() const&;
+    const string& string_value() const;
 
     vector<uint8_t> move_blob();
-    vector<uint8_t> blob_value() &&;
-    const vector<uint8_t>& blob_value() const&;
+    const vector<uint8_t>& blob_value() const;
 
     int int_value() const;
     int64_t int64_value() const;

@@ -130,11 +130,6 @@ Value::move_string() {
     return replacement;
 }
 
-string
-Value::string_value() && {
-    return this->move_string();
-}
-
 vector<uint8_t>
 Value::move_blob() {
     if (m_type != Type::BLOB) {
@@ -143,11 +138,6 @@ Value::move_blob() {
     vector<uint8_t> replacement;
     std::swap(replacement, m_blob);
     return replacement;
-}
-
-vector<uint8_t>
-Value::blob_value() && {
-    return this->move_blob();
 }
 
 int
@@ -178,7 +168,7 @@ Value::double_value() const {
 }
 
 const string&
-Value::string_value() const& {
+Value::string_value() const {
     if (m_type != Type::STRING) {
         throw std::runtime_error {"invalid type for column, string"};
     }
@@ -186,7 +176,7 @@ Value::string_value() const& {
 }
 
 const vector<uint8_t>&
-Value::blob_value() const& {
+Value::blob_value() const {
     if (m_type != Type::BLOB) {
         throw std::runtime_error {"invalid type for column, blob"};
     }
