@@ -1,3 +1,7 @@
+plugins {
+    id 'com.github.jlouns.cpe' version '0.1.0'
+}
+
 apply plugin: 'com.android.application'
 
 android {
@@ -33,7 +37,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-task ndkBuild(type: Exec) {
+task ndkBuild(type: CrossPlatformExec) {
     String MainDirectory = System.getProperty("user.dir") + '/app/'
     File ndkDir = project.getPlugins().getPlugin('android').ndkFolder
     if (ndkDir == null) {
