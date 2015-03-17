@@ -3,10 +3,6 @@
 Cross platform has been well studied on desktop, but this is an exploration in doing that on mobile and an open request
 for comments and improvements.
 
-### Android
-* run `make android` to build APK from the command line
-* Example Application is built with Android Studio
-
 ### The name
 "mobile times 3", Android, iOS, and Windows Phone. (todo, windows phone support)
 
@@ -28,16 +24,22 @@ a Pull Request **during development** to solicit feedback and enable incremental
 * xcode & `xcodebuild`
 * android ndk and `ndk-build` on your PATH to build for android
 * windows phone developer tools (eventually...)
+* Configure the paths to your [Android SDK](http://developer.android.com/sdk/installing/index.html)
+  and [Android NDK](http://developer.android.com/tools/sdk/ndk/index.html) by creating a file
+  using the template at `example_android/local.properties.example`.
 
 ### Installation
 1. Run `git submodule update --init` to download all dependencies
 1. Optionally `gem install xcpretty` to make the output of `xcodebuild` nice
 1. Run `make play`. You should see "Hello, #{your login name}" printed to the console, if so, you seem to already have
 all the requirements met for building on iOS.
-1. Run `make android` to build the example android application
+1. Run `make android` to build the example android application.
 
 ### Objective-C
 Run `make play ios` or `make play mac`
+
+### Android
+Be sure to create a `example_android/local.properties` file pointing to the android-ndk and android-sdk.
 
 ### Building
 

@@ -51,7 +51,11 @@ mac: build_mac/mx3.xcodeproj
 ios: build_ios/mx3.xcodeproj
 	xcodebuild -project build_ios/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
 
-android: GypAndroid.mk
+# This file needs to be manually configured per system.
+example_android/local.properties:
+	@echo "Android SDK and NDK not properly configured, please create a example_android/local.properties file." && false
+
+android: GypAndroid.mk example_android/local.properties
 	cd example_android && ./gradlew app:assembleDebug && cd ..
 
 test: build_mac/mx3.xcodeproj
