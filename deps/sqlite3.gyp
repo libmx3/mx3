@@ -7,9 +7,14 @@
       ],
       'defines': [
         'HAVE_USLEEP=1',
+        # This is important - it causes SQLite to use memory for temp files. Since
+        # Android has no globally writable temp directory, if this is not defined the
+        # application throws an exception when it tries to create a temp file.
+        'SQLITE_TEMP_STORE=3',
       ],
       'cflags': [
         '-DHAVE_USLEEP=1',
+        '-DSQLITE_TEMP_STORE=3',
         '-Wno-unused-const-variable',
       ],
       'xcode_settings': {
