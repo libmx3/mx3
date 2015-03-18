@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <chrono>
 
 #include "stl.hpp"
 #include "src/sqlite/db.hpp"
@@ -16,6 +17,12 @@ TEST(sqlite_lib, can_query_version_info) {
 
 TEST(sqlite_db, can_open_close) {
     auto db = Db::open(":memory:");
+}
+
+TEST(sqlite_db, can_do_busy_timeout) {
+    auto db = Db::open(":memory:");
+    db->busy_timeout(nullopt);
+    db->busy_timeout(std::chrono::seconds {5});
 }
 
 TEST(sqlite_db, wal_hook) {

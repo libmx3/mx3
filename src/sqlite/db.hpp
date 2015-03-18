@@ -1,5 +1,6 @@
 #pragma once
 #include <set>
+#include <chrono>
 #include "stl.hpp"
 #include "stmt.hpp"
 
@@ -89,6 +90,9 @@ class Db final : public std::enable_shared_from_this<Db> {
     string journal_mode();
     int64_t last_insert_rowid();
     int32_t schema_version();
+
+    void busy_timeout(nullopt_t);
+    void busy_timeout(std::chrono::system_clock::duration timeout);
 
     vector<TableInfo> schema_info();
     optional<TableInfo> table_info(const string& table_name);

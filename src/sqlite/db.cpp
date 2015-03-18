@@ -256,6 +256,20 @@ Db::schema_version() {
     return static_cast<int32_t>( this->prepare("PRAGMA schema_version;")->exec_scalar() );
 }
 
+void
+Db::busy_timeout(nullopt_t) {
+    this->busy_timeout(std::chrono::milliseconds{-1});
+}
+
+void
+Db::busy_timeout(std::chrono::system_clock::duration timeout) {
+    const int ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
+    const auto error_code = sqlite3_busy_timeout(m_db.get(), ms);
+    if (error_code != SQLITE_OK) {
+        throw std::runtime_error { sqlite3_errstr(error_code) };
+    }
+}
+
 vector<ColumnInfo>
 Db::column_info(const string& table_name) {
     auto cursor = this->prepare(
