@@ -16,6 +16,11 @@
         '-DHAVE_USLEEP=1',
         '-DSQLITE_TEMP_STORE=3',
         '-Wno-unused-const-variable',
+        '-Wno-unused-parameter',
+      ],
+      'cflags!': [
+        '-Werror',
+        '-Wextra',
       ],
       'xcode_settings': {
         'OTHER_CFLAGS' : ['<@(_cflags)'],
