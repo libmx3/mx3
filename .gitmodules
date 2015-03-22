@@ -9,4 +9,4 @@
 	url = https://github.com/libmx3/json11.git
 [submodule "deps/xcode-googletest"]
 	path = deps/xcode-googletest
-	url = git@github.com:mattstevens/xcode-googletest.git
+	url = https://github.com/mattstevens/xcode-googletest.git
