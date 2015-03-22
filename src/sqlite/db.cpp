@@ -263,8 +263,8 @@ Db::busy_timeout(nullopt_t) {
 
 void
 Db::busy_timeout(std::chrono::system_clock::duration timeout) {
-    const int ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
-    const auto error_code = sqlite3_busy_timeout(m_db.get(), ms);
+    const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
+    const auto error_code = sqlite3_busy_timeout(m_db.get(), static_cast<int>(ms));
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };
     }

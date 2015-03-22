@@ -102,5 +102,26 @@
         '<!@(python glob.py test *.cpp *.hpp)',
       ]
     },
+    {
+      'target_name': 'xctest_runner',
+      'type': 'loadable_module',
+      'mac_xctest_bundle': 1,
+      'cflags_cc!': [ '-Werror', '-Wextra' ],
+      'xcode_settings': {
+        'OTHER_CPLUSPLUSFLAGS!' : ['-Werror', '-Wextra'],
+      },
+      'dependencies': [
+        'libmx3',
+        'deps/gtest.gyp:gtest',
+      ],
+      'include_dirs': [
+        '.',
+        'test',
+      ],
+      'sources': [
+        '<!@(python glob.py test *.cpp *.hpp)',
+        'deps/xcode-googletest/Bundle/GoogleTests.mm',
+      ]
+    },
   ],
 }
