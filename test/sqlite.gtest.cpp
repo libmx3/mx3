@@ -16,7 +16,58 @@ TEST(sqlite_lib, can_query_version_info) {
 }
 
 TEST(sqlite_db, can_open_close) {
-    auto db = Db::open(":memory:");
+    const auto db = Db::open(":memory:");
+}
+
+TEST(sqlite_db, affinity) {
+    const vector<std::pair<string, Affinity>> test_cases {
+        {"INT", Affinity::INTEGER},
+        {"INTEGER", Affinity::INTEGER},
+        {"TINYINT", Affinity::INTEGER},
+        {"SMALLINT", Affinity::INTEGER},
+        {"MEDIUMINT", Affinity::INTEGER},
+        {"BIGINT", Affinity::INTEGER},
+        {"UNSIGNED BIG INT", Affinity::INTEGER},
+        {"INT2", Affinity::INTEGER},
+        {"INT8", Affinity::INTEGER},
+
+        {"CHARACTER(20)", Affinity::TEXT},
+        {"VARCHAR(255)", Affinity::TEXT},
+        {"VARYING CHARACTER(255)", Affinity::TEXT},
+        {"NCHAR(55)", Affinity::TEXT},
+        {"NATIVE CHARACTER(70)", Affinity::TEXT},
+        {"NVARCHAR(100)", Affinity::TEXT},
+        {"TEXT", Affinity::TEXT},
+        {"CLOB", Affinity::TEXT},
+
+        {"BLOB", Affinity::NONE},
+        {"", Affinity::NONE},
+
+        {"REAL", Affinity::REAL},
+        {"DOUBLE", Affinity::REAL},
+        {"DOUBLE PRECISION", Affinity::REAL},
+        {"FLOAT", Affinity::REAL},
+
+        {"NUMERIC", Affinity::NUMERIC},
+        {"DECIMAL(10,5)", Affinity::NUMERIC},
+        {"BOOLEAN", Affinity::NUMERIC},
+        {"DATE", Affinity::NUMERIC},
+        {"DATETIME", Affinity::NUMERIC},
+
+        // Not a recognized type, but `int` matches `point`.
+        {"FLOATING POINT", Affinity::INTEGER},
+        // String doesn't match any of the sqlite types.
+        {"STRING", Affinity::NUMERIC}
+    };
+
+    for (const auto& tc : test_cases) {
+        const auto db = Db::open(":memory:");
+        db->exec("CREATE TABLE `aff_test` (`test_col` " + tc.first + ")");
+        const auto info = db->table_info("aff_test").value();
+        EXPECT_EQ(info.columns[0].name, "test_col");
+        EXPECT_EQ(info.columns[0].type, tc.first);
+        EXPECT_EQ(info.columns[0].type_affinity(), tc.second);
+    }
 }
 
 TEST(sqlite_db, can_do_busy_timeout) {
@@ -280,178 +331,4 @@ TEST(sqlite_stmt, get_values) {
     };
     auto real_map = cursor.value_map();
     EXPECT_EQ(real_map, expected_value_map);
-}
-
-TEST(sqlite_value, tons_of_tests) {
-    auto db  = Db::open_memory();
-    vector<uint8_t> b {1,0,2,3};
-    double d = 1.5;
-    int i = 8;
-    string s = "Steven";
-
-    db->exec("CREATE TABLE abc (`s` TEXT, `b` BLOB, `d` DOUBLE, `i` INTEGER)");
-    auto insert_stmt = db->prepare("INSERT INTO `abc` (s, b, d, i) VALUES (?, ?, ?, ?)");
-    insert_stmt->bind(1, s);
-    insert_stmt->bind(2, b);
-    insert_stmt->bind(3, d);
-    insert_stmt->bind(4, i);
-    insert_stmt->exec();
-
-    auto cursor = db->prepare("SELECT * from `abc`;")->exec_query();
-
-    auto v0 = cursor.value_at(0);
-    auto v1 = cursor.value_at(1);
-    auto v2 = cursor.value_at(2);
-    auto v3 = cursor.value_at(3);
-    auto v_undefined = cursor.value_at(4);
-
-    EXPECT_EQ(v0.type(), Value::Type::STRING);
-    EXPECT_EQ(v1.type(), Value::Type::BLOB);
-    EXPECT_EQ(v2.type(), Value::Type::DOUBLE);
-    EXPECT_EQ(v3.type(), Value::Type::INT);
-    EXPECT_EQ(v_undefined.type(), Value::Type::NUL);
-
-    EXPECT_EQ(v0.string_value(), s);
-    // access twice to make sure we don't move it out
-    EXPECT_THROW(v0.blob_value(),   std::runtime_error);
-    EXPECT_THROW(v0.blob_value(),   std::runtime_error);
-    EXPECT_THROW(v0.double_value(), std::runtime_error);
-    EXPECT_THROW(v0.int_value(),    std::runtime_error);
-    EXPECT_THROW(v0.int64_value(),  std::runtime_error);
-
-    EXPECT_THROW(v1.string_value(), std::runtime_error);
-    // access twice to make sure we don't move it out
-    EXPECT_EQ(v1.blob_value(), b);
-    EXPECT_EQ(v1.blob_value(), b);
-    EXPECT_THROW(v1.double_value(), std::runtime_error);
-    EXPECT_THROW(v1.int_value(),    std::runtime_error);
-    EXPECT_THROW(v1.int64_value(),  std::runtime_error);
-
-    EXPECT_THROW(v2.string_value(), std::runtime_error);
-    EXPECT_THROW(v2.blob_value(),   std::runtime_error);
-    EXPECT_THROW(v2.blob_value(),   std::runtime_error);
-    EXPECT_EQ(v2.double_value(), d);
-    EXPECT_EQ(v2.int_value(), static_cast<int>(d));
-    EXPECT_EQ(v2.int64_value(), static_cast<int64_t>(d));
-
-    EXPECT_THROW(v3.string_value(), std::runtime_error);
-    EXPECT_THROW(v3.blob_value(),   std::runtime_error);
-    EXPECT_EQ(v3.double_value(), i);
-    EXPECT_EQ(v3.int_value(),    i);
-    EXPECT_EQ(v3.int64_value(),  i);
-
-    EXPECT_THROW(v_undefined.blob_value(),   std::runtime_error);
-    EXPECT_THROW(v_undefined.double_value(), std::runtime_error);
-    EXPECT_THROW(v_undefined.int_value(),    std::runtime_error);
-    EXPECT_THROW(v_undefined.int64_value(),  std::runtime_error);
-    EXPECT_THROW(v_undefined.string_value(), std::runtime_error);
-
-    auto v1_copy = v1;
-    EXPECT_EQ(v1_copy.blob_value(),   b);
-    EXPECT_EQ(v1_copy.blob_value(),   b);
-    EXPECT_THROW(v1_copy.double_value(), std::runtime_error);
-    EXPECT_THROW(v1_copy.int_value(),    std::runtime_error);
-    EXPECT_THROW(v1_copy.int64_value(),  std::runtime_error);
-    EXPECT_THROW(v1_copy.string_value(), std::runtime_error);
-
-    EXPECT_EQ(v1_copy, v1);
-
-    auto v0_copy = v0;
-    EXPECT_EQ(v0, v0_copy);
-    EXPECT_EQ(v0, v0);
-
-    string s1 = v0_copy.move_string();
-    string s2 = v0_copy.move_string();
-    EXPECT_FALSE( s1 == s2 );
-    EXPECT_EQ(s2, "");
-
-    s1 = cursor.value_at(0).string_value();
-    EXPECT_EQ(s1, s);
-
-    int64_t ONE = 1;
-    double ONE_FLOAT = 1.0;
-    EXPECT_EQ( Value{ONE}, Value{ONE_FLOAT} );
-    EXPECT_EQ( Value{ONE_FLOAT}, Value{ONE} );
-    EXPECT_FALSE( Value{ONE} == Value{"1"} );
-    EXPECT_FALSE( Value{"1"} == Value{ONE} );
-
-    // can construct a map, set
-    std::map<string, Value> row;
-    std::map<Value, string> row_rev;
-    std::set<Value> things;
-
-    vector<Value> v { .7, static_cast<int64_t>(1), 1.5, static_cast<int64_t>(1000) };
-
-    EXPECT_TRUE( v[0] < v[1] );
-    EXPECT_TRUE( v[1] < v[2] );
-    EXPECT_TRUE( v[2] < v[3] );
-}
-
-TEST(sqlite_value, basic_tests) {
-    using TestType = std::tuple<Value, Value::Type, bool, bool>;
-    using Vt = Value::Type;
-    vector<TestType> tests {
-        {Value {nullptr}, Vt::NUL, true, false},
-        {Value {static_cast<int64_t>(15)}, Vt::INT, false, true},
-        {Value {static_cast<int64_t>(14)}, Vt::INT, false, true},
-        {Value {static_cast<double>(15.5)}, Vt::DOUBLE, false, true},
-        {Value {static_cast<double>(16.5)}, Vt::DOUBLE, false, true},
-        {Value {"Hello"}, Vt::STRING, false, false},
-        {Value {"hello"}, Vt::STRING, false, false},
-        {Value {vector<uint8_t>{3, 0, 1, 2}}, Vt::BLOB, false, false},
-        {Value {vector<uint8_t>{0, 1, 2, 3}}, Vt::BLOB, false, false}
-    };
-
-    for (const auto& test : tests) {
-        const auto& v = std::get<0>(test);
-        EXPECT_EQ( v.type(),       std::get<1>(test) );
-        EXPECT_EQ( v.is_null(),    std::get<2>(test) );
-        EXPECT_EQ( v.is_numeric(), std::get<3>(test) );
-
-        Value v_copy = v;
-        EXPECT_EQ( v_copy.type(),       std::get<1>(test) );
-        EXPECT_EQ( v_copy.is_null(),    std::get<2>(test) );
-        EXPECT_EQ( v_copy.is_numeric(), std::get<3>(test) );
-        EXPECT_TRUE( v == v_copy );
-        EXPECT_TRUE( v_copy == v );
-
-        Value v_move = std::move(v_copy);
-        EXPECT_EQ( v_move.type(),       std::get<1>(test) );
-        EXPECT_EQ( v_move.is_null(),    std::get<2>(test) );
-        EXPECT_EQ( v_move.is_numeric(), std::get<3>(test) );
-        EXPECT_TRUE( v == v_move);
-        EXPECT_TRUE( v_move == v );
-
-        // copy assign
-        v_copy = v_move;
-        EXPECT_EQ( v_copy.type(),       std::get<1>(test) );
-        EXPECT_EQ( v_copy.is_null(),    std::get<2>(test) );
-        EXPECT_EQ( v_copy.is_numeric(), std::get<3>(test) );
-        EXPECT_TRUE( v == v_copy );
-        EXPECT_TRUE( v_copy == v );
-
-        // move assign
-        v_move = Value {44.0};
-        v_move = std::move(v_copy);
-        EXPECT_EQ( v_move.type(),       std::get<1>(test) );
-        EXPECT_EQ( v_move.is_null(),    std::get<2>(test) );
-        EXPECT_EQ( v_move.is_numeric(), std::get<3>(test) );
-        EXPECT_TRUE( v == v_move);
-        EXPECT_TRUE( v_move == v );
-
-        for (const auto& t2 : tests) {
-            if (&t2 == &test) {
-                EXPECT_TRUE( v == std::get<0>(t2) );
-                EXPECT_TRUE( std::get<0>(t2) == v );
-            } else {
-                Value t_copy = std::get<0>(t2);
-                t_copy = v;
-                EXPECT_TRUE( t_copy == v );
-                Value t_copy_2 = std::move(t_copy);
-                EXPECT_TRUE( t_copy_2 == v );
-                EXPECT_FALSE( v == std::get<0>(t2) );
-                EXPECT_FALSE( std::get<0>(t2) == v );
-            }
-        }
-    }
 }

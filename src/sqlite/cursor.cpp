@@ -99,7 +99,7 @@ Cursor::borrow_db() const {
 string
 Cursor::column_name(int pos) const {
     const char * name = sqlite3_column_name(m_raw_stmt.get(), pos);
-    return string {name};
+    return {name};
 }
 
 vector<string>
@@ -141,7 +141,7 @@ Cursor::is_null(int pos) const {
 
 string
 Cursor::string_value(int pos) const {
-    return this->value_at(pos).string_value();
+    return this->value_at(pos).move_string();
 }
 
 int32_t
@@ -161,6 +161,5 @@ Cursor::double_value(int pos) const {
 
 vector<uint8_t>
 Cursor::blob_value(int pos) const {
-    return this->value_at(pos).blob_value();
+    return this->value_at(pos).move_blob();
 }
-

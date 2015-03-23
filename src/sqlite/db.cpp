@@ -10,6 +10,46 @@ namespace {
             sqlite3_free(sql);
         }
     };
+
+    inline char ascii_upper(const char c) {
+        return c < 'a' ? c : c > 'z' ? c : (c - 'a' + 'A');
+    }
+
+    inline bool nocase_eq(const char a, const char b) {
+        return ascii_upper(a) == ascii_upper(b);
+    }
+
+    bool matches_nocase(const string& haystack, const string& needle) {
+        return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), nocase_eq) != haystack.end();
+    }
+}
+
+// see https://www.sqlite.org/datatype3.html
+Affinity ColumnInfo::type_affinity() const {
+    static const string INT {"INT"};
+    static const string CHAR {"CHAR"};
+    static const string CLOB {"CLOB"};
+    static const string TEXT {"TEXT"};
+    static const string BLOB {"BLOB"};
+    static const string REAL {"REAL"};
+    static const string FLO {"FLO"};
+    static const string DOUB {"DOUB"};
+
+    if (matches_nocase(type, INT)) {
+        return Affinity::INTEGER;
+    } else if (matches_nocase(type, CHAR) ||
+               matches_nocase(type, CLOB) ||
+               matches_nocase(type, TEXT)) {
+        return Affinity::TEXT;
+    } else if (matches_nocase(type, BLOB) || type.empty()) {
+        return Affinity::NONE;
+    } else if (matches_nocase(type, REAL) ||
+               matches_nocase(type, FLO) ||
+               matches_nocase(type, DOUB)) {
+        return Affinity::REAL;
+    } else {
+        return Affinity::NUMERIC;
+    }
 }
 
 string

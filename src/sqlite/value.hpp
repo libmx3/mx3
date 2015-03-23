@@ -22,6 +22,7 @@ class Value final {
     bool operator==(const Value& other) const;
 
     enum class Type {
+        // Do not change the orders of these here, since they dictate ordering.
         NUL,
         INT,
         DOUBLE,
@@ -57,6 +58,7 @@ using Row = vector<Value>;
 bool operator<(const Value& l, const Value& r);
 std::ostream& operator <<(std::ostream& os, const mx3::sqlite::Value& v);
 std::ostream& operator <<(std::ostream& os, const vector<mx3::sqlite::Value>& v);
+std::ostream& operator <<(std::ostream& os, Value::Type t);
 
 } } // end mx3::sqlite
 

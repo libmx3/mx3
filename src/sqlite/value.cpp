@@ -211,7 +211,7 @@ mx3::sqlite::operator <<(std::ostream& os, const Value& v) {
         case Value::Type::DOUBLE:
             return os << v.double_value();
         case Value::Type::STRING:
-            return os << v.string_value();
+            return os << "`" + v.string_value() + "`";
         case Value::Type::BLOB:
             return os << "<BLOB " << v.blob_value().size() << " bytes>";
         case Value::Type::NUL:
@@ -232,4 +232,22 @@ mx3::sqlite::operator <<(std::ostream& os, const vector<Value>& values) {
         }
     }
     return os << ")";
+}
+
+std::ostream&
+mx3::sqlite::operator <<(std::ostream& os, Value::Type t) {
+    switch (t) {
+        case Value::Type::NUL:
+            return os << "NUL";
+        case Value::Type::STRING:
+            return os << "STRING";
+        case Value::Type::BLOB:
+            return os << "BLOB";
+        case Value::Type::INT:
+            return os << "INT";
+        case Value::Type::DOUBLE:
+            return os << "DOUBLE";
+        default:
+            return os << "???";
+    }
 }

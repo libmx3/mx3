@@ -37,10 +37,19 @@ enum class Checkpoint {
     RESTART
 };
 
+enum class Affinity {
+    TEXT,
+    NUMERIC,
+    INTEGER,
+    REAL,
+    NONE
+};
+
 struct ColumnInfo final {
     int64_t cid;
     string name;
     string type;
+    Affinity type_affinity() const;
     bool notnull;
     optional<string> dflt_value;
     int32_t pk;
