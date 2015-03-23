@@ -390,7 +390,7 @@ Db::user_version() {
 void
 Db::set_user_version(int32_t user_ver) {
     this->exec(
-        mprintf("PRAGMA user_version=%d;", user_ver)
+        mprintf("PRAGMA user_version=%lld;", user_ver)
     );
 }
 
