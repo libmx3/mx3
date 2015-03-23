@@ -12,6 +12,7 @@ string mprintf(const char * format, int64_t data);
 string libversion();
 string sourceid();
 int libversion_number();
+string escape_column(const string& column);
 
 enum class ChangeType {
     INSERT,

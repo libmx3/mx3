@@ -80,6 +80,21 @@ int libversion_number() {
     return sqlite3_libversion_number();
 }
 
+string escape_column(const string& column) {
+    string result;
+    result.reserve(column.size() + 3);
+    result += '"';
+    for (const char c : column) {
+        if (c == '"') {
+            result += "\"\"";
+        } else {
+            result += c;
+        }
+    }
+    result += '"';
+    return result;
+}
+
 struct Db::only_for_internal_make_shared_t {};
 
 shared_ptr<Db>
@@ -120,7 +135,7 @@ Db::open(const string& db_path, const std::set<OpenFlag>& flags, const optional<
     sqlite3 * db = nullptr;
     const char * vfs_p = vfs_name ? vfs_name->c_str() : nullptr;
     const auto error_code = sqlite3_open_v2(db_path.c_str(), &db, sqlite_flags, vfs_p);
-    auto temp_db = unique_ptr<sqlite3, Db::Closer> {db};
+    unique_ptr<sqlite3, Db::Closer> temp_db {db};
 
     if (error_code != SQLITE_OK) {
         throw std::runtime_error { sqlite3_errstr(error_code) };

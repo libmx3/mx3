@@ -35,7 +35,7 @@ TransactionGuard::~TransactionGuard() {
 }
 
 void TransactionGuard::commit() {
-    auto prev_state = State::COMMIT;
+    State prev_state = State::COMMIT;
     std::swap(m_state, prev_state);
     if (prev_state != State::NONE) {
         throw std::runtime_error {"TransactionGuard usage error: only call commit/rollback once"};
@@ -44,7 +44,7 @@ void TransactionGuard::commit() {
 }
 
 void TransactionGuard::rollback() {
-    auto prev_state = State::ROLLBACK;
+    State prev_state = State::ROLLBACK;
     std::swap(m_state, prev_state);
     if (prev_state != State::NONE) {
         throw std::runtime_error {"TransactionGuard usage error: only call commit/rollback once"};
