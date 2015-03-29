@@ -14,11 +14,11 @@ class Value final {
     Value(const char * x);
     Value(string x);
     Value(vector<uint8_t> x);
-    Value(Value&& other);
+    Value(Value&& other) noexcept;
     Value(const Value& other);
     ~Value();
     Value& operator=(const Value& other);
-    Value& operator=(Value&& other);
+    Value& operator=(Value&& other) noexcept;
     bool operator==(const Value& other) const;
 
     enum class Type {

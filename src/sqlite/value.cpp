@@ -39,7 +39,7 @@ Value::Value(const Value& other) : m_type {other.m_type} {
 }
 
 Value&
-Value::operator=(Value&& other) {
+Value::operator=(Value&& other) noexcept {
     this->~Value();
     m_type = other.m_type;
     switch (m_type) {
@@ -62,7 +62,7 @@ Value::operator=(Value&& other) {
 }
 
 // set m_type to null, so that when the dtor runs, it does nothing
-Value::Value(Value&& other) : m_type {Type::NUL} {
+Value::Value(Value&& other) noexcept : m_type {Type::NUL} {
     *this = std::move(other);
 }
 
