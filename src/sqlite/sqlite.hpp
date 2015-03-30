@@ -4,3 +4,4 @@
 #include "stmt.hpp"
 #include "transaction.hpp"
 #include "value.hpp"
+#include "backup.hpp"
