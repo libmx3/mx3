@@ -3,8 +3,11 @@
 #include "stl.hpp"
 #include "src/sqlite/db.hpp"
 #include "src/sqlite_query/observable_db.hpp"
+#include "src/sqlite_query/query_diff.hpp"
 #include <cstdio>
 #include <iostream>
+#include <algorithm>
+#include <random>
 using std::cout;
 using std::endl;
 
@@ -34,6 +37,38 @@ static void s_print_row(const optional<mx3::sqlite::Row>& row) {
 
 static vector<Value> trivial_row(const int x) {
     return vector<Value> {{x}};
+}
+
+TEST(sqlite_query_diff, incremental_consistent_order) {
+
+    const vector<ListChange> expected_changes {
+        // deletes
+        {3, -1},
+        {2, -1},
+        {1, -1},
+        {0, -1},
+        // inserts
+        {-1, 0},
+        {-1, 1},
+        {-1, 2},
+        {-1, 3},
+        {-1, 4},
+        {-1, 5},
+        // updates
+        {0, 1},
+        {1, 2},
+        {2, 3},
+        {3, 4},
+    };
+    vector<ListChange> input_changes = expected_changes;
+
+    std::random_device rd;
+    std::mt19937 shuffler {rd()};
+    for (size_t i = 0; i < 1000; i++) {
+        std::shuffle(input_changes.begin(), input_changes.end(), shuffler);
+        std::sort(input_changes.begin(), input_changes.end(), incremental_consistent_order);
+        EXPECT_EQ(input_changes, expected_changes);
+    }
 }
 
 TEST(sqlite_db, full_test) {

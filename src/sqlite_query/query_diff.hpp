@@ -15,10 +15,20 @@ struct ListChange final {
     // The index in the new data set or -1 if it is a delete.
     // This index refers to the index in the new data set.
     int32_t to_index;
+    friend bool operator==(const ListChange& a, const ListChange& b);
 };
 
-/* Calculate the diffs between 2 data sets.  The changes will be returned in such an order that
- * they could be applied incrementally.  Deletes (x, -1), inserts (-1, x), then updates (x, y).
+// A comparator for ListChanges which order them 'naturally'.
+// The changes will be returned in such an order that they could be applied incrementally.
+//
+// * deletes highest -> lowest
+// * inserts lowest -> highest
+// * updates lowest -> highest
+// * Deletes (x, -1), inserts (-1, y), then updates (x, y).
+bool incremental_consistent_order(const ListChange& a, const ListChange& b);
+
+/* Calculate the diffs between 2 data sets.
+ * The changes will be ordered in `consistent_order`.  See above.
  *
  * old_list - the previous (stale) data.  Must be sorted by the `less_than` parameter
  * new_list - the new data.  Must also be sorted by the `less_than` parameter
