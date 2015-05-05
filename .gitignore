@@ -42,6 +42,12 @@ DerivedData
 # AppCode
 .idea/
 
+# QtCreator
+*.config
+*.creator
+*.files
+*.includes
+
 # djinni
 src/interface/
 objc/gen/
