@@ -10,3 +10,6 @@
 [submodule "deps/xcode-googletest"]
 	path = deps/xcode-googletest
 	url = https://github.com/mattstevens/xcode-googletest.git
+[submodule "deps/gyp"]
+	path = deps/gyp
+	url = https://chromium.googlesource.com/external/gyp.git
