@@ -31,13 +31,13 @@ djinni:
 # instruct gyp to build using the "xcode" build generator, also specify the OS
 # (so we can conditionally compile using that var later)
 build_mac/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp djinni
-	deps/gyp/gyp mx3.gyp -DOS=mac --depth=. -f xcode --generator-output=./build_mac -Icommon.gypi
+        PYTHONPATH=deps/gyp/pylib deps/gyp/gyp mx3.gyp -DOS=mac --depth=. -f xcode --generator-output=./build_mac -Icommon.gypi
 
 build_ios/mx3.xcodeproj: deps/gyp deps/json11 mx3.gyp djinni
-	deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
+        PYTHONPATH=deps/gyp/pylib deps/gyp/gyp mx3.gyp -DOS=ios --depth=. -f xcode --generator-output=./build_ios -Icommon.gypi
 
 GypAndroid.mk: deps/gyp deps/json11 mx3.gyp djinni
-	ANDROID_BUILD_TOP=dirname $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3_android -Icommon.gypi mx3.gyp
+        ANDROID_BUILD_TOP=dirname PYTHONPATH=deps/gyp/pylib $(which ndk-build) deps/gyp/gyp --depth=. -f android -DOS=android --root-target libmx3_android -Icommon.gypi mx3.gyp
 
 xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -c" || echo "cat")
 
