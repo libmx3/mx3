@@ -8,6 +8,7 @@ build_win/
 .gradle
 
 # gyp + android
+deps/gyp
 GypAndroid.mk
 *.target.mk
 obj/

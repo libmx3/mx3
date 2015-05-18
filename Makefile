@@ -17,7 +17,7 @@ clean:
 gyp: ./deps/gyp
 
 ./deps/gyp:
-	git clone https://chromium.googlesource.com/external/gyp.git ./deps/gyp
+	git clone --depth 1 https://chromium.googlesource.com/external/gyp.git ./deps/gyp
 
 ./deps/djinni:
 	git submodule update --init
