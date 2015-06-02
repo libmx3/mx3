@@ -44,7 +44,7 @@ xb-prettifier := $(shell command -v xcpretty >/dev/null 2>&1 && echo "xcpretty -
 
 # a simple place to test stuff out
 play: build_mac/mx3.xcodeproj objc/play.m
-	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc | ${xb-prettifier} && ./build/Debug/play_objc
+	xcodebuild -project build_mac/mx3.xcodeproj -configuration Debug -target play_objc && ./build/Debug/play_objc
 
 mac: build_mac/mx3.xcodeproj
 	xcodebuild -project build_mac/mx3.xcodeproj -configuration Release -target libmx3_objc | ${xb-prettifier}
