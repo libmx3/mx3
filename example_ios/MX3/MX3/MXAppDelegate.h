@@ -4,6 +4,6 @@
 @interface MXAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) id <MX3Api> api;
+@property (strong, nonatomic) MX3Api *api;
 
 @end

@@ -1,9 +1,10 @@
 #include <Foundation/Foundation.h>
 #include "MX3HttpObjc.h"
+#include "gen/MX3HttpCallback.h"
 
 @implementation MX3HttpObjc
 
-- (void) get:(NSString *)urlString callback:(id <MX3HttpCallback>)callback {
+- (void) get:(NSString *)urlString callback:(MX3HttpCallback *)callback {
     NSURL *URL            = [NSURL URLWithString:urlString];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
 

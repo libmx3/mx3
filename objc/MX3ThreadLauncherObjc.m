@@ -4,7 +4,7 @@
 
 @implementation MX3ThreadLauncherObjc
 
-- (void)startThread:(NSString *)name runFn:(id <MX3AsyncTask>)runFn {
+- (void)startThread:(NSString *)name runFn:(MX3AsyncTask *)runFn {
     NSThread *thread = [[NSThread alloc] initWithTarget:runFn selector:@selector(execute) object:nil];
     if (name) {
         [thread setName:name];

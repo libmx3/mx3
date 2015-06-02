@@ -4,7 +4,6 @@
 
 #import "MX3EventLoopObjc.h"
 #import "gen/MX3Api.h"
-#import "gen/MX3ApiCppProxy.h"
 
 
 int main() {
@@ -14,7 +13,7 @@ int main() {
     NSString *filePath = @"../mx3";
     BOOL fileExists =[[NSFileManager defaultManager] fileExistsAtPath:filePath];
     if (fileExists) {
-        id <MX3Api> api = [MX3ApiCppProxy createApi:filePath uiThread: uiThread httpImpl:httpImpl launcher:launcher];
+        MX3Api *api = [MX3Api createApi:filePath uiThread: uiThread httpImpl:httpImpl launcher:launcher];
         if (![api hasUser]) {
             [api setUsername: NSUserName()];
         }

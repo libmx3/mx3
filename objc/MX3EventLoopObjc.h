@@ -3,6 +3,6 @@
 
 @interface MX3EventLoopObjc : NSObject <MX3EventLoop>
 
-- (void)post:(id <MX3AsyncTask>)task;
+- (void)post:(MX3AsyncTask *)task;
 
 @end

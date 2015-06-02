@@ -3,6 +3,6 @@
 
 @interface MX3HttpObjc : NSObject <MX3Http>
 
-- (void)get:(NSString *)url callback:(id <MX3HttpCallback>)callback;
+- (void)get:(NSString *)url callback:(MX3HttpCallback *)callback;
 
 @end

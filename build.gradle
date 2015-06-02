@@ -56,6 +56,7 @@ task djinniGen(type: CrossPlatformExec, dependsOn: djinniBuild) {
         "--cpp-optional-template", "std::experimental::optional",
 
         "--objc-out", tmp_objc_out,
+        "--objcpp-out", tmp_objc_out,
         "--objcpp-namespace", "djinni_generated",
         "--objc-type-prefix", "MX3",
 
