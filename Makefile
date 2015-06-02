@@ -7,6 +7,7 @@ clean:
 	-rm -rf build_ios/
 	-rm -rf obj/
 	-rm -rf libs/
+	-rm -rf djinni-output-temp/
 	-rm GypAndroid.mk
 	-rm *.target.mk
 	-rm deps/*.target.mk

@@ -101,6 +101,7 @@ task clean(type: Delete) {
     delete (
         "build/",
         "deps/build/",
+        "djinni-output-temp/",
         "build_mac/",
         "build_ios/",
         "obj/",
