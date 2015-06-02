@@ -1,20 +1,22 @@
 #import "MXSampleDataTableViewController.h"
 #import "gen/MX3UserListVmCell.h"
 #import "gen/MX3ListChange.h"
+#import "gen/MX3UserListVm.h"
+#import "gen/MX3UserListVmHandle.h"
 
 NSString *const CellIdentifier = @"MX3Cell";
 
 @interface MXSampleDataTableViewController ()
 
-@property (nonatomic) id <MX3Api> api;
-@property (nonatomic) id <MX3UserListVmHandle> handle;
-@property (nonatomic) id <MX3UserListVm> viewModel;
+@property (nonatomic) MX3Api *api;
+@property (nonatomic) MX3UserListVmHandle *handle;
+@property (nonatomic) MX3UserListVm *viewModel;
 
 @end
 
 @implementation MXSampleDataTableViewController
 
-- (instancetype) initWithApi:(id<MX3Api>)api {
+- (instancetype) initWithApi:(MX3Api *)api {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
         self.api = api;
@@ -39,7 +41,7 @@ NSString *const CellIdentifier = @"MX3Cell";
     [self.handle stop];
 }
 
-- (void)onUpdate:(NSMutableArray *)changes newData:(id <MX3UserListVm>)newData {
+- (void)onUpdate:(NSMutableArray *)changes newData:(MX3UserListVm *)newData {
     if (changes) {
         [self.tableView beginUpdates];
         for (MX3ListChange *change in changes) {
