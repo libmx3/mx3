@@ -16,6 +16,8 @@ obj/
 test_ldb
 test.sqlite
 example.sqlite
+example.sqlite-shm
+example.sqlite-wal
 kv.sqlite
 
 # misc
