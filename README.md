@@ -6,6 +6,29 @@ for comments and improvements.
 ### The name
 "mobile times 3", Android, iOS, and Windows Phone. (todo, windows phone support)
 
+### Learning
+* [Mobile C++ Slack instance](https://mobilecpp.herokuapp.com/)!
+* [UIKonf 2014](http://oleb.net/blog/2014/05/how-dropbox-uses-cplusplus-cross-platform-development/)
+* CppCon 2014 - [A Deep Dive Into Two Cross-Platform Mobile Apps Written in C++](https://www.youtube.com/watch?v=5AZMEm3rZ2Y)
+* CppCon 2014 - [Practical Cross-Platform Mobile C++ Development](https://www.youtube.com/watch?v=ZcBtF-JWJhM)
+* CppCon 2014 - [Microsoft w/ C++ to Deliver Office Across Different Platforms, Part II](https://www.youtube.com/watch?v=MGMoRu5yrVc)
+* [Google Inbox](http://gmailblog.blogspot.com/2014/11/going-under-hood-of-inbox.html)
+* [JVM at Google](http://medianetwork.oracle.com/video/player/3731062156001)
+* Know of a good resource? put up a PR to add it!
+
+### Tools of the Trade
+* [djinni](https://github.com/dropbox/djinni) (pronounced genie) a tool which generates interface bindings from Java -> C++ and ObjC -> C++
+* [gyp](https://chromium.googlesource.com/external/gyp/) a meta-build system used to generate native project files across platforms
+* [cmake](http://www.cmake.org/) (not used in this project) an alternative to gyp
+* [gradle](https://gradle.org/) build automation
+* [json11](https://github.com/dropbox/json11) a minimalist C++11 library for json serialization
+* [optional](https://github.com/akrzemi1/Optional) a reference implementation of [std::experimental::optional](http://en.cppreference.com/w/cpp/experimental/optional)
+* [juce](http://www.juce.com/) cross platform C++ toolkit (not used here)
+* [js2objc](https://github.com/google/j2objc) (not used in this project)
+* [xamarin](http://xamarin.com/) (not used in the project)
+* [Visual Studio's cross platform mobile support](https://www.visualstudio.com/en-us/features/cplusplus-mdd-vs.aspx) and a [related video](http://channel9.msdn.com/Events/Visual-Studio/Connect-event-2014/311)
+* Know of a tool? put up a PR to add it!
+
 ### Contributing
 There are many ways to contribute to mx3:
 
