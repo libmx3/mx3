@@ -10,9 +10,9 @@ using std::endl;
 using namespace mx3::sqlite;
 
 TEST(sqlite_lib, can_query_version_info) {
-    EXPECT_EQ(libversion(), "3.8.10.2");
-    EXPECT_EQ(sourceid(), "2015-05-20 18:17:19 2ef4f3a5b1d1d0c4338f8243d40a2452cc1f7fe4");
-    EXPECT_EQ(libversion_number(), 3008010);
+    EXPECT_EQ(libversion(), "3.8.11.1");
+    EXPECT_EQ(sourceid(), "2015-07-29 20:00:57 cf538e2783e468bbc25e7cb2a9ee64d3e0e80b2f");
+    EXPECT_EQ(libversion_number(), 3008011);
 }
 
 TEST(sqlite_db, can_open_close) {
