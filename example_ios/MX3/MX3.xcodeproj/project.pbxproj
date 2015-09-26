@@ -76,6 +76,20 @@
 			remoteGlobalIDString = 05EB53E0AEA2C8B114F5F0A6;
 			remoteInfo = libmx3;
 		};
+		B0DF97021BB74EB500F3950F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6BAC259353E52B3A6A573C6F;
+			remoteInfo = xctest_runner;
+		};
+		B0DF970B1BB74EB500F3950F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B024F79F1AAD5BFA008B8BB9 /* mx3.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6BAC259353E52B3A6A573C6F;
+			remoteInfo = xctest_runner;
+		};
 		B0F70B2E1A222B2200E36720 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F0C771AE192A79CC006469AB /* mx3.xcodeproj */;
@@ -188,6 +202,7 @@
 				B024F7B41AAD5BFA008B8BB9 /* libmx3_android.dylib */,
 				B024F7B61AAD5BFA008B8BB9 /* play_objc */,
 				B024F7B81AAD5BFA008B8BB9 /* test */,
+				B0DF970C1BB74EB500F3950F /* xctest_runner.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -281,6 +296,7 @@
 				B024F7A81AAD5BFA008B8BB9 /* libmx3_android.dylib */,
 				F0C771C0192A79CC006469AB /* play_objc */,
 				F0C771C4192A79CC006469AB /* test */,
+				B0DF97031BB74EB500F3950F /* xctest_runner.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -408,6 +424,20 @@
 			fileType = "compiled.mach-o.executable";
 			path = test;
 			remoteRef = B024F7B71AAD5BFA008B8BB9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B0DF97031BB74EB500F3950F /* xctest_runner.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = xctest_runner.xctest;
+			remoteRef = B0DF97021BB74EB500F3950F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B0DF970C1BB74EB500F3950F /* xctest_runner.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = xctest_runner.xctest;
+			remoteRef = B0DF970B1BB74EB500F3950F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		F0C771BC192A79CC006469AB /* libmx3.a */ = {
@@ -582,6 +612,7 @@
 					../../objc/,
 				);
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
@@ -606,6 +637,7 @@
 					../../objc/,
 				);
 				INFOPLIST_FILE = "MX3/MX3-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
