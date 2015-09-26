@@ -39,6 +39,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+xcshareddata
 
 # AppCode
 .idea/

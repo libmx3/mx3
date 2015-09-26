@@ -5,12 +5,10 @@
 @implementation MX3HttpObjc
 
 - (void) get:(NSString *)urlString callback:(MX3HttpCallback *)callback {
-    NSURL *URL            = [NSURL URLWithString:urlString];
+    NSURL *URL = [NSURL URLWithString:urlString];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
-
-    [NSURLConnection sendAsynchronousRequest:request
-                                       queue:[NSOperationQueue mainQueue]
-                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error) {
             [callback onNetworkError];
         } else {
@@ -18,7 +16,7 @@
             NSString * strData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [callback onSuccess:httpCode data: strData];
         }
-    }];
+    }] resume];
 }
 
 @end
