@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,11 +38,17 @@ public class GithubUsers extends Activity {
         mUserListHandle = mApi.observerUserList();
         mUserListHandle.start(new UserListVmObserver() {
             @Override
-            public void onUpdate(ArrayList<ListChange> changes, UserListVm newData) {
+            public void onUpdate(ArrayList<ListChange> changes, final UserListVm newData) {
                 mAdapter = new GithubUserAdapter(GithubUsers.this, newData);
                 Log.d("USERS", "count: " + mAdapter.getCount());
                 mListView.setAdapter(mAdapter);
                 mListView.deferNotifyDataSetChanged();
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        newData.deleteRow(position);
+                    }
+                });
             }
         });
 
