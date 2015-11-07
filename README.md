@@ -38,7 +38,7 @@ There are many ways to contribute to mx3:
 1. new target platforms
 1. educating us about your use case for cross platform mobile
 
-There are a few things laid out in TODO, if you want to contribute but don't know how.  If you are building a _large_
+There are a few things laid out in [TODO](TODO.md), if you want to contribute but don't know how.  If you are building a _large_
 feature, please file an issue first to ensure that it aligns with the goals of mx3 - if it does, please submit
 a Pull Request **during development** to solicit feedback and enable incremental code review throughout the process.
 
