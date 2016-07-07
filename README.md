@@ -22,6 +22,9 @@ for comments and improvements.
 * [cmake](http://www.cmake.org/) (not used in this project) an alternative to gyp
 * [gradle](https://gradle.org/) build automation
 * [json11](https://github.com/dropbox/json11) a minimalist C++11 library for json serialization
+* [rapidjson](https://github.com/miloyip/rapidjson) a fast JSON parser/generator for C++ with both SAX/DOM style API.
+* [sqliteCpp](https://github.com/SRombauts/SQLiteCpp) a smart and easy to use C++ SQLite3 wrapper.
+* [JavaCpp](https://github.com/bytedeco/javacpp) the missing bridge between Java and native C++, it can save you from manually writing JNI cpp codes.
 * [optional](https://github.com/akrzemi1/Optional) a reference implementation of [std::experimental::optional](http://en.cppreference.com/w/cpp/experimental/optional)
 * [juce](http://www.juce.com/) cross platform C++ toolkit (not used here)
 * [js2objc](https://github.com/google/j2objc) (not used in this project)
