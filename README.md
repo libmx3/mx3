@@ -22,10 +22,10 @@ for comments and improvements.
 * [cmake](http://www.cmake.org/) (not used in this project) an alternative to gyp
 * [gradle](https://gradle.org/) build automation
 * [json11](https://github.com/dropbox/json11) a minimalist C++11 library for json serialization
-* [rapidjson](https://github.com/miloyip/rapidjson) a fast JSON parser/generator for C++ with both SAX/DOM style API.
-* [sqliteCpp](https://github.com/SRombauts/SQLiteCpp) a smart and easy to use C++ SQLite3 wrapper.
-* [JavaCpp](https://github.com/bytedeco/javacpp) the missing bridge between Java and native C++, it can save you from manually writing JNI cpp codes.
-* [libcurl](https://curl.haxx.se) base of http client for iOS and Android. We need wrapper it for iOS and Android and [`HttpClient`](https://msdn.microsoft.com/library/windows/apps/windows.web.http.httpclient.aspx) for Windows Phone then we will get a non-platform-specific http client. 
+* [rapidjson](https://github.com/miloyip/rapidjson) a fast JSON parser/generator for C++ with both SAX/DOM style API.(not used in this project)
+* [sqliteCpp](https://github.com/SRombauts/SQLiteCpp) a smart and easy to use C++ SQLite3 wrapper.(not used in this project)
+* [JavaCpp](https://github.com/bytedeco/javacpp) the missing bridge between Java and native C++, it can save you from manually writing JNI cpp codes.(not used in this project)
+* [libcurl](https://curl.haxx.se) base of http client for iOS and Android. We need wrapper it for iOS and Android and [`HttpClient`](https://msdn.microsoft.com/library/windows/apps/windows.web.http.httpclient.aspx) for Windows Phone then we will get a non-platform-specific http client.(not used in this project)
 * [optional](https://github.com/akrzemi1/Optional) a reference implementation of [std::experimental::optional](http://en.cppreference.com/w/cpp/experimental/optional)
 * [juce](http://www.juce.com/) cross platform C++ toolkit (not used here)
 * [js2objc](https://github.com/google/j2objc) (not used in this project)
