@@ -24,7 +24,7 @@ for comments and improvements.
 * [json11](https://github.com/dropbox/json11) a minimalist C++11 library for json serialization
 * [optional](https://github.com/akrzemi1/Optional) a reference implementation of [std::experimental::optional](http://en.cppreference.com/w/cpp/experimental/optional)
 * [juce](http://www.juce.com/) cross platform C++ toolkit (not used here)
-* [js2objc](https://github.com/google/j2objc) (not used in this project)
+* [j2objc](https://github.com/google/j2objc) (not used in this project)
 * [xamarin](http://xamarin.com/) (not used in the project)
 * [Visual Studio's cross platform mobile support](https://www.visualstudio.com/en-us/features/cplusplus-mdd-vs.aspx) and a [related video](http://channel9.msdn.com/Events/Visual-Studio/Connect-event-2014/311)
 * Know of a tool? put up a PR to add it!
