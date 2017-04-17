@@ -618,7 +618,6 @@
 					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -643,7 +642,6 @@
 					"/Users/steven/projects/mx3/deps/djinni/support-lib/build/Debug-iphoneos",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				VALID_ARCHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
