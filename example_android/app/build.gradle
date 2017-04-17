@@ -5,17 +5,23 @@ plugins {
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 15
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.mx3"
         minSdkVersion 15
-        targetSdkVersion 15
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         ndk {
             moduleName "mx3_android"
+        }
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11 -frtti -fexceptions"
+            }
         }
     }
     buildTypes {
@@ -35,11 +41,19 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
 }
 
 task ndkBuild(type: CrossPlatformExec) {
     String MainDirectory = System.getProperty("user.dir") + '/app/'
-    File ndkDir = project.getPlugins().getPlugin('android').ndkFolder
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    def ndkDir = properties.getProperty('ndk.dir')
     if (ndkDir == null) {
         ndkDir = file(System.env.ANDROID_NDK)
     }
